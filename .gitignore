@@ -1,0 +1,68 @@
+# Dependências
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build / distribuição
+dist/
+build/
+out/
+
+# Cache
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+.vite/
+
+# Cobertura de testes
+coverage/
+
+# Variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# Chaves e credenciais
+firebase-key.json
+Imagens/Git-2.54.0-64-bit.exe
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/*
+
+# JetBrains
+.idea/
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Arquivos compactados
+*.zip
+*.rar
+
+# Dependências opcionais
+jspm_packages/
+
+# TypeScript
+*.tsbuildinfo
+
+# Firebase
+.firebase/
+
+# Netlify
+.netlify/
+
+# Arquivos locais
+*.local

@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Sushi Bar</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#000;
+  color:white;
+  display:flex;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* ========================= */
+/* SIDEBAR DESKTOP */
+/* ========================= */
+
+.sidebar{
+
+  width:270px;
+
+  background:#6b0505;
+
+  padding:30px 20px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  justify-content:space-between;
+
+  position:sticky;
+
+  top:0;
+
+  height:100vh;
+
+  overflow-y:auto;
+}
+
+.logo{
+  font-size:42px;
+  font-weight:bold;
+  margin-bottom:40px;
+}
+
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.menu-item{
+
+  background:transparent;
+
+  border:none;
+
+  color:white;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+  font-size:18px;
+
+  padding:14px;
+
+  border-radius:14px;
+
+  cursor:pointer;
+
+  transition:0.2s;
+}
+
+.menu-item:hover{
+  background:rgba(255,255,255,0.1);
+}
+
+.sidebar-total{
+
+  margin-top:30px;
+
+  background:rgba(255,255,255,0.1);
+
+  padding:20px;
+
+  border-radius:20px;
+}
+
+.sidebar-total h2{
+  font-size:36px;
+  margin-top:10px;
+}
+
+.sidebar-total button{
+
+  margin-top:20px;
+
+  width:100%;
+
+  padding:14px;
+
+  border:none;
+
+  border-radius:14px;
+
+  background:white;
+
+  color:black;
+
+  font-weight:bold;
+
+  cursor:pointer;
+}
+
+/* ========================= */
+/* MAIN */
+/* ========================= */
+
+.main{
+
+  flex:1;
+
+  overflow-y:auto;
+
+  height:100vh;
+
+  padding:30px;
+}
+
+.mobile-topbar{
+  display:none;
+}
+
+.mobile-menu{
+  display:none;
+}
+
+@media(max-width:900px){
+
+
+    .mobile-topbar{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    position:fixed;
+
+    bottom:0;
+
+    left:0;
+
+    width:100%;
+
+    background:#6b0505;
+
+    padding:12px 10px;
+
+    z-index:9999;
+
+    border-top:1px solid rgba(255,255,255,0.1);
+    }
+
+    .mobile-menu{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:space-around;
+
+    align-items:center;
+
+    gap:10px;
+    }
+
+    .mobile-menu button{
+
+    flex:1;
+
+    background:transparent;
+
+    color:white;
+
+    border:none;
+
+    padding:14px 8px;
+
+    border-radius:12px;
+
+    font-size:14px;
+
+    cursor:pointer;
+
+    transition:0.2s;
+    }
+
+    .mobile-menu button:hover{
+
+    background:rgba(255,255,255,0.1);
+    }
+
+  .main{
+
+    padding-bottom:110px;
+  }
+}
+
+/* ========================= */
+/* RECOMMENDATIONS */
+/* ========================= */
+
+.recommendations{
+
+  background:#7c0d0d;
+
+  padding:25px;
+
+  border-radius:25px;
+
+  margin-bottom:25px;
+}
+
+.recommendations h2{
+  font-size:36px;
+  margin-bottom:20px;
+}
+
+.recommendation-list{
+
+  display:flex;
+
+  gap:20px;
+
+  overflow-x:auto;
+
+  overflow-y:hidden;
+
+  padding-bottom:10px;
+
+  scroll-behavior:smooth;
+}
+
+/* SCROLLBAR */
+
+.recommendation-list::-webkit-scrollbar{
+  height:8px;
+}
+
+.recommendation-list::-webkit-scrollbar-thumb{
+
+  background:rgba(255,255,255,0.3);
+
+  border-radius:20px;
+}
+
+/* CARDS FIXOS */
+
+.recommendation-card{
+
+  min-width:320px;
+
+  flex-shrink:0;
+
+  background:white;
+
+  color:black;
+
+  border-radius:18px;
+
+  padding:15px;
+
+  display:flex;
+
+  gap:15px;
+
+  align-items:center;
+}
+
+.recommendation-card img{
+
+  width:70px;
+
+  height:70px;
+
+  object-fit:cover;
+
+  border-radius:14px;
+}
+
+/* ========================= */
+/* MENU CONTAINER */
+/* ========================= */
+
+.menu-container{
+
+  background:#f6f6f6;
+
+  color:black;
+
+  border-radius:25px;
+
+  padding:30px;
+}
+
+/* ========================= */
+/* CATEGORIES */
+/* ========================= */
+
+.categories{
+
+  display:flex;
+
+  gap:15px;
+
+  overflow-x:auto;
+
+  padding-bottom:10px;
+
+  margin-bottom:30px;
+}
+
+.categories::-webkit-scrollbar{
+  height:6px;
+}
+
+.category-card{
+
+  min-width:120px;
+
+  background:#ececec;
+
+  border:none;
+
+  border-radius:18px;
+
+  padding:20px;
+
+  cursor:pointer;
+
+  transition:0.2s;
+}
+
+.category-card:hover{
+  transform:translateY(-3px);
+}
+
+.category-icon{
+  font-size:32px;
+  margin-bottom:10px;
+}
+
+.category-name{
+  font-size:16px;
+}
+
+/* ========================= */
+/* PRODUCTS */
+/* ========================= */
+
+.products{
+
+  display:grid;
+
+  grid-template-columns:repeat(3,1fr);
+
+  gap:25px;
+
+  max-height:900px;
+
+  overflow-y:auto;
+
+  padding-right:10px;
+}
+
+.products::-webkit-scrollbar{
+  width:8px;
+}
+
+.products::-webkit-scrollbar-thumb{
+  background:#ccc;
+  border-radius:20px;
+}
+
+.product-card{
+
+  background:white;
+
+  border-radius:25px;
+
+  overflow:hidden;
+
+  display:flex;
+
+  flex-direction:column;
+
+  min-height:450px;
+}
+
+.product-card img{
+
+  width:100%;
+
+  height:240px;
+
+  object-fit:cover;
+}
+
+.product-content{
+
+  padding:20px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  flex:1;
+}
+
+.product-content h3{
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+.product-content p{
+
+  color:#555;
+
+  flex:1;
+
+  margin-bottom:15px;
+}
+
+.price{
+
+  font-size:28px;
+
+  font-weight:bold;
+}
+
+.add-cart-btn{
+
+  margin-top:20px;
+
+  border:none;
+
+  background:#9e0505;
+
+  color:white;
+
+  padding:15px;
+
+  border-radius:14px;
+
+  cursor:pointer;
+
+  font-size:16px;
+}
+
+/* ========================= */
+/* CART */
+/* ========================= */
+
+.cart-container{
+
+  background:white;
+
+  color:black;
+
+  padding:25px;
+
+  border-radius:25px;
+
+  margin-bottom:30px;
+}
+
+.cart-container h2{
+  margin-bottom:20px;
+}
+
+#cart-items{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:15px;
+}
+
+.cart-item{
+
+  background:#f3f3f3;
+
+  padding:15px;
+
+  border-radius:15px;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  flex:1;
+
+  min-width:250px;
+}
+
+.trash-btn{
+
+  background:#b30000;
+
+  border:none;
+
+  color:white;
+
+  width:45px;
+
+  height:45px;
+
+  border-radius:12px;
+
+  cursor:pointer;
+}
+
+.finish-order-btn{
+
+  margin-top:20px;
+
+  border:none;
+
+  background:#9e0505;
+
+  color:white;
+
+  padding:15px 20px;
+
+  border-radius:14px;
+
+  cursor:pointer;
+}
+
+/* ========================= */
+/* ACCOUNT PAGE */
+/* ========================= */
+
+.page{
+
+  display:none;
+}
+
+.account-page,
+.orders-page{
+
+  background:#f6f6f6;
+
+  color:black;
+
+  padding:30px;
+
+  border-radius:25px;
+}
+
+.form-group{
+
+  margin-bottom:20px;
+}
+
+.form-group input{
+
+  width:100%;
+
+  padding:16px;
+
+  border-radius:12px;
+
+  border:1px solid #ccc;
+
+  font-size:16px;
+}
+
+.save-btn{
+
+  background:#9e0505;
+
+  color:white;
+
+  border:none;
+
+  padding:15px 20px;
+
+  border-radius:14px;
+
+  cursor:pointer;
+}
+
+/* ========================= */
+/* ORDER HISTORY */
+/* ========================= */
+
+.order-history{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:20px;
+}
+
+.order-card{
+
+  background:white;
+
+  padding:20px;
+
+  border-radius:18px;
+}
+
+/* ========================= */
+/* MOBILE */
+/* ========================= */
+
+@media(max-width:900px){
+
+  body{
+    flex-direction:column;
+    overflow:auto;
+  }
+
+  .sidebar{
+    display:none;
+  }
+
+  /* NAVBAR MOBILE EMBAIXO */
+
+  .mobile-topbar{
+
+    display:flex;
+
+    position:fixed;
+
+    bottom:0;
+
+    left:0;
+
+    width:100%;
+
+    background:#6b0505;
+
+    padding:12px 10px;
+
+    z-index:9999;
+
+    border-top:1px solid rgba(255,255,255,0.1);
+  }
+
+  .mobile-menu{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:space-around;
+
+    align-items:center;
+
+    gap:10px;
+  }
+
+  .mobile-menu button{
+
+    flex:1;
+
+    background:transparent;
+
+    color:white;
+
+    border:none;
+
+    padding:14px 8px;
+
+    border-radius:12px;
+
+    font-size:14px;
+
+    cursor:pointer;
+  }
+
+  .main{
+
+    height:auto;
+
+    overflow:visible;
+
+    padding:15px;
+
+    /* espaço da navbar */
+
+    padding-bottom:110px;
+  }
+
+  .products{
+    grid-template-columns:1fr;
+    max-height:none;
+    overflow:visible;
+  }
+
+  .product-card{
+    min-height:auto;
+  }
+
+  .cart-item{
+    min-width:100%;
+  }
+}
+
+/* ========================= */
+/* MODAL */
+/* ========================= */
+
+.modal-overlay{
+
+  position:fixed;
+
+  top:0;
+  left:0;
+
+  width:100%;
+  height:100%;
+
+  background:rgba(0,0,0,0.7);
+
+  display:none;
+
+  justify-content:center;
+  align-items:center;
+
+  z-index:99999;
+
+  padding:20px;
+}
+
+.modal-box{
+
+  background:white;
+
+  color:black;
+
+  width:100%;
+  max-width:450px;
+
+  border-radius:25px;
+
+  padding:30px;
+
+  animation:modalShow 0.2s ease;
+}
+
+.modal-box h2{
+
+  margin-bottom:25px;
+
+  font-size:30px;
+}
+
+.modal-box p{
+
+  margin-bottom:12px;
+
+  font-size:18px;
+}
+
+.modal-total{
+
+  font-size:32px;
+
+  font-weight:bold;
+
+  margin:25px 0;
+}
+
+.modal-buttons{
+
+  display:flex;
+
+  gap:15px;
+
+  margin-top:30px;
+}
+
+.modal-buttons button{
+
+  flex:1;
+
+  border:none;
+
+  padding:16px;
+
+  border-radius:14px;
+
+  cursor:pointer;
+
+  font-size:16px;
+
+  font-weight:bold;
+}
+
+.modal-cancel{
+
+  background:#ddd;
+}
+
+.modal-confirm{
+
+  background:#9e0505;
+
+  color:white;
+}
+
+@keyframes modalShow{
+
+  from{
+    transform:scale(0.9);
+    opacity:0;
+  }
+
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+/* ========================= */
+/* STATUS COLORS */
+/* ========================= */
+
+.status-delivered{
+
+  background:#d4ffd4 !important;
+
+  border:2px solid #59c759;
+}
+
+.status-delivery{
+
+  background:#ffe3b3 !important;
+
+  border:2px solid #ff9800;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ========================= -->
+<!-- MOBILE TOPBAR -->
+<!-- ========================= -->
+
+<div class="mobile-topbar">
+
+  <h2>Sushi Bar</h2>
+
+</div>
+
+<!-- ========================= -->
+<!-- SIDEBAR -->
+<!-- ========================= -->
+
+<aside class="sidebar">
+
+  <div>
+
+    <div class="logo">
+      Sushi Bar
+    </div>
+
+    <div class="menu">
+
+      <button class="menu-item" onclick="showPage('home-page')">
+        🍣 Cardápio
+      </button>
+
+      <button class="menu-item" onclick="showPage('orders-page')">
+        📄 Seus Pedidos
+      </button>
+
+      <button class="menu-item" onclick="showPage('account-page')">
+        ⚙️ Sua Conta
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="sidebar-total">
+
+    <p>Total</p>
+
+    <h2 id="sidebar-total">
+      R$0.00
+    </h2>
+
+    <button onclick="finishOrder()">
+      Finalizar Pedido
+    </button>
+
+  </div>
+
+</aside>
+
+<!-- ========================= -->
+<!-- MAIN -->
+<!-- ========================= -->
+
+<main class="main">
+
+<!-- ADICIONE ESTA NAVBAR LOGO ABAIXO DA TAG <main class="main"> -->
+
+<div class="mobile-topbar">
+
+  <div class="mobile-menu">
+
+    <button onclick="showPage('home-page')">
+      🍣 Cardápio
+    </button>
+
+    <button onclick="showPage('orders-page')">
+      📄 Pedidos
+    </button>
+
+    <button onclick="showPage('account-page')">
+      ⚙️ Conta
+    </button>
+
+  </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- HOME PAGE -->
+<!-- ========================= -->
+
+<div id="home-page" class="page" style="display:block;">
+
+<section class="recommendations">
+
+<h2>Queridinhos</h2>
+
+<div class="recommendation-list">
+
+<div class="recommendation-card">
+<img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1200&auto=format&fit=crop">
+<div>
+<h3>Hot Roll</h3>
+<p>R$32</p>
+</div>
+</div>
+
+<div class="recommendation-card">
+<img src="https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?q=80&w=1200&auto=format&fit=crop">
+<div>
+<h3>Temaki</h3>
+<p>R$28</p>
+</div>
+</div>
+
+</div>
+
+</section>
+
+<section class="menu-container">
+
+<div class="categories" id="categories"></div>
+
+<div class="cart-container">
+
+<h2>🛒 Carrinho</h2>
+
+<div id="cart-items"></div>
+
+<h3 style="margin-top:20px;">
+Total:
+<span id="cart-total">R$0.00</span>
+</h3>
+
+<select
+id="payment-method"
+style="
+margin-top:20px;
+padding:14px;
+border-radius:12px;
+width:100%;
+"
+>
+
+<option value="">
+Forma de pagamento
+</option>
+
+<option value="Pix">
+Pix
+</option>
+
+<option value="Cartão">
+Cartão
+</option>
+
+<option value="Dinheiro">
+Dinheiro
+</option>
+
+</select>
+
+<button
+class="finish-order-btn"
+onclick="finishOrder()"
+>
+Finalizar
+</button>
+
+</div>
+
+<div class="products" id="products"></div>
+
+</section>
+
+</div>
+
+<!-- ========================= -->
+<!-- ACCOUNT PAGE -->
+<!-- ========================= -->
+
+<!-- SUBSTITUA APENAS A DIV account-page POR ESTA -->
+
+<div id="account-page" class="page">
+
+  <div class="account-page">
+
+    <h1 style="margin-bottom:30px;">
+      Sua Conta
+    </h1>
+
+    <!-- NOME -->
+
+        <div class="form-group">
+
+        <input
+            type="text"
+            id="user-name"
+            placeholder="Seu Nome"
+            required
+        >
+
+        </div>
+
+    <!-- EMAIL -->
+
+        <div class="form-group">
+
+        <input
+            type="email"
+            id="user-email"
+            placeholder="Seu Email"
+        >
+
+        </div>
+
+    <!-- CELULAR -->
+
+        <div class="form-group">
+
+        <input
+            type="text"
+            id="user-phone"
+            placeholder="Seu Celular"
+            required
+        >
+
+        </div>
+
+    <!-- ENDEREÇO -->
+
+        <div class="form-group">
+
+        <input
+            type="text"
+            id="user-address"
+            placeholder="Seu Endereço"
+            required
+        >
+
+        </div>
+
+    <!-- NUMERO -->
+
+        <div class="form-group">
+
+        <input
+            type="text"
+            id="user-number"
+            placeholder="Número"
+            required
+        >
+
+        </div>
+
+    <!-- COMPLEMENTO -->
+
+        <div class="form-group">
+
+        <input
+            type="text"
+            id="user-complement"
+            placeholder="Complemento (Ex: Bloco 16 Apartamento 201)"
+            required
+        >
+
+        </div>
+
+    <button
+      class="save-btn"
+      onclick="saveUserData()"
+    >
+      Salvar Dados
+    </button>
+
+  </div>
+
+</div>
+<!-- ========================= -->
+<!-- ORDERS PAGE -->
+<!-- ========================= -->
+
+<div id="orders-page" class="page">
+
+<div class="orders-page">
+
+<h1 style="margin-bottom:30px;">
+📄 Histórico de Pedidos
+</h1>
+
+<div
+class="order-history"
+id="order-history"
+></div>
+
+</div>
+
+</div>
+
+</main>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  updateDoc,
+  doc,
+  query,
+  orderBy
+}
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+  apiKey: "SUA_KEY",
+
+  authDomain: "restaurante-db-86b5d.firebaseapp.com",
+
+  projectId: "restaurante-db-86b5d",
+
+  storageBucket: "restaurante-db-86b5d.firebasestorage.app",
+
+  messagingSenderId: "457936771059",
+
+  appId: "1:457936771059:web:899d4d55a593d5c45ee486",
+
+  measurementId: "G-0HKPX8VM96"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+/* ========================= */
+/* PRODUCTS */
+/* ========================= */
+
+const products = [
+
+{
+name:'Hot Roll Salmão',
+price:32,
+category:'Hots',
+description:'Hot roll crocante de salmão.',
+image:'https://images.unsplash.com/photo-1611143669185-af224c5e3252?q=80&w=1200&auto=format&fit=crop'
+},
+
+{
+name:'Philadelphia',
+price:29,
+category:'Holls',
+description:'Roll de salmão com cream cheese.',
+image:'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
+},
+
+{
+name:'Temaki',
+price:28,
+category:'Holls',
+description:'Temaki de salmão tradicional.',
+image:'https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?q=80&w=1200&auto=format&fit=crop'
+}
+
+];
+
+/* ========================= */
+/* CATEGORIES */
+/* ========================= */
+
+const categories = [
+
+{ icon:'🍽️', name:'Todos' },
+{ icon:'🍣', name:'Holls' },
+{ icon:'♨️', name:'Hots' }
+
+];
+
+/* ========================= */
+/* STORAGE */
+/* ========================= */
+
+let cart =
+JSON.parse(localStorage.getItem('cart')) || [];
+
+let orders =
+JSON.parse(localStorage.getItem('orders')) || [];
+
+/* ========================= */
+/* SHOW PAGE */
+/* ========================= */
+
+function showPage(id){
+
+document.querySelectorAll('.page')
+.forEach(page => {
+page.style.display='none';
+});
+
+document.getElementById(id)
+.style.display='block';
+
+if(id === 'orders-page'){
+renderOrders();
+}
+
+}
+
+/* ========================= */
+/* RENDER CATEGORIES */
+/* ========================= */
+
+const categoriesContainer =
+document.getElementById('categories');
+
+categories.forEach(category => {
+
+categoriesContainer.innerHTML += `
+
+<button
+class="category-card"
+onclick="filterCategory('${category.name}')"
+>
+
+<div class="category-icon">
+${category.icon}
+</div>
+
+<div class="category-name">
+${category.name}
+</div>
+
+</button>
+
+`;
+
+});
+
+/* ========================= */
+/* FILTER */
+/* ========================= */
+
+function filterCategory(category){
+
+if(category === 'Todos'){
+renderProducts(products);
+return;
+}
+
+const filtered =
+products.filter(
+product => product.category === category
+);
+
+renderProducts(filtered);
+
+}
+
+/* ========================= */
+/* RENDER PRODUCTS */
+/* ========================= */
+
+function renderProducts(data){
+
+const container =
+document.getElementById('products');
+
+container.innerHTML='';
+
+data.forEach(product => {
+
+container.innerHTML += `
+
+<div class="product-card">
+
+<img src="${product.image}">
+
+<div class="product-content">
+
+<h3>${product.name}</h3>
+
+<p>${product.description}</p>
+
+<div class="price">
+R$${product.price}
+</div>
+
+<button
+class="add-cart-btn"
+onclick="addToCart('${product.name}',${product.price})"
+>
+
+Adicionar
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+renderProducts(products);
+
+/* ========================= */
+/* ADD CART */
+/* ========================= */
+
+function addToCart(name,price){
+
+cart.push({
+name,
+price
+});
+
+saveCart();
+
+renderCart();
+
+}
+
+/* ========================= */
+/* REMOVE */
+/* ========================= */
+
+function removeCart(index){
+
+cart.splice(index,1);
+
+saveCart();
+
+renderCart();
+
+}
+
+/* ========================= */
+/* SAVE */
+/* ========================= */
+
+function saveCart(){
+
+localStorage.setItem(
+'cart',
+JSON.stringify(cart)
+);
+
+}
+
+/* ========================= */
+/* RENDER CART */
+/* ========================= */
+
+function renderCart(){
+
+const cartItems =
+document.getElementById('cart-items');
+
+cartItems.innerHTML='';
+
+let total = 0;
+
+cart.forEach((item,index)=>{
+
+total += item.price;
+
+cartItems.innerHTML += `
+
+<div class="cart-item">
+
+<div>
+
+<strong>${item.name}</strong>
+
+<p>R$${item.price}</p>
+
+</div>
+
+<button
+class="trash-btn"
+onclick="removeCart(${index})"
+>
+
+🗑️
+
+</button>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('cart-total')
+.innerText = `R$${total.toFixed(2)}`;
+
+document.getElementById('sidebar-total')
+.innerText = `R$${total.toFixed(2)}`;
+
+}
+
+renderCart();
+
+/* ========================= */
+/* SAVE USER */
+/* ========================= */
+
+function saveUserData(){
+
+  const user = {
+
+    name:
+    document.getElementById('user-name').value,
+
+    email:
+    document.getElementById('user-email').value,
+
+    phone:
+    document.getElementById('user-phone').value,
+
+    address:
+    document.getElementById('user-address').value,
+
+    number:
+    document.getElementById('user-number').value,
+
+    complement:
+    document.getElementById('user-complement').value
+
+  };
+
+  localStorage.setItem(
+    'userData',
+    JSON.stringify(user)
+  );
+
+  alert('Dados salvos!');
+
+}
+
+function loadUser(){
+
+  const user =
+  JSON.parse(localStorage.getItem('userData'));
+
+  if(!user) return;
+
+  document.getElementById('user-name').value =
+  user.name || '';
+
+  document.getElementById('user-email').value =
+  user.email || '';
+
+  document.getElementById('user-phone').value =
+  user.phone || '';
+
+  document.getElementById('user-address').value =
+  user.address || '';
+
+  document.getElementById('user-number').value =
+  user.number || '';
+
+  document.getElementById('user-complement').value =
+  user.complement || '';
+
+}
+
+/* ========================= */
+/* LOAD USER */
+/* ========================= */
+
+loadUser();
+
+let pendingOrder = null;
+
+/* ========================= */
+/* FINISH ORDER */
+/* ========================= */
+
+async function finishOrder(){
+
+  if(cart.length === 0){
+
+    alert('Carrinho vazio!');
+    return;
+  }
+
+  const payment =
+  document.getElementById('payment-method').value;
+
+  if(payment === ''){
+
+    alert('Escolha uma forma de pagamento!');
+    return;
+  }
+
+  const user =
+  JSON.parse(localStorage.getItem('userData'));
+
+  if(!user){
+
+    alert('Preencha os dados da conta!');
+    showPage('account-page');
+
+    return;
+  }
+
+  if(
+    !user.name ||
+    !user.phone ||
+    !user.address ||
+    !user.number ||
+    !user.complement
+  ){
+
+    alert('Complete todos os dados!');
+    showPage('account-page');
+
+    return;
+  }
+
+  const total =
+  cart.reduce(
+    (sum,item)=>sum+item.price,
+    0
+  );
+
+  pendingOrder = {
+
+    customer:user.name,
+
+    phone:user.phone,
+
+    address:user.address,
+
+    number:user.number,
+
+    complement:user.complement,
+
+    payment,
+
+    items:[...cart],
+
+    total,
+
+    status:"Recebido",
+
+    createdAt:Date.now()
+
+  };
+
+  document.getElementById(
+    'modal-content'
+  ).innerHTML = `
+
+    <p>
+      <strong>Cliente:</strong>
+      ${user.name}
+    </p>
+
+    <p>
+      <strong>Telefone:</strong>
+      ${user.phone}
+    </p>
+
+    <p>
+      <strong>Endereço:</strong><br>
+      ${user.address},
+      ${user.number}
+    </p>
+
+    <p>
+      ${user.complement}
+    </p>
+
+    <p>
+      <strong>Pagamento:</strong>
+      ${payment}
+    </p>
+
+    <div class="modal-total">
+      R$${total.toFixed(2)}
+    </div>
+
+  `;
+
+  document.getElementById(
+    'order-modal'
+  ).style.display = 'flex';
+
+}
+
+function closeOrderModal(){
+
+  document.getElementById(
+    'order-modal'
+  ).style.display = 'none';
+
+}
+
+async function confirmOrderFirebase(){
+
+  if(!pendingOrder) return;
+
+  await addDoc(
+
+    collection(db,"orders"),
+
+    pendingOrder
+
+  );
+
+  cart=[];
+
+  saveCart();
+
+  renderCart();
+
+  closeOrderModal();
+
+  alert('Pedido realizado!');
+
+}
+
+/* ========================= */
+/* GLOBAL FUNCTIONS */
+/* ========================= */
+
+window.closeOrderModal =
+closeOrderModal;
+
+window.confirmOrderFirebase =
+confirmOrderFirebase;
+
+window.finishOrder =
+finishOrder;
+
+window.showPage =
+showPage;
+
+window.addToCart =
+addToCart;
+
+window.removeCart =
+removeCart;
+
+window.filterCategory =
+filterCategory;
+
+window.saveUserData =
+saveUserData;
+
+/* ========================= */
+/* RENDER ORDERS */
+/* ========================= */
+
+function renderOrders(){
+
+  const container =
+  document.getElementById('order-history');
+
+  const user =
+  JSON.parse(localStorage.getItem('userData'));
+
+  if(!user || !user.phone){
+
+    container.innerHTML = `
+      <p>
+        Faça login para ver seus pedidos.
+      </p>
+    `;
+
+    return;
+  }
+
+  /* QUERY ORDENADA */
+
+  const ordersQuery = query(
+
+    collection(db,"orders"),
+
+    orderBy("createdAt","desc")
+
+  );
+
+  onSnapshot(
+
+    ordersQuery,
+
+    (snapshot)=>{
+
+      container.innerHTML='';
+
+      let encontrouPedido = false;
+
+      snapshot.forEach((docItem)=>{
+
+        const order = docItem.data();
+
+        /* FILTRO TELEFONE */
+
+        if(order.phone !== user.phone){
+          return;
+        }
+
+        encontrouPedido = true;
+
+        /* STATUS COLOR */
+
+        let statusClass = '';
+
+        if(order.status === 'Entregue'){
+          statusClass = 'status-delivered';
+        }
+
+        else if(
+          order.status === 'Saiu para entrega'
+        ){
+          statusClass = 'status-delivery';
+        }
+
+        container.innerHTML += `
+
+        <div class="order-card ${statusClass}">
+
+          <h3>
+            Pedido
+          </h3>
+
+          <p>
+            Cliente:
+            ${order.customer}
+          </p>
+
+          <p>
+            Telefone:
+            ${order.phone}
+          </p>
+
+          <p>
+            Status:
+            <strong>${order.status}</strong>
+          </p>
+
+          <p>
+            Pagamento:
+            ${order.payment}
+          </p>
+
+          <p>
+            Itens:
+            ${order.items.map(item=>item.name).join(', ')}
+          </p>
+
+          <h2>
+            R$${order.total.toFixed(2)}
+          </h2>
+
+        </div>
+
+        `;
+
+      });
+
+      if(!encontrouPedido){
+
+        container.innerHTML = `
+          <p>
+            Você ainda não possui pedidos.
+          </p>
+        `;
+
+      }
+
+    }
+
+  );
+
+}
+
+renderOrders();
+
+window.showPage = showPage;
+window.filterCategory = filterCategory;
+window.addToCart = addToCart;
+window.removeCart = removeCart;
+window.finishOrder = finishOrder;
+window.saveUserData = saveUserData;
+
+
+</script>
+<!-- ========================= -->
+<!-- ORDER MODAL -->
+<!-- ========================= -->
+
+<div id="order-modal" class="modal-overlay">
+
+  <div class="modal-box">
+
+    <h2>
+      Confirmar Pedido 🍣
+    </h2>
+
+    <div id="modal-content"></div>
+
+    <div class="modal-buttons">
+
+      <button
+        class="modal-cancel"
+        onclick="closeOrderModal()"
+      >
+        Cancelar
+      </button>
+
+      <button
+        class="modal-confirm"
+        onclick="confirmOrderFirebase()"
+      >
+        Confirmar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>
