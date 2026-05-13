@@ -866,6 +866,284 @@ body{
   border:2px solid #ff9800;
 }
 
+/* STATUS MINI ICON */
+
+.order-status-row{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-bottom:15px;
+
+}
+
+.order-status-icon{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  font-size:32px;
+
+  background:transparent !important;
+
+  width:auto !important;
+
+  height:auto !important;
+
+  border-radius:0 !important;
+
+  padding:0 !important;
+
+  box-shadow:none !important;
+
+}
+
+/* RECEBIDO */
+
+.icon-received{
+
+  background:#3498db;
+
+  animation:statusPulse 2s infinite;
+
+}
+
+/* PREPARANDO */
+
+.icon-preparing{
+
+  background:#f1c40f;
+
+  animation:statusSpin 3s linear infinite;
+
+}
+
+/* ENTREGA */
+
+.icon-out{
+
+  background:#e67e22;
+
+  animation:statusMove 1s infinite alternate;
+
+}
+
+/* ENTREGUE */
+
+.icon-done{
+
+  background:#2ecc71;
+
+  animation:statusPop 1s infinite alternate;
+
+}
+
+/* ANIMAÇÕES */
+
+@keyframes statusPulse{
+
+  0%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.1);
+  }
+
+  100%{
+    transform:scale(1);
+  }
+
+}
+
+@keyframes statusSpin{
+
+  from{
+    transform:rotate(0deg);
+  }
+
+  to{
+    transform:rotate(360deg);
+  }
+
+}
+
+@keyframes statusMove{
+
+  from{
+    transform:translateX(0);
+  }
+
+  to{
+    transform:translateX(6px);
+  }
+
+}
+
+@keyframes statusPop{
+
+  from{
+    transform:scale(1);
+  }
+
+  to{
+    transform:scale(1.12);
+  }
+
+}
+
+
+/* ========================= */
+/* MOBILE CART BUTTON */
+/* ========================= */
+
+#mobile-cart-btn{
+
+  display:none;
+
+}
+
+@media(max-width:900px){
+
+  #mobile-cart-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+    position:fixed;
+
+    bottom:85px;
+
+    right:18px;
+
+    z-index:9999;
+
+    border:none;
+
+    background:#9e0505;
+
+    color:white;
+
+    padding:14px 18px;
+
+    border-radius:999px;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    box-shadow:0 8px 25px rgba(0,0,0,0.3);
+
+    cursor:pointer;
+
+  }
+
+  #mobile-cart-count{
+
+    background:white;
+
+    color:#9e0505;
+
+    min-width:24px;
+
+    height:24px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    padding:2px;
+
+  }
+
+}
+
+/* ========================= */
+/* MOBILE HEADER */
+/* ========================= */
+
+.mobile-header{
+
+  display:none;
+
+}
+
+@media(max-width:900px){
+
+  .mobile-header{
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+    border-radius:0 0 28px 28px;
+
+    margin:-15px -15px 20px -15px;
+
+    background:#111;
+
+    box-shadow:0 8px 25px rgba(0,0,0,0.25);
+
+  }
+
+  .mobile-logo{
+
+    width:100%;
+
+    height:220px;
+
+    object-fit:cover;
+
+  }
+
+  .mobile-header-content{
+
+    padding:20px;
+
+  }
+
+  .mobile-header-content h1{
+
+    font-size:34px;
+
+    margin-bottom:8px;
+
+    color:white;
+
+  }
+
+  .mobile-header-content p{
+
+    color:rgba(255,255,255,0.8);
+
+    font-size:16px;
+
+  }
+
+}
+
+
 </style>
 </head>
 
@@ -933,9 +1211,19 @@ body{
 
 <main class="main">
 
-<!-- ADICIONE ESTA NAVBAR LOGO ABAIXO DA TAG <main class="main"> -->
-
 <div class="mobile-topbar">
+
+  <button
+  id="mobile-cart-btn"
+  onclick="scrollToCart()"
+  >
+
+  🛒
+  <span id="mobile-cart-count">
+  0
+  </span>
+
+  </button>
 
   <div class="mobile-menu">
 
@@ -960,6 +1248,27 @@ body{
 <!-- ========================= -->
 
 <div id="home-page" class="page" style="display:block;">
+
+<div class="mobile-header">
+
+  <img
+    class="mobile-logo"
+    src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1200&auto=format&fit=crop"
+  >
+
+  <div class="mobile-header-content">
+
+    <h1>
+      Sushi Bar
+    </h1>
+
+    <p>
+      Sushi fresco feito na hora 🍣
+    </p>
+
+  </div>
+
+</div>  
 
 <section class="recommendations">
 
@@ -1478,6 +1787,12 @@ document.getElementById('cart-total')
 document.getElementById('sidebar-total')
 .innerText = `R$${total.toFixed(2)}`;
 
+document.getElementById(
+'mobile-cart-count'
+).innerText = cart.length;
+
+window.scrollToCart = scrollToCart;
+
 }
 
 renderCart();
@@ -1799,14 +2114,54 @@ function renderOrders(){
         ){
           statusClass = 'status-delivery';
         }
+        
+
+        let icon = '';
+        let iconClass = '';
+
+        if(order.status === 'Recebido'){
+
+          icon = '📨';
+          iconClass = 'icon-received';
+
+        }
+
+        else if(order.status === 'Preparando'){
+
+          icon = '🍣';
+          iconClass = 'icon-preparing';
+
+        }
+
+        else if(order.status === 'Saiu para entrega'){
+
+          icon = '🛵';
+          iconClass = 'icon-out';
+
+        }
+
+        else if(order.status === 'Entregue'){
+
+          icon = '✅';
+          iconClass = 'icon-done';
+
+        }
 
         container.innerHTML += `
 
         <div class="order-card ${statusClass}">
 
+        <div class="order-status-row">
+
+          <div class="order-status-icon ${iconClass}">
+            ${icon}
+          </div>
+
           <h3>
-            Pedido
+            ${order.status}
           </h3>
+
+        </div>
 
           <p>
             Cliente:
@@ -1868,6 +2223,23 @@ window.removeCart = removeCart;
 window.finishOrder = finishOrder;
 window.saveUserData = saveUserData;
 
+
+function scrollToCart(){
+
+  const cartSection =
+  document.querySelector('.cart-container');
+
+  if(cartSection){
+
+    cartSection.scrollIntoView({
+
+      behavior:'smooth'
+
+    });
+
+  }
+
+}
 
 </script>
 <!-- ========================= -->
