@@ -364,8 +364,30 @@ body{
 }
 
 .category-icon{
-  font-size:32px;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
   margin-bottom:10px;
+}
+
+.category-icon img{
+
+  width:52px;
+  height:52px;
+
+  object-fit:contain;
+
+  transition:0.25s;
+}
+
+.category-card:hover .category-icon img{
+
+  transform:
+  scale(1.08)
+  rotate(-4deg);
+
 }
 
 .category-name{
@@ -384,11 +406,8 @@ body{
 
   gap:25px;
 
-  max-height:900px;
+  padding-right:0;
 
-  overflow-y:auto;
-
-  padding-right:10px;
 }
 
 .products::-webkit-scrollbar{
@@ -1143,6 +1162,18 @@ body{
 
 }
 
+#combo-modal-img{
+  animation: modalShow 0.2s ease;
+}
+
+.recommendation-card{
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.recommendation-card:hover{
+  transform:scale(1.02);
+}
 
 </style>
 </head>
@@ -1272,28 +1303,29 @@ body{
 
 <section class="recommendations">
 
-<h2>Queridinhos</h2>
+<h2>Combos</h2>
 
 <div class="recommendation-list">
 
-<div class="recommendation-card">
-<img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1200&auto=format&fit=crop">
-<div>
-<h3>Hot Roll</h3>
-<p>R$32</p>
-</div>
-</div>
+<div class="recommendation-card"
+     style="cursor:pointer"
+     onclick="openComboModal({
+       name: 'Combo de fritos!',
+       description: 'X Hot Philadelphia, X Hot Skin, X Haru Hot, X Lula à dorê, X Harumaki Legumes',
+       price: 0.90,
+       image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1200&auto=format&fit=crop'
+     })"
+>
 
-<div class="recommendation-card">
-<img src="https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?q=80&w=1200&auto=format&fit=crop">
-<div>
-<h3>Temaki</h3>
-<p>R$28</p>
-</div>
-</div>
+  <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1200&auto=format&fit=crop">
+
+  <div>
+    <h3>Combo de fritos!</h3>
+    <p></p>
+    <h3>R$ xx,xx</h3>
+  </div>
 
 </div>
-
 </section>
 
 <section class="menu-container">
@@ -1519,6 +1551,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
+
 /* ========================= */
 /* PRODUCTS */
 /* ========================= */
@@ -1526,28 +1559,118 @@ const db = getFirestore(app);
 const products = [
 
 {
-name:'Hot Roll Salmão',
+name:'Hot Roll Philadelphia (Salmão)',
 price:32,
 category:'Hots',
-description:'Hot roll crocante de salmão.',
-image:'https://images.unsplash.com/photo-1611143669185-af224c5e3252?q=80&w=1200&auto=format&fit=crop'
+description:'Delicado hot roll recheado com salmão, cream cheese Philadelphia, cebolinha, envolto em massa crocante e levemente dourada.',
+image:'Imagens/Hot Roll Philadelphia.jpg'
 },
 
 {
-name:'Philadelphia',
+name:'Hot Roll Philadelphia (Atum)',
 price:29,
-category:'Holls',
+category:'Hots',
 description:'Roll de salmão com cream cheese.',
-image:'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
+image:'Imagens/Hot Roll Atum.png'
 },
 
 {
-name:'Temaki',
+name:'Roll Philadelphia Salmão',
 price:28,
-category:'Holls',
+category:'Hossomakis',
+description:'Roll de salmão com cream cheese.',
+image:'Imagens/Roll Salmão.png'
+},
+
+{
+name:'Roll Philadelphia Atum',
+price:28,
+category:'Hossomakis',
+description:'Roll de atum com cream cheese.',
+image:'Imagens/Roll Atum.png'
+},
+
+{
+name:'Haru Hot Roll',
+price:28,
+category:'Hots',
+description:'Delicado hot roll recheado com salmão, cream cheese Philadelphia, cebolinha, envolto em massa crocante e levemente dourada.',
+image:'Imagens/Haru-Hot.jpg'
+},
+
+{
+name:'Hot Roll Skin',
+price:28,
+category:'Hots',
+description:'Delicado hot roll recheado com salmão, cream cheese Philadelphia, cebolinha, envolto em massa crocante e levemente dourada.',
+image:'Imagens/Hot Roll Skin.jpg'
+},
+
+{
+name:'Roll Skin',
+price:28,
+category:'Hossomakis',
+description:'Roll de salmão com cream cheese.',
+image:'Imagens/Roll Skin.jpg'
+},
+
+{
+name:'Hot Roll Kani',
+price:28,
+category:'Hots',
+description:'Delicado hot roll recheado com kani, cream cheese Philadelphia, cebolinha, envolto em massa crocante e levemente dourada.',
+image:'Imagens/Hot roll Kani.jpg'
+},
+
+{
+name:'Roll Kani',
+price:28,
+category:'Hossomakis',
+description:'Roll de kani com cream cheese.',
+image:'Imagens/Roll Kani.jpg'
+},
+
+{
+name:'Lula à Dorê',
+price:28,
+category:'Porções',
 description:'Temaki de salmão tradicional.',
-image:'https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?q=80&w=1200&auto=format&fit=crop'
-}
+image:'Imagens/Lula a Dore.jpg'
+},
+
+{
+name:'Harumaki de Legumes',
+price:28,
+category:'Harumakis',
+description:'Temaki de salmão tradicional.',
+image:'Imagens/Harumaki Legume.jpg'
+},
+
+{
+name:'Harumaki de Salmão',
+price:28,
+category:'Harumakis',
+description:'Temaki de salmão tradicional.',
+image:'Imagens/Harumaki Salmão.jpeg'
+},
+
+{
+name:'Harumaki de queijo',
+price:28,
+category:'Harumakis',
+description:'Temaki de salmão tradicional.',
+image:'Imagens/Harumaki queijo.jpg'
+},
+
+
+{
+name:'Salada Sunomono',
+price:28,
+category:'Saladas',
+description:'Temaki de salmão tradicional.',
+image:'Imagens/salada-sunomono.jpg'
+},
+
 
 ];
 
@@ -1557,12 +1680,37 @@ image:'https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?q=80&w=1200&
 
 const categories = [
 
-{ icon:'🍽️', name:'Todos' },
-{ icon:'🍣', name:'Holls' },
-{ icon:'♨️', name:'Hots' }
+{
+  image:'Imagens/todos.png',
+  name:'Todos'
+},
+
+{
+  image:'Imagens/rolls.png',
+  name:'Hossomakis'
+},
+
+{
+  image:'Imagens/hots.png',
+  name:'Hots'
+},
+
+{
+  image:'Imagens/harumaki.png',
+  name:'Harumakis'
+},
+
+{
+  image:'Imagens/porcoes.png',
+  name:'Porções'
+},
+
+{
+  image:'Imagens/salada.png',
+  name:'Saladas'
+}
 
 ];
-
 /* ========================= */
 /* STORAGE */
 /* ========================= */
@@ -1610,9 +1758,13 @@ onclick="filterCategory('${category.name}')"
 >
 
 <div class="category-icon">
-${category.icon}
-</div>
 
+  <img
+    src="${category.image}"
+    alt="${category.name}"
+  >
+
+</div>
 <div class="category-name">
 ${category.name}
 </div>
@@ -2241,6 +2393,44 @@ function scrollToCart(){
 
 }
 
+let selectedCombo = null;
+
+function openComboModal(combo){
+
+  selectedCombo = combo;
+
+  document.getElementById('combo-modal-img').src = combo.image;
+  document.getElementById('combo-modal-name').innerText = combo.name;
+  document.getElementById('combo-modal-desc').innerText = combo.description;
+  document.getElementById('combo-modal-price').innerText = `R$${combo.price.toFixed(2)}`;
+
+  document.getElementById('combo-modal').style.display = 'flex';
+}
+
+function closeComboModal(){
+  document.getElementById('combo-modal').style.display = 'none';
+}
+
+function confirmAddCombo(){
+
+  if(!selectedCombo) return;
+
+  cart.push({
+    name: selectedCombo.name,
+    price: selectedCombo.price
+  });
+
+  saveCart();
+  renderCart();
+
+  closeComboModal();
+
+  }
+
+  window.openComboModal = openComboModal;
+  window.closeComboModal = closeComboModal;
+  window.confirmAddCombo = confirmAddCombo;
+
 </script>
 <!-- ========================= -->
 <!-- ORDER MODAL -->
@@ -2275,6 +2465,53 @@ function scrollToCart(){
     </div>
 
   </div>
+</div>
+<!-- ========================= -->
+<!-- COMBO MODAL -->
+<!-- ========================= -->
+
+<div id="combo-modal" class="modal-overlay">
+
+  <div class="modal-box">
+
+    <img
+      id="combo-modal-img"
+      style="
+        width:100%;
+        height:200px;
+        object-fit:cover;
+        border-radius:18px;
+        margin-bottom:15px;
+      "
+    >
+
+    <h2 id="combo-modal-name"></h2>
+
+    <p id="combo-modal-desc"></p>
+
+    <div class="modal-total" id="combo-modal-price"></div>
+
+    <div class="modal-buttons">
+
+      <button
+        class="modal-cancel"
+        onclick="closeComboModal()"
+      >
+        Cancelar
+      </button>
+
+      <button
+        class="modal-confirm"
+        onclick="confirmAddCombo()"
+      >
+        Adicionar ao carrinho
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
 </div>
 </body>
