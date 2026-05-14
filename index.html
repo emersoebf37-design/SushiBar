@@ -2378,18 +2378,27 @@ window.saveUserData = saveUserData;
 
 function scrollToCart(){
 
-  const cartSection =
-  document.querySelector('.cart-container');
+  // abre a página do cardápio
+  showPage('home-page');
 
-  if(cartSection){
+  // espera renderizar
+  setTimeout(() => {
 
-    cartSection.scrollIntoView({
+    const cartSection =
+    document.querySelector('.cart-container');
 
-      behavior:'smooth'
+    if(cartSection){
 
-    });
+      cartSection.scrollIntoView({
 
-  }
+        behavior:'smooth',
+        block:'start'
+
+      });
+
+    }
+
+  }, 100);
 
 }
 
