@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Sushi Bar</title>
+<title>Kaizora</title>
 
 <style>
 
@@ -16,7 +16,7 @@
 }
 
 body{
-  background:#000;
+  background:#ffff;
   color:white;
   display:flex;
   min-height:100vh;
@@ -34,6 +34,8 @@ body{
   background:#6b0505;
 
   padding:30px 20px;
+
+  padding-top:0;
 
   display:flex;
 
@@ -63,69 +65,59 @@ body{
 }
 
 .menu-item{
-
-  background:transparent;
-
-  border:none;
-
+  width:100%;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
   color:white;
 
   display:flex;
-
   align-items:center;
-
-  gap:12px;
+  gap:14px;
 
   font-size:18px;
+  font-weight:600;
 
-  padding:14px;
-
-  border-radius:14px;
+  padding:16px 18px;
+  border-radius:16px;
 
   cursor:pointer;
+  transition:0.25s ease;
 
-  transition:0.2s;
+  backdrop-filter: blur(6px);
 }
 
+/* HOVER MAIS BONITO */
 .menu-item:hover{
-  background:rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.15);
+  transform:translateX(6px);
+  box-shadow:0 8px 20px rgba(0,0,0,0.25);
 }
 
-.sidebar-total{
-
-  margin-top:30px;
-
-  background:rgba(255,255,255,0.1);
-
-  padding:20px;
-
-  border-radius:20px;
+/* EFEITO DE “CLIQUE” */
+.menu-item:active{
+  transform:translateX(3px) scale(0.98);
 }
 
-.sidebar-total h2{
-  font-size:36px;
-  margin-top:10px;
+/* ÍCONES MAIS DESTACADOS */
+.menu-item{
+  position:relative;
 }
 
-.sidebar-total button{
+/* LINHA LATERAL NO HOVER */
+.menu-item::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:10px;
+  bottom:10px;
+  width:4px;
+  border-radius:10px;
+  background:transparent;
+  transition:0.25s;
+}
 
-  margin-top:20px;
-
-  width:100%;
-
-  padding:14px;
-
-  border:none;
-
-  border-radius:14px;
-
-  background:white;
-
-  color:black;
-
-  font-weight:bold;
-
-  cursor:pointer;
+.menu-item:hover::before{
+  background:#ffffff;
 }
 
 /* ========================= */
@@ -222,7 +214,38 @@ body{
 
     padding-bottom:110px;
   }
+
+  .cart-mobile-actions{
+
+    display:none !important;
+
+    gap:12px;
+
+    margin-top:20px;
+
+  }
+
+  @media(max-width:900px){
+
+    .cart-mobile-actions{
+
+      display:flex !important;
+
+    }
+
+  }
+
+  .cart-mobile-actions .finish-order-btn{
+
+    flex:1;
+
+    margin-top:0;
+
+  }
+  
 }
+
+
 
 /* ========================= */
 /* RECOMMENDATIONS */
@@ -494,6 +517,19 @@ body{
   font-size:16px;
 }
 
+
+/* HOVER MAIS CLARO */
+.add-cart-btn:hover{
+  background:#c20707;
+  transform:translateY(-2px);
+  box-shadow:0 6px 15px rgba(158, 5, 5, 0.25);
+}
+
+/* CLIQUE */
+.add-cart-btn:active{
+  transform:translateY(0px) scale(0.98);
+}
+
 /* ========================= */
 /* CART */
 /* ========================= */
@@ -576,6 +612,19 @@ body{
 
   cursor:pointer;
 }
+
+/* HOVER MAIS CLARO */
+.finish-order-btn:hover{
+  background:#c20707;
+  transform:translateY(-2px);
+  box-shadow:0 6px 15px rgba(158, 5, 5, 0.25);
+}
+
+/* CLIQUE */
+.finish-order-btn:active{
+  transform:translateY(0px) scale(0.98);
+}
+
 
 /* ========================= */
 /* ACCOUNT PAGE */
@@ -1120,7 +1169,7 @@ body{
 
     margin:-15px -15px 20px -15px;
 
-    background:#111;
+    background:#ffffff;
 
     box-shadow:0 8px 25px rgba(0,0,0,0.25);
 
@@ -1154,7 +1203,7 @@ body{
 
   .mobile-header-content p{
 
-    color:rgba(255,255,255,0.8);
+    color:rgba(0, 0, 0, 0.8);
 
     font-size:16px;
 
@@ -1175,20 +1224,388 @@ body{
   transform:scale(1.02);
 }
 
+/* ========================= */
+/* DESKTOP PREMIUM LAYOUT */
+/* ========================= */
+
+@media(min-width:1200px){
+
+  /* MAIN */
+
+  .main{
+
+    padding:40px;
+
+    background:#f3f3f3;
+
+  }
+
+  /* COMBOS */
+
+  .recommendations{
+
+    padding:35px;
+
+    border-radius:32px;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,0.08);
+
+  }
+
+  .recommendation-list{
+
+    gap:25px;
+
+  }
+
+  .recommendation-card{
+
+    min-width:380px;
+
+    padding:18px;
+
+    border-radius:22px;
+
+    transition:0.25s;
+
+  }
+
+  .recommendation-card:hover{
+
+    transform:
+    translateY(-4px)
+    scale(1.02);
+
+    box-shadow:
+    0 10px 25px rgba(0,0,0,0.12);
+
+  }
+
+  .recommendation-card img{
+
+    width:90px;
+    height:90px;
+
+  }
+
+  /* MENU CONTAINER */
+
+  .menu-container{
+
+    display:grid;
+
+    grid-template-columns:
+    1fr 380px;
+
+    gap:30px;
+
+    align-items:start;
+
+    background:transparent;
+
+    padding:0;
+
+  }
+
+  /* LEFT SIDE */
+
+  .menu-content{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:25px;
+
+  }
+
+  /* CATEGORIES */
+
+  .categories{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:28px;
+
+    margin-bottom:0;
+
+    box-shadow:
+    0 8px 25px rgba(0,0,0,0.05);
+
+  }
+
+  /* PRODUCTS */
+
+  .products{
+
+    grid-template-columns:
+    repeat(2,1fr);
+
+    gap:30px;
+
+  }
+
+  .product-card{
+
+    border-radius:28px;
+
+    transition:0.25s;
+
+    box-shadow:
+    0 8px 25px rgba(0,0,0,0.06);
+
+  }
+
+  .product-card:hover{
+
+    transform:
+    translateY(-6px);
+
+    box-shadow:
+    0 15px 35px rgba(0,0,0,0.10);
+
+  }
+
+  .product-card img{
+
+    height:260px;
+
+  }
+
+  .product-content{
+
+    padding:25px;
+
+  }
+
+  .product-content h3{
+
+    font-size:24px;
+
+    line-height:1.2;
+
+  }
+
+  .product-content p{
+
+    font-size:15px;
+
+    line-height:1.5;
+
+  }
+
+  .price{
+
+    font-size:30px;
+
+  }
+
+  /* CART */
+
+  .cart-container{
+
+    position:sticky;
+
+    top:30px;
+
+    border-radius:28px;
+
+    padding:30px;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,0.08);
+
+  }
+
+  .cart-container h2{
+
+    font-size:34px;
+
+  }
+
+  #cart-items{
+
+    flex-direction:column;
+
+    flex-wrap:nowrap;
+
+    max-height:400px;
+
+    overflow-y:auto;
+
+    padding-right:8px;
+
+  }
+
+  .cart-item{
+
+    min-width:100%;
+
+  }
+
+  .finish-order-btn{
+
+    width:100%;
+
+    padding:18px;
+
+    font-size:18px;
+
+  }
+
+
+  
+
+}
+/* ESCONDE BOTÃO FECHAR NO DESKTOP */
+
+.close-cart-btn{
+  display:none;
+}
+
+/* MOSTRA APENAS NO MOBILE */
+
+@media(max-width:900px){
+
+  .close-cart-btn{
+    display:block;
+  }
+
+}
+
+/* ========================= */
+/* MOBILE CART FULLSCREEN */
+/* ========================= */
+
+@media(max-width:900px){
+
+  .cart-container{
+
+    position:fixed;
+
+    top:0;
+
+    right:-100%;
+
+    width:100%;
+
+    height:100vh;
+
+    background:white;
+
+    z-index:99999;
+
+    border-radius:0;
+
+    transition:0.3s ease;
+
+    overflow-y:auto;
+
+    padding:25px;
+    
+    -webkit-overflow-scrolling:touch;
+
+  }
+
+  .cart-container::-webkit-scrollbar{
+  width:6px;
+  }
+
+  .cart-container::-webkit-scrollbar-thumb{
+
+    background:#ccc;
+
+    border-radius:20px;
+
+  }
+
+  .cart-container.active{
+
+    right:0;
+
+  }
+
+  .cart-mobile-actions{
+
+  display:flex !important;
+
+  gap:12px;
+
+  margin-top:20px;
+
+  }
+
+  .cart-mobile-actions .finish-order-btn{
+
+    flex:1;
+
+    margin-top:0;
+
+  }
+  @media(max-width:900px){
+
+  .cart-container{
+
+    display:flex;
+
+    flex-direction:column;
+
+  }
+
+  #cart-items{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    max-height:55vh;
+
+    padding-right:6px;
+
+  }
+
+  #cart-items::-webkit-scrollbar{
+  width:6px;
+}
+
+#cart-items::-webkit-scrollbar-thumb{
+
+  background:#ccc;
+
+  border-radius:20px;
+
+}
+
+}
+
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo img {
+  width: 290px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  transition: 0.3s;
+  object-fit: contain;
+}
+
+.logo img:hover {
+  transform: scale(1.05);
+}
+
 </style>
 </head>
 
 <body>
-
-<!-- ========================= -->
-<!-- MOBILE TOPBAR -->
-<!-- ========================= -->
-
-<div class="mobile-topbar">
-
-  <h2>Sushi Bar</h2>
-
-</div>
 
 <!-- ========================= -->
 <!-- SIDEBAR -->
@@ -1196,44 +1613,26 @@ body{
 
 <aside class="sidebar">
 
-  <div>
+<div class="logo">
 
-    <div class="logo">
-      Sushi Bar
-    </div>
+  <img src="Imagens/Kaizora.jpeg">
 
-    <div class="menu">
+  <div class="menu">
 
-      <button class="menu-item" onclick="showPage('home-page')">
-        🍣 Cardápio
-      </button>
+    <button class="menu-item" onclick="showPage('home-page')">
+      🍣 Cardápio
+    </button>
 
-      <button class="menu-item" onclick="showPage('orders-page')">
-        📄 Seus Pedidos
-      </button>
+    <button class="menu-item" onclick="showPage('orders-page')">
+      📄 Seus Pedidos
+    </button>
 
-      <button class="menu-item" onclick="showPage('account-page')">
-        ⚙️ Sua Conta
-      </button>
-
-    </div>
-
-  </div>
-
-  <div class="sidebar-total">
-
-    <p>Total</p>
-
-    <h2 id="sidebar-total">
-      R$0.00
-    </h2>
-
-    <button onclick="finishOrder()">
-      Finalizar Pedido
+    <button class="menu-item" onclick="showPage('account-page')">
+      ⚙️ Sua Conta
     </button>
 
   </div>
-
+</div>
 </aside>
 
 <!-- ========================= -->
@@ -1246,7 +1645,7 @@ body{
 
   <button
   id="mobile-cart-btn"
-  onclick="scrollToCart()"
+  onclick="toggleCart()"
   >
 
   🛒
@@ -1284,21 +1683,8 @@ body{
 
   <img
     class="mobile-logo"
-    src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1200&auto=format&fit=crop"
+    src="Imagens/Kaizora.jpeg"
   >
-
-  <div class="mobile-header-content">
-
-    <h1>
-      Sushi Bar
-    </h1>
-
-    <p>
-      Sushi fresco feito na hora 🍣
-    </p>
-
-  </div>
-
 </div>  
 
 <section class="recommendations">
@@ -1307,12 +1693,13 @@ body{
 
 <div class="recommendation-list">
 
+<!-- COMBO 1 -->
+
 <div class="recommendation-card"
-     style="cursor:pointer"
      onclick="openComboModal({
-       name: 'Combo de fritos!',
-       description: 'X Hot Philadelphia, X Hot Skin, X Haru Hot, X Lula à dorê, X Harumaki Legumes',
-       price: 0.90,
+       name: 'Combo Crocantissimo',
+       description: '18 Hot Roll Philadelphia Salmão, 12 Hot Roll Kani, 6 Harumaki de Queijo e 6 Harumaki de Legumes',
+       price: 6290,
        image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1200&auto=format&fit=crop'
      })"
 >
@@ -1320,67 +1707,233 @@ body{
   <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1200&auto=format&fit=crop">
 
   <div>
-    <h3>Combo de fritos!</h3>
-    <p></p>
-    <h3>R$ xx,xx</h3>
+    <h3>Combo Crocantissimo</h3>
+    <p>Uma explosão de crocância para dividir.</p>
+    <h3>R$ 62,90</h3>
   </div>
 
 </div>
-</section>
 
-<section class="menu-container">
+<!-- COMBO 2 -->
 
-<div class="categories" id="categories"></div>
-
-<div class="cart-container">
-
-<h2>🛒 Carrinho</h2>
-
-<div id="cart-items"></div>
-
-<h3 style="margin-top:20px;">
-Total:
-<span id="cart-total">R$0.00</span>
-</h3>
-
-<select
-id="payment-method"
-style="
-margin-top:20px;
-padding:14px;
-border-radius:12px;
-width:100%;
-"
+<div class="recommendation-card"
+     onclick="openComboModal({
+       name: 'Combo Philadelphia Lovers',
+       description: '18 Hot Roll Philadelphia Salmão, 16 Hossomaki Philadelphia Atum, 16 Hossomaki Philadelphia Salmão, Salada Sunomono',
+       price: 80.90,
+       image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
+     })"
 >
 
-<option value="">
-Forma de pagamento
-</option>
+  <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop">
 
-<option value="Pix">
-Pix
-</option>
-
-<option value="Cartão">
-Cartão
-</option>
-
-<option value="Dinheiro">
-Dinheiro
-</option>
-
-</select>
-
-<button
-class="finish-order-btn"
-onclick="finishOrder()"
->
-Finalizar
-</button>
+  <div>
+    <h3>Combo Philadelphia Lovers</h3>
+    <p>Os favoritos com cream cheese em um combo completo.</p>
+    <h3>R$ 80,90</h3>
+  </div>
 
 </div>
 
-<div class="products" id="products"></div>
+<!-- COMBO 3 -->
+
+<div class="recommendation-card"
+     onclick="openComboModal({
+       name: 'Combo Salmão Supreme',
+       description: '16 Hot Roll Philadelphia Salmão, 16 Hossomaki Philadelphia Salmão, 6 Harumaki de Salmão, 4 Harumaki de Queijo e Salada Sunomono',
+       price: 74.90,
+       image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
+     })"
+>
+
+  <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop">
+
+  <div>
+    <h3>Combo Salmão Supreme</h3>
+    <p>Criado especialmente para fãs de salmão.</p>
+    <h3>R$ 74,90</h3>
+  </div>
+
+</div>
+
+<!-- COMBO 4 -->
+
+<div class="recommendation-card"
+      onclick="openComboModal({
+        name: 'Combo Tradicional',
+        description: '18 Hossomaki Skin, 12 Hossomaki Kani, 6 Harumaki de Legumes e Salada Sunomono',
+        price: 44.90,
+        image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
+      })"
+  >
+
+  <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop">
+
+  <div>
+    <h3>Combo Tradicional</h3>
+    <p>Leve, equilibrado e perfeito para qualquer momento.</p>
+    <h3>R$ 44,90</h3>
+  </div>
+
+</div>
+
+  <!-- COMBO 5 -->
+
+<div class="recommendation-card"
+    onclick="openComboModal({
+      name: 'Combo Kani Mix',
+      description: '18 Hossomaki Kani, 12 Hot Roll Kani, 6 Harumaki de Queijo, 2 Harumaki de Legumes e Salada Sunomono',
+      price: 49.90,
+      image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
+    })"
+  >
+
+  <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop">
+
+  <div>
+    <h3>Combo Kani Mix</h3>
+    <p>O melhor do kani em diferentes versões.</p>
+    <h3>R$ 49,90</h3>
+  </div>
+</div> 
+
+  <!-- COMBO 6 -->
+
+<div class="recommendation-card"
+    onclick="openComboModal({
+      name: 'Combo Skin Lovers',
+      description: '20 Hot Roll Skin, 18 Hossomaki Skin e 6 Harumaki de Queijo',
+      price: 47.90,
+      image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
+    })"
+  >
+
+  <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop">
+
+  <div>
+    <h3>Combo Skin Lovers</h3>
+    <p>Muito sabor e textura em um só pedido.</p>
+    <h3>R$ 47,90</h3>
+  </div>
+</div>
+
+    <!-- COMBO 7 -->
+
+<div class="recommendation-card"
+    onclick="openComboModal({
+      name: 'Combo Premium',
+      description: '12 Hot Roll Philadelphia Salmão, 12 Hot Roll Philadelphia Atum e 12 Hossomaki Philadelphia Salmão, 12 Hossomaki Philadelphia Atum, 6 Harumaki de Salmão e salada Sunomono',
+      price: 84.90,
+      image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
+    })"
+  >
+
+  <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop">
+
+  <div>
+    <h3>Combo Premium</h3>
+    <p>Combo completo pensado para compartilhar.</p>
+    <h3>R$ 84,90</h3>
+  </div>
+
+</div>
+
+    <!-- COMBO 8 -->
+
+<div class="recommendation-card"
+    onclick="openComboModal({
+      name: 'Combo Porção Especial',
+      description: '12 Lula à Dorê, 12 Harumaki de Queijo 6 Harumaki de Legumes e 6 Harumaki de Salmão.',
+      price: 89.90,
+      image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
+    })"
+  >
+
+  <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop">
+
+  <div>
+    <h3>Combo Porção Especial</h3>
+    <p>Ideal para petiscar enquanto assiste a um filme.</p>
+    <h3>R$ 89,90</h3>
+  </div>
+
+</div>
+
+
+</div>
+</section>
+<section class="menu-container">
+
+  <!-- ESQUERDA -->
+
+  <div class="menu-content">
+
+    <div class="categories" id="categories"></div>
+
+    <div class="products" id="products"></div>
+
+  </div>
+
+  <!-- DIREITA -->
+
+  <div class="cart-container">
+
+    <h2>🛒 Carrinho</h2>
+
+    <p>* Taxa de 2 Reais de entrega</p>
+
+    <div id="cart-items"></div>
+
+    <h3 style="margin-top:20px;">
+      Total:
+      <span id="cart-total">R$0.00</span>
+    </h3>
+
+    <select
+      id="payment-method"
+      style="
+      margin-top:20px;
+      padding:14px;
+      border-radius:12px;
+      width:100%;
+      "
+    >
+
+      <option value="">
+        Forma de pagamento
+      </option>
+
+      <option value="Pix">
+        Pix
+      </option>
+
+      <option value="Cartão">
+        Cartão
+      </option>
+
+      <option value="Dinheiro">
+        Dinheiro
+      </option>
+
+    </select>
+
+  <div class="cart-mobile-actions">
+
+    <button
+      class="finish-order-btn"
+      onclick="finishOrder()"
+    >
+      Finalizar
+    </button>
+
+    <button
+      class="finish-order-btn close-cart-btn"
+      onclick="toggleCart()"
+    >
+      Fechar
+    </button>
+
+  </div>
 
 </section>
 
@@ -1389,9 +1942,6 @@ Finalizar
 <!-- ========================= -->
 <!-- ACCOUNT PAGE -->
 <!-- ========================= -->
-
-<!-- SUBSTITUA APENAS A DIV account-page POR ESTA -->
-
 <div id="account-page" class="page">
 
   <div class="account-page">
@@ -1559,115 +2109,114 @@ const db = getFirestore(app);
 const products = [
 
 {
-name:'Hot Roll Philadelphia (Salmão)',
-price:32,
+name:'Hot Roll Philadelphia Salmão (12 unidades)',
+price:22,
 category:'Hots',
-description:'Delicado hot roll recheado com salmão, cream cheese Philadelphia, cebolinha, envolto em massa crocante e levemente dourada.',
+description:'Sushi empanado com farinha Panko, recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Hot Roll Philadelphia.jpg'
 },
 
 {
-name:'Hot Roll Philadelphia (Atum)',
-price:29,
+name:'Hot Roll Philadelphia Atum (12 unidades)',
+price:20,
 category:'Hots',
-description:'Roll de salmão com cream cheese.',
+description:'Sushi empanado com farinha Panko, recheado com atum, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Hot Roll Atum.png'
 },
 
 {
-name:'Roll Philadelphia Salmão',
-price:28,
+name:'Hossomaki Philadelphia Salmão (12 unidades)',
+price:18,
 category:'Hossomakis',
-description:'Roll de salmão com cream cheese.',
+description:'Sushi recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Roll Salmão.png'
 },
 
 {
-name:'Roll Philadelphia Atum',
-price:28,
+name:'Hossomaki Philadelphia Atum (12 unidades)',
+price:18,
 category:'Hossomakis',
-description:'Roll de atum com cream cheese.',
+description:'Sushi recheado com atum, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Roll Atum.png'
 },
 
-{
-name:'Haru Hot Roll',
+/*{
+name:'Haru Hot Roll (12 unidades)',
 price:28,
 category:'Hots',
 description:'Delicado hot roll recheado com salmão, cream cheese Philadelphia, cebolinha, envolto em massa crocante e levemente dourada.',
 image:'Imagens/Haru-Hot.jpg'
-},
+},*/
 
 {
-name:'Hot Roll Skin',
-price:28,
+name:'Hot Roll Skin (12 unidades)',
+price:14,
 category:'Hots',
-description:'Delicado hot roll recheado com salmão, cream cheese Philadelphia, cebolinha, envolto em massa crocante e levemente dourada.',
+description:'Sushi empanado com farinha Panko, recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Hot Roll Skin.jpg'
 },
 
 {
-name:'Roll Skin',
-price:28,
+name:'Hossomaki Skin (12 unidades)',
+price:12,
 category:'Hossomakis',
-description:'Roll de salmão com cream cheese.',
+description:'Sushi recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Roll Skin.jpg'
 },
 
 {
-name:'Hot Roll Kani',
-price:28,
+name:'Hot Roll Kani (12 unidades)',
+price:16,
 category:'Hots',
-description:'Delicado hot roll recheado com kani, cream cheese Philadelphia, cebolinha, envolto em massa crocante e levemente dourada.',
+description:'Sushi empanado com farinha Panko, recheado com kani, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Hot Roll Kani.jpg'
 },
 
 {
-name:'Roll Kani',
-price:28,
+name:'Hossomaki Kani (12 unidades)',
+price:14,
 category:'Hossomakis',
-description:'Roll de kani com cream cheese.',
+description:'Sushi recheado com kani, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Roll Kani.jpg'
 },
 
 {
-name:'Lula à Dorê',
-price:28,
+name:'Lula à Dorê (6 unidades)',
+price:24,
 category:'Porções',
-description:'Temaki de salmão tradicional.',
+description:'Anéis de lula empanados e fritos até dourarem, crocantes por fora e macios por dentro.',
 image:'Imagens/Lula a Dore.jpg'
 },
 
 {
-name:'Harumaki de Legumes',
-price:28,
+name:'Harumaki de Legumes (6 unidades)',
+price:9.99,
 category:'Harumakis',
-description:'Temaki de salmão tradicional.',
+description:'Rolinho primavera crocante recheado com cream cheese e legumes frescos e temperados.',
 image:'Imagens/Harumaki Legume.jpg'
 },
 
 {
-name:'Harumaki de Salmão',
-price:28,
+name:'Harumaki de Salmão (6 unidades)',
+price:14.99,
 category:'Harumakis',
-description:'Temaki de salmão tradicional.',
+description:'Rolinho primavera recheado com salmão fresco e cream cheese, envolto em massa crocante.',
 image:'Imagens/Harumaki Salmão.jpeg'
 },
 
 {
-name:'Harumaki de queijo',
-price:28,
+name:'Harumaki de queijo (6 unidades)',
+price:9.99,
 category:'Harumakis',
-description:'Temaki de salmão tradicional.',
+description:'Rolinho primavera recheado com queijo, envolto em massa crocante.',
 image:'Imagens/Harumaki Queijo.jpg'
 },
 
-
 {
 name:'Salada Sunomono',
-price:28,
+price:5,
 category:'Saladas',
-description:'Temaki de salmão tradicional.',
+description:'Tradicional salada japonesa feita com pepino fatiado, molho agridoce suave e gergelim.',
 image:'Imagens/salada-sunomono.jpg'
 },
 
@@ -1687,7 +2236,7 @@ const categories = [
 
 {
   image:'Imagens/Rolls.png',
-  name:'Hossomakis'
+  name:'Hossomaki'
 },
 
 {
@@ -1697,7 +2246,7 @@ const categories = [
 
 {
   image:'Imagens/Harumaki.png',
-  name:'Harumakis'
+  name:'Harumaki'
 },
 
 {
@@ -1727,20 +2276,23 @@ JSON.parse(localStorage.getItem('orders')) || [];
 
 function showPage(id){
 
-document.querySelectorAll('.page')
-.forEach(page => {
-page.style.display='none';
-});
+  document.querySelectorAll('.page')
+  .forEach(page => {
+    page.style.display = 'none';
+  });
 
-document.getElementById(id)
-.style.display='block';
+  document.getElementById(id).style.display = 'block';
 
-if(id === 'orders-page'){
-renderOrders();
+  const cartBtn = document.getElementById('mobile-cart-btn');
+
+  if (cartBtn) {
+    cartBtn.style.display = (id === 'home-page') ? 'flex' : 'none';
+  }
+
+  if(id === 'orders-page'){
+    renderOrders();
+  }
 }
-
-}
-
 /* ========================= */
 /* RENDER CATEGORIES */
 /* ========================= */
@@ -1902,6 +2454,10 @@ cartItems.innerHTML='';
 
 let total = 0;
 
+if(cart.length > 0){
+  total += 2; // taxa de entrega
+}
+
 cart.forEach((item,index)=>{
 
 total += item.price;
@@ -1936,14 +2492,9 @@ onclick="removeCart(${index})"
 document.getElementById('cart-total')
 .innerText = `R$${total.toFixed(2)}`;
 
-document.getElementById('sidebar-total')
-.innerText = `R$${total.toFixed(2)}`;
-
 document.getElementById(
 'mobile-cart-count'
 ).innerText = cart.length;
-
-window.scrollToCart = scrollToCart;
 
 }
 
@@ -2071,7 +2622,7 @@ async function finishOrder(){
   cart.reduce(
     (sum,item)=>sum+item.price,
     0
-  );
+  ) + 2;
 
   pendingOrder = {
 
@@ -2375,33 +2926,6 @@ window.removeCart = removeCart;
 window.finishOrder = finishOrder;
 window.saveUserData = saveUserData;
 
-
-function scrollToCart(){
-
-  // abre a página do cardápio
-  showPage('home-page');
-
-  // espera renderizar
-  setTimeout(() => {
-
-    const cartSection =
-    document.querySelector('.cart-container');
-
-    if(cartSection){
-
-      cartSection.scrollIntoView({
-
-        behavior:'smooth',
-        block:'start'
-
-      });
-
-    }
-
-  }, 100);
-
-}
-
 let selectedCombo = null;
 
 function openComboModal(combo){
@@ -2440,6 +2964,31 @@ function confirmAddCombo(){
   window.closeComboModal = closeComboModal;
   window.confirmAddCombo = confirmAddCombo;
 
+
+  function toggleCart(){
+
+    const cart =
+    document.querySelector('.cart-container');
+
+    cart.classList.toggle('active');
+
+  }
+
+  window.toggleCart = toggleCart;
+  
+
+const slider = document.querySelector('.recommendation-list');
+
+const comboList =
+document.querySelector('.recommendation-list');
+
+comboList.addEventListener('wheel', (e) => {
+
+  e.preventDefault();
+
+  comboList.scrollLeft += e.deltaY;
+
+});
 </script>
 <!-- ========================= -->
 <!-- ORDER MODAL -->
