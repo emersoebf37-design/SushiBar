@@ -30,6 +30,11 @@ coverage/
 .env.*
 !.env.example
 
+auth_whatsapp/
+sent_orders.json
+firebase-key.json
+node_modules/
+
 # Chaves e credenciais
 firebase-key.json
 Imagens/Git-2.54.0-64-bit.exe
