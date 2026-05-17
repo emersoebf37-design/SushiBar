@@ -5,6 +5,13 @@ const {
   StringSelectMenuBuilder
 } = require('discord.js');
 
+const {
+  conectarWhatsApp,
+  enviarMensagem,
+  mensagemNovoPedido,
+  mensagemStatus
+} = require('./whatsapp');
+
 const admin = require('firebase-admin');
 
 const serviceAccount = require('./firebase-key.json');
@@ -37,6 +44,7 @@ client.once('ready', () => {
 
   console.log(`Bot online: ${client.user.tag}`);
 
+  conectarWhatsApp();
   listenOrders();
 
 });
@@ -116,6 +124,11 @@ async function listenOrders(){
         components:[row]
 
       });
+    
+      await enviarMensagem(
+      order.phone,
+      mensagemNovoPedido(order)
+      );
 
     }
 
@@ -143,6 +156,20 @@ client.on('interactionCreate', async(interaction)=>{
     status:value
 
   });
+
+  // Busca os dados do pedido para pegar o telefone
+  const orderDoc = await db
+    .collection('orders')
+    .doc(orderId)
+    .get();
+
+  const orderData = orderDoc.data();
+
+  // Manda atualização no WhatsApp
+  await enviarMensagem(
+    orderData.phone,
+    mensagemStatus(orderData, value)
+  );
 
   await interaction.reply({
 
