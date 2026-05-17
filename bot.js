@@ -87,30 +87,31 @@ async function listenOrders(){
 
       await channel.send({
 
-        content:
+    content:
+    `\`\`\`ansi
+    \u001b[1;33m🍣 NOVO PEDIDO\u001b[0m
 
-`🍣 NOVO PEDIDO
+    \u001b[1;37mCliente:\u001b[0m ${order.customer}
+    \u001b[1;37mTelefone:\u001b[0m ${order.phone}
 
-Cliente: ${order.customer}
+    \u001b[1;37mEndereço:\u001b[0m
+    ${order.address}, ${order.number}
+    ${order.complement}
 
-Telefone: ${order.phone}
+    \u001b[1;37mPagamento:\u001b[0m ${order.payment}
 
-Endereço:
-${order.address}, ${order.number}
+    \u001b[1;36mItens:\u001b[0m
+    ${order.items.map(i => i.name).join('\n')}
 
-${order.complement}
+    \u001b[1;36mAdicionais:\u001b[0m
+    🥢 Hashi: ${order.addons?.hashi || 0}
+    🍯 Tarê: ${order.addons?.tare || 0}
+    🍶 Teriyaki: ${order.addons?.teriyaki || 0}
 
-Pagamento:
-${order.payment}
+    \u001b[1;32mTotal: R$${order.total.toFixed(2)}\u001b[0m
 
-Itens:
-${order.items.map(i=>i.name).join(', ')}
-
-Total:
-R$${order.total.toFixed(2)}
-
-Status:
-${order.status}`,
+    \u001b[1;31mStatus: ${order.status}\u001b[0m
+    \`\`\``,
 
         components:[row]
 

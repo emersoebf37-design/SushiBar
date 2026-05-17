@@ -143,6 +143,12 @@ body{
   display:none;
 }
 
+.cart-mobile-actions{
+  display:none;
+  gap:12px;
+  margin-top:20px;
+}
+
 @media(max-width:900px){
 
 
@@ -215,16 +221,6 @@ body{
     padding-bottom:110px;
   }
 
-  .cart-mobile-actions{
-
-    display:none !important;
-
-    gap:12px;
-
-    margin-top:20px;
-
-  }
-
   @media(max-width:900px){
 
     .cart-mobile-actions{
@@ -242,6 +238,12 @@ body{
     margin-top:0;
 
   }
+
+  @media(max-width:900px){
+  .cart-mobile-actions{
+    display:flex !important;
+  }
+}
   
 }
 
@@ -552,31 +554,23 @@ body{
 }
 
 #cart-items{
-
+  overflow-y:auto;
+  max-height:55vh;
+  padding-right:6px;
   display:flex;
-
-  flex-wrap:wrap;
-
-  gap:15px;
+  flex-direction:column;
+  gap:10px;
 }
 
 .cart-item{
-
   background:#f3f3f3;
-
-  padding:15px;
-
+  padding:15px 18px;
   border-radius:15px;
-
   display:flex;
-
   justify-content:space-between;
-
   align-items:center;
-
-  flex:1;
-
-  min-width:250px;
+  width:100%;
+  min-height:72px;
 }
 
 .trash-btn{
@@ -1601,6 +1595,87 @@ body{
 .logo img:hover {
   transform: scale(1.05);
 }
+.addons-box{
+  margin-top:20px;
+  padding:18px;
+  border-radius:18px;
+  background:#f6f6f6;
+  border:1px solid #e6e6e6;
+}
+
+.addons-box h3{
+  margin-bottom:15px;
+  font-size:20px;
+}
+
+.addon-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:12px 0;
+  border-bottom:1px solid #e9e9e9;
+}
+
+.addon-item:last-child{
+  border-bottom:none;
+}
+
+/* CONTROLE DE QUANTIDADE */
+.qty-control{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:white;
+  padding:6px 10px;
+  border-radius:999px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* BOTÕES + e - */
+.qty-control button{
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:50%;
+  background:#9e0505;
+  color:white;
+  font-size:18px;
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  transition:0.2s;
+}
+
+.qty-control button:hover{
+  background:#c20707;
+  transform:scale(1.1);
+}
+
+.qty-control button:active{
+  transform:scale(0.95);
+}
+
+/* NÚMERO */
+.qty-control span{
+  min-width:20px;
+  text-align:center;
+  font-weight:bold;
+  font-size:16px;
+}
+
+#desktop-finish-btn{
+  display:none;
+}
+
+@media(min-width:901px){
+  #desktop-finish-btn{
+    display:block;
+  }
+}
 
 </style>
 </head>
@@ -1917,13 +1992,22 @@ body{
 
     </select>
 
+  <button
+    class="finish-order-btn"
+    id="desktop-finish-btn"
+    onclick="finishOrder()"
+    style="width:100%;margin-top:15px;font-size:16px;font-weight:bold;"
+  >
+    Finalizar Pedido
+  </button>
+
   <div class="cart-mobile-actions">
 
     <button
       class="finish-order-btn"
       onclick="finishOrder()"
     >
-      Finalizar
+      Finalizar Pedido
     </button>
 
     <button
@@ -2127,7 +2211,7 @@ image:'Imagens/Hot Roll Atum.png'
 {
 name:'Hossomaki Philadelphia Salmão (12 unidades)',
 price:18,
-category:'Hossomakis',
+category:'Hossomaki',
 description:'Sushi recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Roll Salmão.png'
 },
@@ -2135,7 +2219,7 @@ image:'Imagens/Roll Salmão.png'
 {
 name:'Hossomaki Philadelphia Atum (12 unidades)',
 price:18,
-category:'Hossomakis',
+category:'Hossomaki',
 description:'Sushi recheado com atum, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Roll Atum.png'
 },
@@ -2159,7 +2243,7 @@ image:'Imagens/Hot Roll Skin.jpg'
 {
 name:'Hossomaki Skin (12 unidades)',
 price:12,
-category:'Hossomakis',
+category:'Hossomaki',
 description:'Sushi recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Roll Skin.jpg'
 },
@@ -2175,7 +2259,7 @@ image:'Imagens/Hot Roll Kani.jpg'
 {
 name:'Hossomaki Kani (12 unidades)',
 price:14,
-category:'Hossomakis',
+category:'Hossomaki',
 description:'Sushi recheado com kani, cream cheese e arroz, envolto em alga nori.',
 image:'Imagens/Roll Kani.jpg'
 },
@@ -2191,7 +2275,7 @@ image:'Imagens/Lula a Dore.jpg'
 {
 name:'Harumaki de Legumes (6 unidades)',
 price:9.99,
-category:'Harumakis',
+category:'Harumaki',
 description:'Rolinho primavera crocante recheado com cream cheese e legumes frescos e temperados.',
 image:'Imagens/Harumaki Legume.jpg'
 },
@@ -2199,7 +2283,7 @@ image:'Imagens/Harumaki Legume.jpg'
 {
 name:'Harumaki de Salmão (6 unidades)',
 price:14.99,
-category:'Harumakis',
+category:'Harumaki',
 description:'Rolinho primavera recheado com salmão fresco e cream cheese, envolto em massa crocante.',
 image:'Imagens/Harumaki Salmão.jpeg'
 },
@@ -2207,7 +2291,7 @@ image:'Imagens/Harumaki Salmão.jpeg'
 {
 name:'Harumaki de queijo (6 unidades)',
 price:9.99,
-category:'Harumakis',
+category:'Harumaki',
 description:'Rolinho primavera recheado com queijo, envolto em massa crocante.',
 image:'Imagens/Harumaki Queijo.jpg'
 },
@@ -2579,28 +2663,24 @@ let pendingOrder = null;
 async function finishOrder(){
 
   if(cart.length === 0){
-
     alert('Carrinho vazio!');
     return;
   }
 
   const payment =
-  document.getElementById('payment-method').value;
+    document.getElementById('payment-method').value;
 
   if(payment === ''){
-
     alert('Escolha uma forma de pagamento!');
     return;
   }
 
   const user =
-  JSON.parse(localStorage.getItem('userData'));
+    JSON.parse(localStorage.getItem('userData'));
 
   if(!user){
-
     alert('Preencha os dados da conta!');
     showPage('account-page');
-
     return;
   }
 
@@ -2611,82 +2691,57 @@ async function finishOrder(){
     !user.number ||
     !user.complement
   ){
-
     alert('Complete todos os dados!');
     showPage('account-page');
-
     return;
   }
 
-  const total =
-  cart.reduce(
-    (sum,item)=>sum+item.price,
-    0
-  ) + 2;
+  // ✅ PEGA OS ADDONS REAIS DO ESTADO GLOBAL
+  const addonsCopy = { ...addons };
+
+  const baseTotal =
+    cart.reduce((sum,item)=>sum+item.price,0) + (cart.length > 0 ? 2 : 0);
+
+  const addonTotal =
+    (addonsCopy.tare * 0.5) +
+    (addonsCopy.teriyaki * 0.5);
+
+  const total = baseTotal + addonTotal;
 
   pendingOrder = {
-
-    customer:user.name,
-
-    phone:user.phone,
-
-    address:user.address,
-
-    number:user.number,
-
-    complement:user.complement,
-
+    customer: user.name,
+    phone: user.phone,
+    address: user.address,
+    number: user.number,
+    complement: user.complement,
     payment,
-
-    items:[...cart],
-
+    items: [...cart],
     total,
-
-    status:"Recebido",
-
-    createdAt:Date.now()
-
+    addons: addonsCopy,
+    status: "Recebido",
+    createdAt: Date.now()
   };
 
-  document.getElementById(
-    'modal-content'
-  ).innerHTML = `
+  document.getElementById('modal-content').innerHTML = `
+    <p><strong>Cliente:</strong> ${user.name}</p>
+    <p><strong>Telefone:</strong> ${user.phone}</p>
+    <p><strong>Endereço:</strong><br>${user.address}, ${user.number}</p>
+    <p>${user.complement}</p>
+    <p><strong>Pagamento:</strong> ${payment}</p>
 
+    <p><strong>Adicionais:</strong></p>
     <p>
-      <strong>Cliente:</strong>
-      ${user.name}
-    </p>
-
-    <p>
-      <strong>Telefone:</strong>
-      ${user.phone}
-    </p>
-
-    <p>
-      <strong>Endereço:</strong><br>
-      ${user.address},
-      ${user.number}
-    </p>
-
-    <p>
-      ${user.complement}
-    </p>
-
-    <p>
-      <strong>Pagamento:</strong>
-      ${payment}
+      Hashi: ${addonsCopy.hashi || 0}<br>
+      Tarê: ${addonsCopy.tare || 0}<br>
+      Teriyaki: ${addonsCopy.teriyaki || 0}
     </p>
 
     <div class="modal-total">
       R$${total.toFixed(2)}
     </div>
-
   `;
 
-  document.getElementById(
-    'order-modal'
-  ).style.display = 'flex';
-
+  document.getElementById('order-modal').style.display = 'flex';
 }
 
 function closeOrderModal(){
@@ -2701,24 +2756,32 @@ async function confirmOrderFirebase(){
 
   if(!pendingOrder) return;
 
+  const addonsCopy = { ...addons };
+
+  const baseTotal =
+    cart.reduce((sum, item) => sum + item.price, 0) + (cart.length > 0 ? 2 : 0);
+
+  const addonTotal =
+    (addonsCopy.tare * 0.5) +
+    (addonsCopy.teriyaki * 0.5);
+
+  const total = baseTotal + addonTotal;
+
+  pendingOrder.addons = addonsCopy;
+  pendingOrder.total = total;
+
   await addDoc(
-
-    collection(db,"orders"),
-
+    collection(db, "orders"),
     pendingOrder
-
   );
 
-  cart=[];
-
+  cart = [];
   saveCart();
-
   renderCart();
-
+  resetAddonUI();
   closeOrderModal();
 
   alert('Pedido realizado!');
-
 }
 
 /* ========================= */
@@ -2989,7 +3052,76 @@ comboList.addEventListener('wheel', (e) => {
   comboList.scrollLeft += e.deltaY;
 
 });
+
+let addons = {
+  hashi: 0,
+  tare: 0,
+  teriyaki: 0
+};
+
+const ADDON_PRICE = {
+  tare: 0.5,
+  teriyaki: 0.5
+};
+
+
+function calculateTotal(){
+
+  const baseTotal =
+    cart.reduce((sum, item) => sum + item.price, 0) + 2;
+
+  const addonTotal =
+    (addons.tare * ADDON_PRICE.tare) +
+    (addons.teriyaki * ADDON_PRICE.teriyaki);
+
+  return baseTotal + addonTotal;
+}
+
+function updateModalTotal(){
+
+  const total = calculateTotal();
+
+  const el = document.querySelector('.modal-total');
+
+  if(el){
+    el.innerText = `R$${total.toFixed(2)}`;
+  }
+}
+
+function changeAddon(type, value){
+
+  if(!addons[type] && addons[type] !== 0) return;
+
+  addons[type] = Math.max(0, addons[type] + value);
+
+  const el = document.getElementById(`qty-${type}`);
+
+  if(el){
+    el.innerText = addons[type];
+  }
+
+  updateModalTotal();
+}
+
+function resetAddonUI(){
+
+  Object.keys(addons).forEach(key=>{
+    addons[key] = 0;
+
+    const el = document.getElementById(`qty-${key}`);
+    if(el) el.innerText = 0;
+  });
+
+  updateModalTotal();
+}
+
+window.changeAddon = changeAddon;
+window.resetAddonUI = resetAddonUI;
+window.updateModalTotal = updateModalTotal;
+
 </script>
+
+
 <!-- ========================= -->
 <!-- ORDER MODAL -->
 <!-- ========================= -->
@@ -2998,28 +3130,47 @@ comboList.addEventListener('wheel', (e) => {
 
   <div class="modal-box">
 
-    <h2>
-      Confirmar Pedido 🍣
-    </h2>
+    <h2>Confirmar Pedido 🍣</h2>
 
     <div id="modal-content"></div>
 
+    <!-- ADICIONAIS FIXOS -->
+    <div class="addons-box">
+
+      <h3>Adicionais</h3>
+
+      <div class="addon-item">
+        <span>🥢 Adaptador de hashi (Grátis)</span>
+        <div class="qty-control">
+          <button onclick="changeAddon('hashi', -1)">−</button>
+          <span id="qty-hashi">0</span>
+          <button onclick="changeAddon('hashi', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="addon-item">
+        <span>🍯 Molho Tarê (+R$0,50)</span>
+        <div class="qty-control">
+          <button onclick="changeAddon('tare', -1)">−</button>
+          <span id="qty-tare">0</span>
+          <button onclick="changeAddon('tare', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="addon-item">
+        <span>🍶 Molho Teriyaki (+R$0,50)</span>
+        <div class="qty-control">
+          <button onclick="changeAddon('teriyaki', -1)">−</button>
+          <span id="qty-teriyaki">0</span>
+          <button onclick="changeAddon('teriyaki', 1)">+</button>
+        </div>
+      </div>
+
+    </div>
+
     <div class="modal-buttons">
-
-      <button
-        class="modal-cancel"
-        onclick="closeOrderModal()"
-      >
-        Cancelar
-      </button>
-
-      <button
-        class="modal-confirm"
-        onclick="confirmOrderFirebase()"
-      >
-        Confirmar
-      </button>
-
+      <button class="modal-cancel" onclick="closeOrderModal()">Cancelar</button>
+      <button class="modal-confirm" onclick="confirmOrderFirebase()">Confirmar</button>
     </div>
 
   </div>
