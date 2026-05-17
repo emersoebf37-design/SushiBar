@@ -62,11 +62,8 @@ async function enviarMensagem(telefone, mensagem){
 
   try {
 
-    // Formata o número para o padrão do WhatsApp
-    // Remove tudo que não for número
     const numero = telefone.replace(/\D/g, '');
 
-    // Adiciona DDI 55 se não tiver
     const jid = numero.startsWith('55')
       ? `${numero}@s.whatsapp.net`
       : `55${numero}@s.whatsapp.net`;
@@ -107,6 +104,22 @@ ${order.complement}
 Acompanhe seu pedido por aqui. Obrigado! 🙏`;
 }
 
+// 🆕 MENSAGEM DE COBRANÇA PIX
+function mensagemPix(order){
+  return `💸 *Kaizora — Pagamento via Pix*
+
+Olá, *${order.customer}*! Para confirmar seu pedido, realize o pagamento:
+
+💰 *Valor:* R$${order.total.toFixed(2)}
+
+🔑 *Chave Pix:*
+\`SEU_CHAVE_PIX_AQUI\`
+
+Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos seu pedido. 🙏
+
+⚠️ O pedido só será preparado após a confirmação do pagamento.`;
+}
+
 /* MENSAGEM DE STATUS */
 function mensagemStatus(order, novoStatus){
 
@@ -135,5 +148,6 @@ module.exports = {
   conectarWhatsApp,
   enviarMensagem,
   mensagemNovoPedido,
-  mensagemStatus
+  mensagemStatus,
+  mensagemPix  // 🆕 exportando a nova função
 };

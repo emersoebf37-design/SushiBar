@@ -2155,6 +2155,8 @@ import {
   addDoc,
   onSnapshot,
   updateDoc,
+  setDoc,   
+  getDoc,   
   doc,
   query,
   orderBy
@@ -2770,20 +2772,49 @@ async function confirmOrderFirebase(){
   pendingOrder.addons = addonsCopy;
   pendingOrder.total = total;
 
-  await addDoc(
-    collection(db, "orders"),
-    pendingOrder
-  );
+  // Gera o próximo ID sequencial
+  let nextId = 1;
 
-  cart = [];
-  saveCart();
-  renderCart();
-  resetAddonUI();
-  closeOrderModal();
+  try {
 
-  alert('Pedido realizado!');
+    const counterRef = doc(db, "meta", "orderCounter");
+    const counterSnap = await getDoc(counterRef);
+
+    if(counterSnap.exists()){
+      nextId = (counterSnap.data().current || 0) + 1;
+      await updateDoc(counterRef, { current: nextId });
+    } else {
+      // Primeira vez: cria o documento com current: 1
+      await setDoc(counterRef, { current: 1 });
+      nextId = 1;
+    }
+
+  } catch(e) {
+    console.error('Erro no contador:', e);
+    // Mesmo se o contador falhar, salva o pedido sem ID sequencial
+    nextId = Date.now();
+  }
+
+  pendingOrder.orderId = nextId;
+
+  try {
+
+    await addDoc(collection(db, "orders"), pendingOrder);
+
+    cart = [];
+    saveCart();
+    renderCart();
+    resetAddonUI();
+    closeOrderModal();
+
+    alert(`Pedido #${nextId} realizado!`);
+
+  } catch(e) {
+    console.error('Erro ao salvar pedido:', e);
+    alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
+  }
+
 }
-
 /* ========================= */
 /* GLOBAL FUNCTIONS */
 /* ========================= */
@@ -2928,6 +2959,8 @@ function renderOrders(){
           </h3>
 
         </div>
+
+         <p><strong>Pedido #${order.orderId || '—'}</strong></p>
 
           <p>
             Cliente:

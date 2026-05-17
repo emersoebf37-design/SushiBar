@@ -9,12 +9,13 @@ const {
   conectarWhatsApp,
   enviarMensagem,
   mensagemNovoPedido,
-  mensagemStatus
+  mensagemStatus,
+  mensagemPix
 } = require('./whatsapp');
 
 const admin = require('firebase-admin');
-
 const serviceAccount = require('./firebase-key.json');
+const fs = require('fs');
 
 /* FIREBASE */
 
@@ -34,70 +35,95 @@ const client = new Client({
 
 const CHANNEL_ID = '1503577826207600823';
 
-/* PEDIDOS JÁ ENVIADOS */
+/* ARQUIVO DE IDs JÁ PROCESSADOS */
 
-const sentOrders = new Set();
+const SENT_FILE = './sent_orders.json';
+
+function carregarEnviados() {
+  try {
+    if (fs.existsSync(SENT_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SENT_FILE, 'utf8'));
+      return new Set(data);
+    }
+  } catch(err) {
+    console.error('Erro ao carregar sent_orders.json:', err.message);
+  }
+  return new Set();
+}
+
+function salvarEnviados(set) {
+  try {
+    fs.writeFileSync(SENT_FILE, JSON.stringify([...set]), 'utf8');
+  } catch(err) {
+    console.error('Erro ao salvar sent_orders.json:', err.message);
+  }
+}
+
+const sentOrders = carregarEnviados();
 
 /* BOT ONLINE */
 
 client.once('ready', () => {
-
   console.log(`Bot online: ${client.user.tag}`);
-
   conectarWhatsApp();
   listenOrders();
-
 });
 
 /* ESCUTAR PEDIDOS */
 
-async function listenOrders(){
+async function listenOrders() {
 
   db.collection('orders')
-  .onSnapshot(async(snapshot)=>{
+    .orderBy('createdAt', 'desc')
+    .onSnapshot(async (snapshot) => {
 
-    for(const change of snapshot.docChanges()){
+      for (const change of snapshot.docChanges()) {
 
-      if(change.type !== 'added') continue;
+        if (change.type !== 'added') continue;
 
-      const orderId = change.doc.id;
+        const orderId = change.doc.id;
 
-      if(sentOrders.has(orderId)) continue;
-
-      sentOrders.add(orderId);
-
-      const order = change.doc.data();
-
-      const channel =
-      await client.channels.fetch(CHANNEL_ID);
-
-      const menu =
-      new StringSelectMenuBuilder()
-      .setCustomId(`status_${orderId}`)
-      .setPlaceholder('Atualizar status')
-      .addOptions([
-        {
-          label:'Em preparo',
-          value:'Em preparo'
-        },
-        {
-          label:'Saiu para entrega',
-          value:'Saiu para entrega'
-        },
-        {
-          label:'Entregue',
-          value:'Entregue'
+        if (sentOrders.has(orderId)) {
+          console.log(`⏭️ Pedido ${orderId} já enviado, ignorando.`);
+          continue;
         }
-      ]);
 
-      const row =
-      new ActionRowBuilder().addComponents(menu);
+        // Só processa pedidos dos últimos 5 minutos
+        const order = change.doc.data();
+        const agora = Date.now();
+        const criado = order.createdAt || 0;
 
-      await channel.send({
+        if (agora - criado > 5 * 60 * 1000) {
+          console.log(`⏭️ Pedido ${orderId} é antigo, ignorando.`);
+          sentOrders.add(orderId);
+          salvarEnviados(sentOrders);
+          continue;
+        }
 
-    content:
-    `\`\`\`ansi
-    \u001b[1;33m🍣 NOVO PEDIDO\u001b[0m
+        sentOrders.add(orderId);
+        salvarEnviados(sentOrders);
+
+        console.log(`🛒 Novo pedido: ${orderId} — ${order.customer}`);
+
+        /* DISCORD */
+
+        const channel = await client.channels.fetch(CHANNEL_ID);
+
+        const menu = new StringSelectMenuBuilder()
+          .setCustomId(`status_${orderId}`)
+          .setPlaceholder('Atualizar status')
+          .addOptions([
+            { label: 'Em preparo',        value: 'Em preparo'        },
+            { label: 'Saiu para entrega', value: 'Saiu para entrega' },
+            { label: 'Entregue',          value: 'Entregue'          }
+          ]);
+
+        const row = new ActionRowBuilder().addComponents(menu);
+
+        await channel.send({
+          content:
+          `\`\`\`ansi
+    \u001b[1;33m🍣 NOVO PEDIDO — #${order.orderId || '?'}\u001b[0m
 
     \u001b[1;37mCliente:\u001b[0m ${order.customer}
     \u001b[1;37mTelefone:\u001b[0m ${order.phone}
@@ -120,63 +146,42 @@ async function listenOrders(){
 
     \u001b[1;31mStatus: ${order.status}\u001b[0m
     \`\`\``,
+          components: [row]
+        });
 
-        components:[row]
+        /* WHATSAPP */
 
-      });
-    
-      await enviarMensagem(
-      order.phone,
-      mensagemNovoPedido(order)
-      );
+        await enviarMensagem(order.phone, mensagemNovoPedido(order));
 
-    }
+        if (order.payment?.toLowerCase().includes('pix')) {
+          await enviarMensagem(order.phone, mensagemPix(order));
+        }
 
-  });
+      }
+
+    });
 
 }
 
 /* ALTERAR STATUS */
 
-client.on('interactionCreate', async(interaction)=>{
+client.on('interactionCreate', async (interaction) => {
 
-  if(!interaction.isStringSelectMenu()) return;
+  if (!interaction.isStringSelectMenu()) return;
 
-  const value =
-  interaction.values[0];
+  const value   = interaction.values[0];
+  const orderId = interaction.customId.replace('status_', '');
 
-  const orderId =
-  interaction.customId.replace('status_','');
+  await db.collection('orders').doc(orderId).update({ status: value });
 
-  await db
-  .collection('orders')
-  .doc(orderId)
-  .update({
-
-    status:value
-
-  });
-
-  // Busca os dados do pedido para pegar o telefone
-  const orderDoc = await db
-    .collection('orders')
-    .doc(orderId)
-    .get();
-
+  const orderDoc  = await db.collection('orders').doc(orderId).get();
   const orderData = orderDoc.data();
 
-  // Manda atualização no WhatsApp
-  await enviarMensagem(
-    orderData.phone,
-    mensagemStatus(orderData, value)
-  );
+  await enviarMensagem(orderData.phone, mensagemStatus(orderData, value));
 
   await interaction.reply({
-
-    content:`✅ Status atualizado para: ${value}`,
-
-    ephemeral:true
-
+    content: `✅ Status atualizado para: ${value}`,
+    ephemeral: true
   });
 
 });
@@ -184,5 +189,4 @@ client.on('interactionCreate', async(interaction)=>{
 /* LOGIN */
 
 require('dotenv').config();
-
 client.login(process.env.DISCORD_TOKEN);
