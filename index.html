@@ -1687,6 +1687,37 @@ body{
   }
 }
 
+.esgotado-overlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:260px;
+  background:rgba(0,0,0,0.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2;
+}
+
+.esgotado-badge{
+  background:#b30000;
+  color:white;
+  font-size:22px;
+  font-weight:bold;
+  padding:10px 28px;
+  border-radius:12px;
+  letter-spacing:2px;
+  transform:rotate(-15deg);
+  box-shadow:0 4px 15px rgba(0,0,0,0.4);
+}
+
+.product-card.esgotado .add-cart-btn{
+  background:#aaa;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+
 </style>
 </head>
 
@@ -1776,177 +1807,8 @@ body{
 
 <h2>Combos</h2>
 
-<div class="recommendation-list">
+<div class="recommendation-list" id="combo-list"></div>
 
-<!-- COMBO 1 -->
-
-<div class="recommendation-card"
-     onclick="openComboModal({
-       name: 'Combo Crocantissimo',
-       description: '1 Temaki Frito, 8 Hot Skin, 8 Hot Kani, 8 Hot Philadelphia Salmão.',
-       price: 49.90,
-       image: 'Imagens/Combo Crocantissimo.png'
-     })"
->
-
-  <img src="Imagens/Combo Crocantissimo.png">
-
-  <div>
-    <h3>Combo Crocantissimo</h3>
-    <p>Uma explosão de crocância</p>
-    <h3>R$ 49,90</h3>
-  </div>
-
-</div>
-
-<!-- COMBO 2 -->
-
-<div class="recommendation-card"
-     onclick="openComboModal({
-       name: 'Combo Individual',
-       description: '1 Temaki Frito, 8 Hossomaki Philadelphia, 2 Harumaki de Legumes',
-       price: 39.90,
-       image: 'Imagens/Combo Individual.jpg'
-     })"
->
-
-  <img src="Imagens/Combo Individual.jpg">
-
-  <div>
-    <h3>Combo Individual</h3>
-    <p>Uma seleção para as noites de muita fome.</p>
-    <h3>R$ 39,90</h3>
-  </div>
-
-</div>
-
-<!-- COMBO 3 -->
-
-<div class="recommendation-card"
-     onclick="openComboModal({
-       name: 'Combo de Frios',
-       description: '18 Hossomaki Skin, 18 Hossomaki Kani e Salada Sunomono',
-       price: 29.90,
-       image: 'Imagens/Combo de Frios.png'
-     })"
->
-
-  <img src="Imagens/Combo de Frios.png">
-
-  <div>
-    <h3>Combo de Frios</h3>
-    <p>Uma seleção de peças frias saborosas.</p>
-    <h3>R$ 29,90</h3>
-  </div>
-
-</div>
-
-<!-- COMBO 4 -->
-
-<div class="recommendation-card"
-      onclick="openComboModal({
-        name: 'Combo Premium',
-        description: '24 Hot Philadelphia Salmão, 12 Hot Skin e 6 Lula à Dorê',
-        price: 74.90,
-        image: 'Imagens/Combo Premium.png'
-      })"
-  >
-
-  <img src="Imagens/Combo Premium.png">
-
-  <div>
-    <h3>Combo Premium</h3>
-    <p>Combo completo pensado para compartilhar.</p>
-    <h3>R$ 74,90</h3>
-  </div>
-
-</div>
-
-  <!-- COMBO 5 -->
-
-<div class="recommendation-card"
-    onclick="openComboModal({
-      name: 'Combo Primavera',
-      description: ' 4 Harumaki de Legumes, 4 Harumaki de Queijo e 4 Harumaki de Frango',
-      price: 37.90,
-      image: 'Imagens/Combo Primavera.jpg'
-    })"
-  >
-
-  <img src="Imagens/Combo Primavera.jpg">
-
-  <div>
-    <h3>Combo Primavera</h3>
-    <p>Uma seleção crocante de peças saborosas.</p>
-    <h3>R$ 37,90</h3>
-  </div>
-</div> 
-
-
-
-<div class="recommendation-card"
-    onclick="openComboModal({
-      name: 'Mega Combo Hot Roll',
-      description: '32 Hot Roll Philadelphia',
-      price: 39.90,
-      image: 'Imagens/Mega Combo Hot Roll.jpg'
-    })"
-  >
-
-  <img src="Imagens/Mega Combo Hot Roll.jpg">
-
-  <div>
-    <h3>Mega Combo Hot Roll</h3>
-    <p>Hot Roll até não dar mais</p>
-    <h3>R$ 39,90</h3>
-  </div>
-</div>
-
-  <!-- 
-
-<div class="recommendation-card"
-    onclick="openComboModal({
-      name: 'Combo Premium',
-      description: '12 Hot Roll Philadelphia Salmão, 12 Hot Roll Philadelphia Atum e 12 Hossomaki Philadelphia Salmão, 12 Hossomaki Philadelphia Atum, 6 Harumaki de Salmão e salada Sunomono',
-      price: 139.90,
-      image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
-    })"
-  >
-
-  <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop">
-
-  <div>
-    <h3>Combo Premium</h3>
-    <p>Combo completo pensado para compartilhar.</p>
-    <h3>R$ 139,90</h3>
-  </div>
-
-</div>
-
-
-
-<div class="recommendation-card"
-    onclick="openComboModal({
-      name: 'Combo Porção Especial',
-      description: '12 Lula à Dorê, 12 Harumaki de Queijo 6 Harumaki de Legumes e 2 Harumaki de Salmão.',
-      price: 139.90,
-      image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop'
-    })"
-  >
-
-  <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=1200&auto=format&fit=crop">
-
-  <div>
-    <h3>Combo Porção Especial</h3>
-    <p>Ideal para petiscar enquanto assiste a um filme.</p>
-    <h3>R$ 139,90</h3>
-  </div>
--->
-
-</div>
-
-
-</div>
 </section>
 <section class="menu-container">
 
@@ -2210,7 +2072,8 @@ name:'Hot Roll Philadelphia Salmão (12 unidades)',
 price:21,
 category:'Hots',
 description:'Sushi empanado com farinha Panko, recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.',
-image:'Imagens/Hot Roll Philadelphia.jpg'
+image:'Imagens/Hot Roll Philadelphia.jpg',
+esgotado: false
 },
 
 {
@@ -2218,15 +2081,17 @@ name:'Temaki Frito',
 price:26.99,
 category:'Hots',
 description:'Temaki empanado com farinha Panko, recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.',
-image:'Imagens/Temaki-Frito.jpg'
+image:'Imagens/Temaki-Frito.jpg',
+esgotado: false
 },
 
 {
 name:'Temaki ',
 price:19.99,
-category:'Hots',
+category:'Hossomaki',
 description:'Temaki recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.',
-image:'Imagens/Temaki.jpg'
+image:'Imagens/Temaki.jpg',
+esgotado: true
 },
 
 {
@@ -2234,7 +2099,8 @@ name:'Hossomaki Philadelphia Salmão (12 unidades)',
 price:19,
 category:'Hossomaki',
 description:'Sushi recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.',
-image:'Imagens/Roll Salmão.png'
+image:'Imagens/Roll Salmão.png',
+esgotado: false
 },
 /*
 {
@@ -2242,7 +2108,8 @@ name:'Hossomaki Philadelphia Atum (12 unidades)',
 price:18,
 category:'Hossomaki',
 description:'Sushi recheado com atum, cream cheese e arroz, envolto em alga nori.',
-image:'Imagens/Roll Atum.png'
+image:'Imagens/Roll Atum.png',
+esgotado: false
 },
 */
 {
@@ -2250,7 +2117,8 @@ name:'Shimeji na Manteiga',
 price:14.90,
 category:'Porções',
 description:'Porção de cogumelo shimeji refogado na manteiga, temperado com shoyu e cebolinha.',
-image:'Imagens/Shimeji.jpg'
+image:'Imagens/Shimeji.jpg',
+esgotado: false
 },
 
 {
@@ -2258,7 +2126,8 @@ name:'Hot Roll Skin (12 unidades) ',
 price:12,
 category:'Hots',
 description:'Sushi empanado com farinha Panko, recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.',
-image:'Imagens/Hot Roll Skin.jpg'
+image:'Imagens/Hot Roll Skin.jpg',
+esgotado: false
 },
 
 {
@@ -2266,7 +2135,8 @@ name:'Hossomaki Skin (12 unidades)',
 price:9.99,
 category:'Hossomaki',
 description:'Sushi recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.',
-image:'Imagens/Roll Skin.jpg'
+image:'Imagens/Roll Skin.jpg',
+esgotado: false
 },
 
 {
@@ -2274,7 +2144,8 @@ name:'Hot Roll Kani (12 unidades)',
 price:15,
 category:'Hots',
 description:'Sushi empanado com farinha Panko, recheado com kani, cream cheese e arroz, envolto em alga nori.',
-image:'Imagens/Hot Roll Kani.jpg'
+image:'Imagens/Hot Roll Kani.jpg',
+esgotado: false
 },
 
 {
@@ -2282,7 +2153,8 @@ name:'Hossomaki Kani (12 unidades)',
 price:12,
 category:'Hossomaki',
 description:'Sushi recheado com kani, cream cheese e arroz, envolto em alga nori.',
-image:'Imagens/Roll Kani.jpg'
+image:'Imagens/Roll Kani.jpg',
+esgotado: false
 },
 
 {
@@ -2290,7 +2162,8 @@ name:'Lula à Dorê (6 unidades)',
 price:25.90,
 category:'Porções',
 description:'Anéis de lula empanados e fritos até dourarem, crocantes por fora e macios por dentro.',
-image:'Imagens/Lula a Dore.jpg'
+image:'Imagens/Lula a Dore.jpg',
+esgotado: false
 },
 
 {
@@ -2298,7 +2171,8 @@ name:'Harumaki de Legumes (3 unidades)',
 price:12.99,
 category:'Harumaki',
 description:'Rolinho primavera crocante recheado com cream cheese e legumes frescos e temperados.',
-image:'Imagens/Harumaki Legume.jpg'
+image:'Imagens/Harumaki Legume.jpg',
+esgotado: false
 },
 
 {
@@ -2306,7 +2180,8 @@ name:'Harumaki de Salmão (3 unidades)',
 price:19,
 category:'Harumaki',
 description:'Rolinho primavera recheado com salmão fresco e cream cheese, envolto em massa crocante.',
-image:'Imagens/Harumaki Salmão.jpeg'
+image:'Imagens/Harumaki Salmão.jpeg',
+esgotado: false
 },
 
 {
@@ -2314,7 +2189,8 @@ name:'Harumaki de queijo (3 unidades)',
 price:12.99,
 category:'Harumaki',
 description:'Rolinho primavera recheado com queijo e oregano, envolto em massa crocante.',
-image:'Imagens/Harumaki Queijo.jpg'
+image:'Imagens/Harumaki Queijo.jpg',
+esgotado: false
 },
 
 {
@@ -2322,7 +2198,8 @@ name:'Harumaki de Frango com Requeijão (3 unidades)',
 price:12.99,
 category:'Harumaki',
 description:'Rolinho primavera recheado com frango e requeijão, envolto em massa crocante.',
-image:'Imagens/Harumaki Frango.png'
+image:'Imagens/Harumaki Frango.png',
+esgotado: false
 },
 
 {
@@ -2330,9 +2207,67 @@ name:'Salada Sunomono',
 price:5,
 category:'Saladas',
 description:'Tradicional salada japonesa feita com pepino fatiado, molho agridoce suave e gergelim.',
-image:'Imagens/salada-sunomono.jpeg'
+image:'Imagens/salada-sunomono.jpeg',
+esgotado: false
 },
 
+];
+
+const combos = [
+
+{
+  name: 'Combo Crocantissimo',
+  description: 'Uma explosão de crocância',
+  descricaoModal: '1 Temaki Frito, 8 Hot Skin, 8 Hot Kani, 8 Hot Philadelphia Salmão.',
+  price: 49.90,
+  image: 'Imagens/Combo Crocantissimo.png',
+  esgotado: false
+},
+
+{
+  name: 'Combo Individual',
+  description: 'Uma seleção para as noites de muita fome.',
+  descricaoModal: '1 Temaki Frito, 8 Hossomaki Philadelphia, 2 Harumaki de Legumes.',
+  price: 39.90,
+  image: 'Imagens/Combo Individual.jpg',
+  esgotado: false
+},
+
+{
+  name: 'Combo de Frios',
+  description: 'Uma seleção de peças frias saborosas.',
+  descricaoModal: '18 Hossomaki Skin, 18 Hossomaki Kani e Salada Sunomono.',
+  price: 29.90,
+  image: 'Imagens/Combo de Frios.png',
+  esgotado: false
+},
+
+{
+  name: 'Combo Premium',
+  description: 'Combo completo pensado para compartilhar.',
+  descricaoModal: '24 Hot Philadelphia Salmão, 12 Hot Skin e 6 Lula à Dorê.',
+  price: 74.90,
+  image: 'Imagens/Combo Premium.png',
+  esgotado: false
+},
+
+{
+  name: 'Combo Primavera',
+  description: 'Uma seleção crocante de peças saborosas.',
+  descricaoModal: '4 Harumaki de Legumes, 4 Harumaki de Queijo e 4 Harumaki de Frango.',
+  price: 37.90,
+  image: 'Imagens/Combo Primavera.jpg',
+  esgotado: false
+},
+
+{
+  name: 'Mega Combo Hot Roll',
+  description: 'Hot Roll até não dar mais.',
+  descricaoModal: '32 Hot Roll Philadelphia.',
+  price: 39.90,
+  image: 'Imagens/Mega Combo Hot Roll.jpg',
+  esgotado: false
+}
 
 ];
 
@@ -2466,49 +2401,89 @@ renderProducts(filtered);
 
 function renderProducts(data){
 
-const container =
-document.getElementById('products');
+  const container = document.getElementById('products');
+  container.innerHTML = '';
 
-container.innerHTML='';
+  data.forEach(product => {
 
-data.forEach(product => {
+    container.innerHTML += `
+      <div class="product-card ${product.esgotado ? 'esgotado' : ''}">
 
-container.innerHTML += `
+        <div style="position:relative;">
+          <img src="${product.image}">
+          ${product.esgotado ? `
+            <div class="esgotado-overlay">
+              <span class="esgotado-badge">ESGOTADO</span>
+            </div>
+          ` : ''}
+        </div>
 
-<div class="product-card">
+        <div class="product-content">
+          <h3>${product.name}</h3>
+          <p>${product.description}</p>
+          <div class="price">R$${product.price}</div>
+          <button
+            class="add-cart-btn"
+            ${product.esgotado ? 'disabled' : ''}
+            onclick="addToCart('${product.name}',${product.price})"
+          >
+            ${product.esgotado ? 'Esgotado' : 'Adicionar'}
+          </button>
+        </div>
 
-<img src="${product.image}">
+      </div>
+    `;
 
-<div class="product-content">
-
-<h3>${product.name}</h3>
-
-<p>${product.description}</p>
-
-<div class="price">
-R$${product.price}
-</div>
-
-<button
-class="add-cart-btn"
-onclick="addToCart('${product.name}',${product.price})"
->
-
-Adicionar
-
-</button>
-
-</div>
-
-</div>
-
-`;
-
-});
+  });
 
 }
 
 renderProducts(products);
+
+
+function renderCombos(){
+
+  const container = document.getElementById('combo-list');
+  container.innerHTML = '';
+
+  combos.forEach(combo => {
+
+    container.innerHTML += `
+      <div class="recommendation-card ${combo.esgotado ? 'combo-esgotado' : ''}"
+        onclick="${combo.esgotado ? '' : `openComboModal({
+          name: '${combo.name}',
+          description: '${combo.descricaoModal}',
+          price: ${combo.price},
+          image: '${combo.image}'
+        })`}"
+        style="${combo.esgotado ? 'cursor:default;opacity:0.7;' : ''}"
+      >
+
+        <div style="position:relative;flex-shrink:0;">
+          <img src="${combo.image}">
+          ${combo.esgotado ? `
+            <div class="esgotado-overlay" style="height:70px;border-radius:14px;">
+              <span class="esgotado-badge" style="font-size:13px;padding:5px 12px;">ESGOTADO</span>
+            </div>
+          ` : ''}
+        </div>
+
+        <div>
+          <h3>${combo.name}</h3>
+          <p>${combo.description}</p>
+          <h3>R$ ${combo.price.toFixed(2).replace('.', ',')}</h3>
+          ${combo.esgotado ? '<p style="color:#b30000;font-weight:bold;font-size:13px;">Indisponível</p>' : ''}
+        </div>
+
+      </div>
+    `;
+
+  });
+
+}
+
+renderCombos();
+
 
 /* ========================= */
 /* ADD CART */
