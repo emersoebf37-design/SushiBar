@@ -113,7 +113,7 @@ Olá, *${order.customer}*! Para confirmar seu pedido, realize o pagamento:
 💰 *Valor:* R$${order.total.toFixed(2)}
 
 🔑 *Chave Pix:*
-\`SEU_CHAVE_PIX_AQUI\`
+\`e5da076d-f585-4274-83bd-acb0e26904fb\`
 
 Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos seu pedido. 🙏
 
