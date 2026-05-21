@@ -30,6 +30,7 @@ coverage/
 .env.*
 !.env.example
 
+index.js
 auth_whatsapp/
 sent_orders.json
 firebase-key.json
@@ -71,3 +72,4 @@ jspm_packages/
 
 # Arquivos locais
 *.local
+functions/index.js
