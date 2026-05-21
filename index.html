@@ -2737,7 +2737,6 @@ async function finishOrder(){
     <p>
       Hashi: ${addonsCopy.hashi || 0}<br>
       Tarê: ${addonsCopy.tare || 0}<br>
-      Teriyaki: ${addonsCopy.teriyaki || 0}
     </p>
 
     <div class="modal-total">
@@ -3195,16 +3194,6 @@ window.updateModalTotal = updateModalTotal;
           <button onclick="changeAddon('tare', 1)">+</button>
         </div>
       </div>
-
-      <div class="addon-item">
-        <span>🍶 Molho Teriyaki (+R$0,50)</span>
-        <div class="qty-control">
-          <button onclick="changeAddon('teriyaki', -1)">−</button>
-          <span id="qty-teriyaki">0</span>
-          <button onclick="changeAddon('teriyaki', 1)">+</button>
-        </div>
-      </div>
-
     </div>
 
     <div class="modal-buttons">
