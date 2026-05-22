@@ -1837,8 +1837,19 @@ body{
       <span id="cart-total">R$0.00</span>
     </h3>
 
+    <p
+    id="payment-warning"
+    style="
+      margin-top:8px;
+      color:#008a2e;
+      font-size:14px;
+      font-weight:bold;
+    "
+  ></p>
+
     <select
       id="payment-method"
+      onchange="renderCart()"
       style="
       margin-top:20px;
       padding:14px;
@@ -1877,17 +1888,18 @@ body{
   <div class="cart-mobile-actions">
 
     <button
-      class="finish-order-btn"
-      onclick="finishOrder()"
-    >
-      Finalizar Pedido
-    </button>
-
-    <button
       class="finish-order-btn close-cart-btn"
       onclick="toggleCart()"
     >
       Fechar
+    </button>
+
+
+    <button
+      class="finish-order-btn"
+      onclick="finishOrder()"
+    >
+      Finalizar Pedido
     </button>
 
   </div>
@@ -2395,6 +2407,14 @@ renderProducts(filtered);
 
 }
 
+function gercardPrice(price){
+  return price * 1.05;
+}
+
+function formatPrice(value){
+  return value.toFixed(2).replace('.', ',');
+}
+
 /* ========================= */
 /* RENDER PRODUCTS */
 /* ========================= */
@@ -2405,6 +2425,9 @@ function renderProducts(data){
   container.innerHTML = '';
 
   data.forEach(product => {
+
+    const cardPrice = gercardPrice
+  (product.price);
 
     container.innerHTML += `
       <div class="product-card ${product.esgotado ? 'esgotado' : ''}">
@@ -2419,9 +2442,37 @@ function renderProducts(data){
         </div>
 
         <div class="product-content">
+
           <h3>${product.name}</h3>
+
           <p>${product.description}</p>
-          <div class="price">R$${product.price}</div>
+
+          <div
+            style="
+              color:#c40000;
+              text-decoration:line-through;
+              font-size:16px;
+              margin-bottom:5px;
+            "
+          >
+            R$${formatPrice(cardPrice)}
+          </div>
+
+          <div class="price">
+            R$${formatPrice(product.price)}
+          </div>
+
+          <div
+            style="
+              color:#008a2e;
+              font-size:14px;
+              font-weight:bold;
+              margin-top:5px;
+            "
+          >
+            5% OFF no Pix e Dinheiro
+          </div>
+
           <button
             class="add-cart-btn"
             ${product.esgotado ? 'disabled' : ''}
@@ -2429,6 +2480,7 @@ function renderProducts(data){
           >
             ${product.esgotado ? 'Esgotado' : 'Adicionar'}
           </button>
+
         </div>
 
       </div>
@@ -2471,7 +2523,31 @@ function renderCombos(){
         <div>
           <h3>${combo.name}</h3>
           <p>${combo.description}</p>
-          <h3>R$ ${combo.price.toFixed(2).replace('.', ',')}</h3>
+          <div
+            style="
+              color:#c40000;
+              text-decoration:line-through;
+              font-size:14px;
+              margin-top:6px;
+            "
+          >
+            R$ ${(combo.price * 1.05).toFixed(2).replace('.', ',')}
+          </div>
+
+          <h3 style="margin-top:4px;">
+            R$ ${combo.price.toFixed(2).replace('.', ',')}
+          </h3>
+
+          <p
+            style="
+              color:#008a2e;
+              font-size:13px;
+              font-weight:bold;
+              margin-top:4px;
+            "
+          >
+            5% OFF no Pix e Dinheiro
+          </p>
           ${combo.esgotado ? '<p style="color:#b30000;font-weight:bold;font-size:13px;">Indisponível</p>' : ''}
         </div>
 
@@ -2535,54 +2611,73 @@ JSON.stringify(cart)
 
 function renderCart(){
 
-const cartItems =
-document.getElementById('cart-items');
+  const cartItems =
+  document.getElementById('cart-items');
 
-cartItems.innerHTML='';
+  cartItems.innerHTML='';
 
-let total = 0;
+  let total = 0;
 
-if(cart.length > 0){
-  total += 2; // taxa de entrega
-}
+  const payment =
+  document.getElementById('payment-method')?.value;
 
-cart.forEach((item,index)=>{
+  if(cart.length > 0){
+    total += 2;
+  }
 
-total += item.price;
+  cart.forEach((item,index)=>{
 
-cartItems.innerHTML += `
+  total += item.price;
+  cartItems.innerHTML += `
 
-<div class="cart-item">
+  <div class="cart-item">
 
-<div>
+  <div>
 
-<strong>${item.name}</strong>
+  <strong>${item.name}</strong>
 
-<p>R$${item.price}</p>
+  <p>R$${item.price}</p>
 
-</div>
+  </div>
 
-<button
-class="trash-btn"
-onclick="removeCart(${index})"
->
+  <button
+  class="trash-btn"
+  onclick="removeCart(${index})"
+  >
 
-🗑️
+  🗑️
 
-</button>
+  </button>
 
-</div>
+  </div>
 
-`;
+  `;
 
-});
+  });
 
-document.getElementById('cart-total')
-.innerText = `R$${total.toFixed(2)}`;
+  if(payment === 'Cartão'){
+    total *= 1.05;
+  }
 
-document.getElementById(
-'mobile-cart-count'
-).innerText = cart.length;
+  document.getElementById('cart-total')
+  .innerText = `R$${total.toFixed(2).replace('.', ',')}`;
+
+  document.getElementById(
+  'mobile-cart-count'
+  ).innerText = cart.length;
+
+
+  const warning =
+  document.getElementById('payment-warning');
+
+  if(payment === 'Cartão'){
+    warning.innerText =
+    '5% OFF para pagamentos no Pix e Dinheiro';
+  }else{
+    warning.innerText =
+    '5% OFF para pagamentos no Pix e Dinheiro';
+  }
+  
 
 }
 
@@ -2848,6 +2943,8 @@ filterCategory;
 window.saveUserData =
 saveUserData;
 
+window.renderCart = renderCart;
+
 /* ========================= */
 /* RENDER ORDERS */
 /* ========================= */
@@ -3036,7 +3133,41 @@ function openComboModal(combo){
   document.getElementById('combo-modal-img').src = combo.image;
   document.getElementById('combo-modal-name').innerText = combo.name;
   document.getElementById('combo-modal-desc').innerText = combo.description;
-  document.getElementById('combo-modal-price').innerText = `R$${combo.price.toFixed(2)}`;
+  document.getElementById('combo-modal-price').innerHTML = `
+
+    <div
+      style="
+        color:#c40000;
+        text-decoration:line-through;
+        font-size:18px;
+        margin-bottom:6px;
+      "
+    >
+      R$${(combo.price * 1.05).toFixed(2).replace('.', ',')}
+    </div>
+
+    <div
+      style="
+        font-size:38px;
+        font-weight:bold;
+        color:black;
+      "
+    >
+      R$${combo.price.toFixed(2).replace('.', ',')}
+    </div>
+
+    <div
+      style="
+        color:#008a2e;
+        font-size:15px;
+        font-weight:bold;
+        margin-top:8px;
+      "
+    >
+      5% OFF no Pix e Dinheiro
+    </div>
+
+`;
 
   document.getElementById('combo-modal').style.display = 'flex';
 }
