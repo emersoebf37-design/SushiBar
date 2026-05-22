@@ -11,6 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@whiskeysockets/baileys": "^7.0.0-rc11",
     "discord.js": "^14.26.4",
     "dotenv": "^17.4.2",
