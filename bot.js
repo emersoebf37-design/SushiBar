@@ -120,34 +120,45 @@ async function listenOrders() {
 
         const row = new ActionRowBuilder().addComponents(menu);
 
-        await channel.send({
+        const msg = await channel.send({
           content:
           `\`\`\`ansi
-    \u001b[1;33m🍣 NOVO PEDIDO — #${order.orderId || '?'}\u001b[0m
+        \u001b[1;33m🍣 NOVO PEDIDO — #${order.orderId || '?'}\u001b[0m
 
-    \u001b[1;37mCliente:\u001b[0m ${order.customer}
-    \u001b[1;37mTelefone:\u001b[0m ${order.phone}
+        \u001b[1;37mCliente:\u001b[0m ${order.customer}
+        \u001b[1;37mTelefone:\u001b[0m ${order.phone}
 
-    \u001b[1;37mEndereço:\u001b[0m
-    ${order.address}, ${order.number}
-    ${order.complement}
+        \u001b[1;37mEndereço:\u001b[0m
+        ${order.address}, ${order.number}
+        ${order.complement}
 
-    \u001b[1;37mPagamento:\u001b[0m ${order.payment}
+        \u001b[1;37mPagamento:\u001b[0m ${order.payment}
 
-    \u001b[1;36mItens:\u001b[0m
-    ${order.items.map(i => i.name).join('\n')}
+        \u001b[1;36mItens:\u001b[0m
+        ${order.items.map(i => i.name).join('\n')}
 
-    \u001b[1;36mAdicionais:\u001b[0m
-    🥢 Hashi: ${order.addons?.hashi || 0}
-    🍯 Tarê: ${order.addons?.tare || 0}
-    🍶 Teriyaki: ${order.addons?.teriyaki || 0}
+        \u001b[1;36mAdicionais:\u001b[0m
+        🥢 Hashi: ${order.addons?.hashi || 0}
+        🍯 Tarê: ${order.addons?.tare || 0}
+        🍶 Teriyaki: ${order.addons?.teriyaki || 0}
 
-    \u001b[1;32mTotal: R$${order.total.toFixed(2)}\u001b[0m
+        \u001b[1;32mTotal: R$${order.total.toFixed(2)}\u001b[0m
 
-    \u001b[1;31mStatus: ${order.status}\u001b[0m
-    \`\`\``,
+        \u001b[1;31mStatus: ${order.status}\u001b[0m
+        \`\`\``,
           components: [row]
         });
+
+        /* APAGAR APÓS 30 SEGUNDOS */
+
+        setTimeout(async () => {
+          try {
+            await msg.delete();
+            console.log(`🗑️ Mensagem do pedido ${orderId} apagada.`);
+          } catch (err) {
+            console.error('Erro ao apagar mensagem:', err.message);
+          }
+        }, 10 * 60 * 60 * 1000); /* 10 horas */
 
         /* WHATSAPP */
 

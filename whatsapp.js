@@ -88,9 +88,8 @@ Olá, *${order.customer}*! Seu pedido foi recebido com sucesso.
 ${order.items.map(i => `• ${i.name}`).join('\n')}
 
 🧾 *Adicionais:*
-🥢 Hashi: ${order.addons?.hashi || 0}
+🥢 Adaptador de Hashi: ${order.addons?.hashi || 0}
 🍯 Tarê: ${order.addons?.tare || 0}
-🍶 Teriyaki: ${order.addons?.teriyaki || 0}
 
 💰 *Total:* R$${order.total.toFixed(2)}
 💳 *Pagamento:* ${order.payment}
