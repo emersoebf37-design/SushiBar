@@ -1718,6 +1718,13 @@ body{
   pointer-events:none;
 }
 
+.tempo-preparo{
+  margin-top:8px;
+  font-size:14px;
+  color:#666;
+  font-weight:600;
+}
+
 </style>
 </head>
 
@@ -1893,7 +1900,6 @@ body{
     >
       Fechar
     </button>
-
 
     <button
       class="finish-order-btn"
@@ -3092,6 +3098,10 @@ function renderOrders(){
           <h2>
             R$${order.total.toFixed(2)}
           </h2>
+
+          <p class="tempo-preparo">
+            ⏱️ Tempo estimado de preparo: 30 min
+          </p>
 
         </div>
 
