@@ -29,8 +29,8 @@ function calcularTaxa(distanciaKm, motoboy_on) {
     taxa += (km - 2) * 2;
   }
 
-  // acima de 2km só com motoboy ativo
-  if (km > 2 && !motoboy_on) {
+  // acima de 3km só com motoboy ativo
+  if (km > 3 && !motoboy_on) {
     return {
       taxa: 0,
       entrega: false,
