@@ -2347,6 +2347,61 @@ JSON.parse(localStorage.getItem('cart')) || [];
 let orders =
 JSON.parse(localStorage.getItem('orders')) || [];
 
+
+let siteConfig = {
+  motoboy_on: false,
+  restaurante_aberto: true,
+  produtos_esgotados: [],
+  combos_esgotados: [],
+};
+
+let lastConfigFetch = 0;
+const CONFIG_CACHE_MS = 5 * 60 * 1000;
+
+async function fetchConfig(force = false){
+  const agora = Date.now();
+  if(!force && agora - lastConfigFetch < CONFIG_CACHE_MS) return;
+  try {
+    const res = await fetch('/api/config');
+    const data = await res.json();
+    siteConfig = data;
+    lastConfigFetch = agora;
+    applyEsgotados();
+    checkRestauranteAberto();
+  } catch(e) {
+    console.warn('Não foi possível buscar configurações:', e);
+  }
+}
+
+function applyEsgotados(){
+  products.forEach(p => {
+    p.esgotado = siteConfig.produtos_esgotados?.includes(p.name) || false;
+  });
+  combos.forEach(c => {
+    c.esgotado = siteConfig.combos_esgotados?.includes(c.name) || false;
+  });
+  renderProducts(products);
+  renderCombos();
+}
+
+function checkRestauranteAberto(){
+  const aviso = document.getElementById('restaurante-fechado');
+  const finishBtns = document.querySelectorAll('.finish-order-btn');
+  if(!siteConfig.restaurante_aberto){
+    if(aviso) aviso.style.display = 'flex';
+    finishBtns.forEach(btn => btn.disabled = true);
+  } else {
+    if(aviso) aviso.style.display = 'none';
+    finishBtns.forEach(btn => btn.disabled = false);
+  }
+}
+
+fetchConfig(true);
+
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible') fetchConfig();
+});
+
 /* ========================= */
 /* SHOW PAGE */
 /* ========================= */
@@ -2783,6 +2838,13 @@ async function finishOrder(){
     return;
   }
 
+  await fetchConfig();
+
+  if(!siteConfig.restaurante_aberto){
+    alert('O restaurante está fechado no momento. Tente mais tarde!');
+    return;
+  }
+
   const payment =
     document.getElementById('payment-method').value;
 
@@ -3176,6 +3238,28 @@ window.updateModalTotal = updateModalTotal;
 <div id="loading-overlay" class="loading-overlay">
   <div class="loading-spinner"></div>
   <div class="loading-text">Enviando pedido...</div>
+</div>
+
+<!-- RESTAURANTE FECHADO -->
+<div id="restaurante-fechado" style="
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.85);
+  z-index:999998;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  gap:15px;
+  text-align:center;
+  padding:30px;
+">
+  <div style="font-size:60px;">🍣</div>
+  <h2 style="font-size:28px;color:white;">Estamos fechados</h2>
+  <p style="color:rgba(255,255,255,0.7);font-size:16px;max-width:300px;">
+    No momento não estamos aceitando pedidos. Volte em breve!
+  </p>
 </div>
 
 <!-- ========================= -->
