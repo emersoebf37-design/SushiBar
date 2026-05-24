@@ -2385,14 +2385,25 @@ function applyEsgotados(){
 }
 
 function checkRestauranteAberto(){
-  const aviso = document.getElementById('restaurante-fechado');
   const finishBtns = document.querySelectorAll('.finish-order-btn');
+  const aviso = document.getElementById('aviso-fechado');
+
   if(!siteConfig.restaurante_aberto){
-    if(aviso) aviso.style.display = 'flex';
-    finishBtns.forEach(btn => btn.disabled = true);
+    finishBtns.forEach(btn => {
+      btn.disabled = true;
+      btn.style.background = '#aaa';
+      btn.style.cursor = 'not-allowed';
+      btn.innerText = '🔴 Restaurante fechado';
+    });
+    if(aviso) aviso.style.display = 'block';
   } else {
+    finishBtns.forEach(btn => {
+      btn.disabled = false;
+      btn.style.background = '';
+      btn.style.cursor = '';
+      btn.innerText = 'Finalizar Pedido';
+    });
     if(aviso) aviso.style.display = 'none';
-    finishBtns.forEach(btn => btn.disabled = false);
   }
 }
 
@@ -3240,26 +3251,19 @@ window.updateModalTotal = updateModalTotal;
   <div class="loading-text">Enviando pedido...</div>
 </div>
 
-<!-- RESTAURANTE FECHADO -->
-<div id="restaurante-fechado" style="
+<!-- AVISO FECHADO NO CARRINHO -->
+<div id="aviso-fechado" style="
   display:none;
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.85);
-  z-index:999998;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  gap:15px;
-  text-align:center;
-  padding:30px;
+  background:#fff0f0;
+  border-left:4px solid #9e0505;
+  border-radius:8px;
+  padding:12px 15px;
+  margin-top:15px;
+  color:#9e0505;
+  font-size:14px;
+  font-weight:bold;
 ">
-  <div style="font-size:60px;">🍣</div>
-  <h2 style="font-size:28px;color:white;">Estamos fechados</h2>
-  <p style="color:rgba(255,255,255,0.7);font-size:16px;max-width:300px;">
-    No momento não estamos aceitando pedidos. Volte em breve!
-  </p>
+  🔴 Estamos fechados no momento. Volte em breve!
 </div>
 
 <!-- ========================= -->
