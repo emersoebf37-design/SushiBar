@@ -30,14 +30,19 @@ coverage/
 .env.*
 !.env.example
 
+# Arquivos locais do projeto
 index.js
 auth_whatsapp/
 sent_orders.json
-firebase-key.json
-node_modules/
+functions/index.js
 
 # Chaves e credenciais
 firebase-key.json
+firebase-adminsdk*.json
+creds.json
+*.json.key
+
+# Executáveis
 Imagens/Git-2.54.0-64-bit.exe
 
 # Sistema operacional
@@ -72,4 +77,3 @@ jspm_packages/
 
 # Arquivos locais
 *.local
-functions/index.js

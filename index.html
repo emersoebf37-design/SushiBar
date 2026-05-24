@@ -1845,8 +1845,8 @@ body{
       color:#444;
       line-height:1.8;
     ">
-      🛵 <strong>Entrega até 2km</strong> — R$2,00<br>
-      📍 <strong>Acima de 2km</strong> — Retirada no local/Entrega por App
+      🛵 <strong>Entrega até 1km</strong> — R$2,00<br>
+      📍 <strong>Acima de 1km</strong> — Retirada no local/Entrega por App
     </div>
 
   <div id="cart-items"></div>
@@ -2047,49 +2047,7 @@ id="order-history"
 
 </main>
 
-<script type="module">
-
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  updateDoc,
-  setDoc,   
-  getDoc,   
-  doc,
-  query,
-  orderBy
-}
-from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-
-
-const firebaseConfig = {
-
-  apiKey: "AIzaSyA5B5Zwj3bZq8ba-1XeyItBh5RRGfNrqQE",
-
-  authDomain: "restaurante-db-86b5d.firebaseapp.com",
-
-  projectId: "restaurante-db-86b5d",
-
-  storageBucket: "restaurante-db-86b5d.firebasestorage.app",
-
-  messagingSenderId: "457936771059",
-
-  appId: "1:457936771059:web:899d4d55a593d5c45ee486",
-
-  measurementId: "G-0HKPX8VM96"
-
-};
-
-const app = initializeApp(firebaseConfig);
-
-const db = getFirestore(app);
-
-
+<script>
 
 /* ========================= */
 /* PRODUCTS */
@@ -2872,66 +2830,25 @@ function closeOrderModal(){
 
 }
 
-async function confirmOrderFirebase(){
-
+async function confirmOrder(){
   if(!pendingOrder) return;
-
-  const addonsCopy = { ...addons };
-
-  const baseTotal =
-    cart.reduce((sum, item) => sum + item.price, 0) + (cart.length > 0 ? 2 : 0);
-
-  const addonTotal =
-    (addonsCopy.tare * 0.5) +
-    (addonsCopy.teriyaki * 0.5);
-
-  const total = baseTotal + addonTotal;
-
-  pendingOrder.addons = addonsCopy;
-  pendingOrder.total = total;
-
-  // Gera o próximo ID sequencial
-  let nextId = 1;
-
   try {
-
-    const counterRef = doc(db, "meta", "orderCounter");
-    const counterSnap = await getDoc(counterRef);
-
-    if(counterSnap.exists()){
-      nextId = (counterSnap.data().current || 0) + 1;
-      await updateDoc(counterRef, { current: nextId });
-    } else {
-      // Primeira vez: cria o documento com current: 1
-      await setDoc(counterRef, { current: 1 });
-      nextId = 1;
-    }
-
-  } catch(e) {
-    console.error('Erro no contador:', e);
-    // Mesmo se o contador falhar, salva o pedido sem ID sequencial
-    nextId = Date.now();
-  }
-
-  pendingOrder.orderId = nextId;
-
-  try {
-
-    await addDoc(collection(db, "orders"), pendingOrder);
-
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pendingOrder),
+    });
+    const data = await response.json();
+    if(!response.ok) throw new Error(data.error || 'Erro desconhecido');
     cart = [];
     saveCart();
     renderCart();
     resetAddonUI();
     closeOrderModal();
-
-    alert(`Pedido #${nextId} realizado!`);
-
-  } catch(e) {
-    console.error('Erro ao salvar pedido:', e);
+    alert(`Pedido #${data.orderId} realizado com sucesso!`);
+  } catch(error){
     alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
   }
-
 }
 /* ========================= */
 /* GLOBAL FUNCTIONS */
@@ -2940,8 +2857,7 @@ async function confirmOrderFirebase(){
 window.closeOrderModal =
 closeOrderModal;
 
-window.confirmOrderFirebase =
-confirmOrderFirebase;
+window.confirmOrder = confirmOrder;
 
 window.finishOrder =
 finishOrder;
@@ -2967,173 +2883,64 @@ window.renderCart = renderCart;
 /* RENDER ORDERS */
 /* ========================= */
 
-function renderOrders(){
+async function renderOrders(){
 
-  const container =
-  document.getElementById('order-history');
+  const container = document.getElementById('order-history');
 
-  const user =
-  JSON.parse(localStorage.getItem('userData'));
+  const user = JSON.parse(localStorage.getItem('userData'));
 
   if(!user || !user.phone){
-
-    container.innerHTML = `
-      <p>
-        Faça login para ver seus pedidos.
-      </p>
-    `;
-
+    container.innerHTML = '<p>Preencha seus dados na aba Conta para ver seus pedidos.</p>';
     return;
   }
 
-  /* QUERY ORDENADA */
+  container.innerHTML = '<p>Carregando pedidos...</p>';
 
-  const ordersQuery = query(
+  try {
 
-    collection(db,"orders"),
+    const response = await fetch(`/api/orders?phone=${encodeURIComponent(user.phone)}`);
+    const data = await response.json();
 
-    orderBy("createdAt","desc")
+    if(!response.ok) throw new Error(data.error);
 
-  );
+    const orders = data.orders;
+    container.innerHTML = '';
 
-  onSnapshot(
-
-    ordersQuery,
-
-    (snapshot)=>{
-
-      container.innerHTML='';
-
-      let encontrouPedido = false;
-
-      snapshot.forEach((docItem)=>{
-
-        const order = docItem.data();
-
-        /* FILTRO TELEFONE */
-
-        if(order.phone !== user.phone){
-          return;
-        }
-
-        encontrouPedido = true;
-
-        /* STATUS COLOR */
-
-        let statusClass = '';
-
-        if(order.status === 'Entregue'){
-          statusClass = 'status-delivered';
-        }
-
-        else if(
-          order.status === 'Saiu para entrega'
-        ){
-          statusClass = 'status-delivery';
-        }
-        
-
-        let icon = '';
-        let iconClass = '';
-
-        if(order.status === 'Recebido'){
-
-          icon = '📨';
-          iconClass = 'icon-received';
-
-        }
-
-        else if(order.status === 'Preparando'){
-
-          icon = '🍣';
-          iconClass = 'icon-preparing';
-
-        }
-
-        else if(order.status === 'Saiu para entrega'){
-
-          icon = '🛵';
-          iconClass = 'icon-out';
-
-        }
-
-        else if(order.status === 'Entregue'){
-
-          icon = '✅';
-          iconClass = 'icon-done';
-
-        }
-
-        container.innerHTML += `
-
-        <div class="order-card ${statusClass}">
-
-        <div class="order-status-row">
-
-          <div class="order-status-icon ${iconClass}">
-            ${icon}
-          </div>
-
-          <h3>
-            ${order.status}
-          </h3>
-
-        </div>
-
-         <p><strong>Pedido #${order.orderId || '—'}</strong></p>
-
-          <p>
-            Cliente:
-            ${order.customer}
-          </p>
-
-          <p>
-            Telefone:
-            ${order.phone}
-          </p>
-
-          <p>
-            Status:
-            <strong>${order.status}</strong>
-          </p>
-
-          <p>
-            Pagamento:
-            ${order.payment}
-          </p>
-
-          <p>
-            Itens:
-            ${order.items.map(item=>item.name).join(', ')}
-          </p>
-
-          <h2>
-            R$${order.total.toFixed(2)}
-          </h2>
-
-          <p class="tempo-preparo">
-            ⏱️ Tempo estimado de preparo: 30 min
-          </p>
-
-        </div>
-
-        `;
-
-      });
-
-      if(!encontrouPedido){
-
-        container.innerHTML = `
-          <p>
-            Você ainda não possui pedidos.
-          </p>
-        `;
-
-      }
-
+    if(orders.length === 0){
+      container.innerHTML = '<p>Você ainda não possui pedidos.</p>';
+      return;
     }
 
-  );
+    const icons = { 'Recebido':'📨', 'Preparando':'🍣', 'Saiu para entrega':'🛵', 'Entregue':'✅' };
+    const iconClasses = { 'Recebido':'icon-received', 'Preparando':'icon-preparing', 'Saiu para entrega':'icon-out', 'Entregue':'icon-done' };
+
+    orders.forEach(order => {
+
+      let statusClass = '';
+      if(order.status === 'Entregue') statusClass = 'status-delivered';
+      else if(order.status === 'Saiu para entrega') statusClass = 'status-delivery';
+
+      container.innerHTML += `
+        <div class="order-card ${statusClass}">
+          <div class="order-status-row">
+            <div class="order-status-icon ${iconClasses[order.status] || ''}">${icons[order.status] || ''}</div>
+            <h3>${order.status}</h3>
+          </div>
+          <p><strong>Pedido #${order.orderId || '—'}</strong></p>
+          <p>Cliente: ${order.customer}</p>
+          <p>Telefone: ${order.phone}</p>
+          <p>Status: <strong>${order.status}</strong></p>
+          <p>Pagamento: ${order.payment}</p>
+          <p>Itens: ${order.items.map(i => i.name).join(', ')}</p>
+          <h2>R$${order.total.toFixed(2)}</h2>
+          <p class="tempo-preparo">⏱️ Tempo estimado de preparo: 30 min</p>
+        </div>`;
+    });
+
+  } catch(error){
+    container.innerHTML = '<p>Erro ao carregar pedidos. Tente novamente.</p>';
+    console.error(error);
+  }
 
 }
 
@@ -3351,7 +3158,7 @@ window.updateModalTotal = updateModalTotal;
 
     <div class="modal-buttons">
       <button class="modal-cancel" onclick="closeOrderModal()">Cancelar</button>
-      <button class="modal-confirm" onclick="confirmOrderFirebase()">Confirmar</button>
+      <button class="modal-confirm" onclick="confirmOrder()">Confirmar</button>
     </div>
 
   </div>
@@ -3403,7 +3210,6 @@ window.updateModalTotal = updateModalTotal;
 
 </div>
 
-</div>
 
 <!-- Vercel Analytics -->
 <script>
