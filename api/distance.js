@@ -5,23 +5,43 @@ const RESTAURANTE = "Av. Estácio de Sá, 787, Parque Novo Rio, RJ, CEP 25585-00
 
 // Tabela de taxas por km
 function calcularTaxa(distanciaKm, motoboy_on) {
-  if (distanciaKm <= 1) return { taxa: 2, entrega: true };
-  if (distanciaKm <= 2) return { taxa: 4, entrega: true };
-  if (distanciaKm <= 3) return { taxa: 6, entrega: true };
-  if (distanciaKm <= 4) return { taxa: 8, entrega: true };
-  if (distanciaKm <= 5) return { taxa: 10, entrega: true };
 
-  // Acima de 5km — só entrega se motoboy_on
-  if (!motoboy_on) {
-    return { taxa: 0, entrega: false, motivo: "Fora da área de entrega. Retire no local ou use um app." };
+  const km = Math.ceil(distanciaKm);
+
+  // acima de 8km
+  if (km > 8) {
+    return {
+      taxa: 0,
+      entrega: false,
+      motivo: "Endereço fora do raio máximo de entrega (8km)."
+    };
   }
 
-  if (distanciaKm <= 6) return { taxa: 13, entrega: true };
-  if (distanciaKm <= 7) return { taxa: 16, entrega: true };
-  if (distanciaKm <= 8) return { taxa: 19, entrega: true };
+  let taxa = 2;
 
-  // Acima de 8km — não entregamos
-  return { taxa: 0, entrega: false, motivo: "Endereço fora do raio máximo de entrega (8km)." };
+  // entre 1 e 2km
+  if (km > 1) {
+    taxa += 1;
+  }
+
+  // acima de 2km
+  if (km > 2) {
+    taxa += (km - 2) * 2;
+  }
+
+  // acima de 2km só com motoboy ativo
+  if (km > 2 && !motoboy_on) {
+    return {
+      taxa: 0,
+      entrega: false,
+      motivo: "Fora da área de entrega. Entre em contato conosco no (21) 3955-6573."
+    };
+  }
+
+  return {
+    taxa,
+    entrega: true
+  };
 }
 
 export default async function handler(req, res) {
