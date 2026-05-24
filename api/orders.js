@@ -1,17 +1,35 @@
-// api/orders.js
-// Essa função roda no SERVIDOR do Vercel — a API key nunca vai pro navegador
-
 const { initializeApp, getApps, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 
-// Inicializa o Firebase Admin só uma vez
+function getPrivateKey() {
+  const key = process.env.FIREBASE_PRIVATE_KEY;
+  if (!key) throw new Error("FIREBASE_PRIVATE_KEY não definida");
+
+  // Tenta todos os formatos possíveis
+  if (key.includes("\\n")) {
+    return key.replace(/\\n/g, "\n");
+  }
+
+  if (key.includes("\n")) {
+    return key;
+  }
+
+  // Se vier sem quebras, reconstrói o formato PEM
+  const body = key
+    .replace("-----BEGIN PRIVATE KEY-----", "")
+    .replace("-----END PRIVATE KEY-----", "")
+    .replace(/\s/g, "");
+
+  const lines = body.match(/.{1,64}/g).join("\n");
+  return `-----BEGIN PRIVATE KEY-----\n${lines}\n-----END PRIVATE KEY-----\n`;
+}
+
 if (!getApps().length) {
   initializeApp({
     credential: cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      // A chave privada vem da variável de ambiente (nunca exposta)
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      privateKey: getPrivateKey(),
     }),
   });
 }
@@ -19,14 +37,11 @@ if (!getApps().length) {
 const db = getFirestore();
 
 export default async function handler(req, res) {
-  // Permite chamadas do seu próprio site
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
 
   // ========================
   // POST — Criar novo pedido
@@ -35,14 +50,11 @@ export default async function handler(req, res) {
     try {
       const order = req.body;
 
-      // Gera o ID sequencial com segurança no servidor
       const counterRef = db.collection("meta").doc("orderCounter");
-
       let nextId = 1;
 
       await db.runTransaction(async (transaction) => {
         const counterSnap = await transaction.get(counterRef);
-
         if (counterSnap.exists) {
           nextId = (counterSnap.data().current || 0) + 1;
           transaction.update(counterRef, { current: nextId });
@@ -73,10 +85,7 @@ export default async function handler(req, res) {
   // ========================
   if (req.method === "GET") {
     const { phone } = req.query;
-
-    if (!phone) {
-      return res.status(400).json({ error: "Telefone não informado." });
-    }
+    if (!phone) return res.status(400).json({ error: "Telefone não informado." });
 
     try {
       const snapshot = await db
@@ -85,7 +94,6 @@ export default async function handler(req, res) {
         .get();
 
       const orders = [];
-
       snapshot.forEach((doc) => {
         const data = doc.data();
         if (data.phone === phone) {
