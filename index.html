@@ -3018,15 +3018,20 @@ async function finishOrder(){
   // ✅ PEGA OS ADDONS REAIS DO ESTADO GLOBAL
   const addonsCopy = { ...addons };
 
-  const baseTotal =
-    cart.reduce((sum,item)=>sum+item.price,0) + (cart.length > 0 ? 2 : 0);
+  let baseTotal =
+    cart.reduce((sum,item)=>sum + item.price, 0) +
+    (cart.length > 0 ? (entregaAtual.taxa || 2) : 0);
 
   const addonTotal =
     (addonsCopy.tare * 0.5) +
     (addonsCopy.teriyaki * 0.5);
 
-  const total = baseTotal + addonTotal;
+  let total = baseTotal + addonTotal;
 
+  // aplica taxa do cartão
+  if(payment === 'Cartão'){
+    total *= 1.05;
+  }
   pendingOrder = {
     customer: user.name,
     phone: user.phone,
@@ -3055,7 +3060,7 @@ async function finishOrder(){
     </p>
 
     <div class="modal-total">
-      R$${total.toFixed(2)}
+      R$${total.toFixed(2).replace('.', ',')}
     </div>
   `;
 
