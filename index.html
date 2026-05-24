@@ -1886,16 +1886,20 @@ body{
       color:#444;
       line-height:1.8;
     ">
-      🛵 <strong>Entrega até 1km</strong> — R$2,00<br>
-      📍 <strong>Acima de 1km</strong> — Retirada no local/Entrega por App
+    🛵 Calculando taxa de entrega...
     </div>
 
   <div id="cart-items"></div>
 
     <h3 style="margin-top:20px;">
       Total:
-      <span id="cart-total">R$0.00</span>
+      <span id="cart-total">R$0,00</span>
     </h3>
+    <p id="entrega-detalhe" style="
+      font-size:13px;
+      color:#666;
+      margin-top:5px;
+    "></p>
 
     <p
     id="payment-warning"
@@ -2428,6 +2432,95 @@ document.addEventListener('visibilitychange', () => {
   if(document.visibilityState === 'visible') fetchConfig();
 });
 
+// ========================
+// CÁLCULO DE DISTÂNCIA
+// ========================
+
+let entregaAtual = {
+  taxa: 2,
+  entrega: true,
+  distanciaKm: null,
+  distanciaTexto: null,
+  duracaoTexto: null,
+  motivo: null,
+};
+
+async function calcularEntrega(){
+  const user = JSON.parse(localStorage.getItem('userData'));
+
+  if(!user || !user.address || !user.number){
+    document.getElementById('entrega-info').innerHTML =
+      '📍 <strong>Preencha seu endereço</strong> na aba Conta para calcular a entrega.';
+    entregaAtual = { taxa: 2, entrega: true, distanciaKm: null };
+    renderCart();
+    return;
+  }
+
+  const enderecoCompleto = `${user.address}, ${user.number}, Brasil`;
+
+  document.getElementById('entrega-info').innerHTML =
+    '🛵 Calculando taxa de entrega...';
+
+  try {
+    const motoboy = siteConfig.motoboy_on ? 'true' : 'false';
+    const res = await fetch(`/api/distance?address=${encodeURIComponent(enderecoCompleto)}&motoboy_on=${motoboy}`);
+    const data = await res.json();
+
+    if(!res.ok || !data.entrega){
+      // Fora da área
+      entregaAtual = { taxa: 0, entrega: false, distanciaKm: data.distanciaKm, motivo: data.motivo };
+
+      document.getElementById('entrega-info').innerHTML = `
+        ❌ <strong style="color:#9e0505;">${data.motivo || 'Fora da área de entrega.'}</strong>
+      `;
+
+      // Bloqueia botão de finalizar
+      document.querySelectorAll('.finish-order-btn').forEach(btn => {
+        if(!btn.classList.contains('close-cart-btn')){
+          btn.disabled = true;
+          btn.style.background = '#aaa';
+          btn.innerText = '❌ Fora da área';
+        }
+      });
+
+    } else {
+      entregaAtual = {
+        taxa: data.taxa,
+        entrega: true,
+        distanciaKm: data.distanciaKm,
+        distanciaTexto: data.distanciaTexto,
+        duracaoTexto: data.duracaoTexto,
+      };
+
+      document.getElementById('entrega-info').innerHTML = `
+        🛵 <strong>${data.distanciaTexto}</strong> — Taxa: <strong>R$${data.taxa.toFixed(2).replace('.', ',')}</strong>
+        <span style="color:#666;font-size:12px;"> · ⏱️ ~${data.duracaoTexto}</span>
+      `;
+
+      // Restaura botão se estava bloqueado por distância
+      if(siteConfig.restaurante_aberto){
+        document.querySelectorAll('.finish-order-btn').forEach(btn => {
+          if(!btn.classList.contains('close-cart-btn')){
+            btn.disabled = false;
+            btn.style.background = '';
+            btn.innerText = 'Finalizar Pedido';
+          }
+        });
+      }
+    }
+
+    renderCart();
+
+  } catch(e) {
+    console.warn('Erro ao calcular entrega:', e);
+    document.getElementById('entrega-info').innerHTML =
+      '🛵 <strong>Entrega até 1km</strong> — R$2,00';
+    entregaAtual = { taxa: 2, entrega: true };
+    renderCart();
+  }
+}
+
+
 /* ========================= */
 /* SHOW PAGE */
 /* ========================= */
@@ -2449,6 +2542,10 @@ function showPage(id){
 
   if(id === 'orders-page'){
     renderOrders();
+  }
+
+  if(id === 'home-page'){
+    calcularEntrega();
   }
 }
 /* ========================= */
@@ -2720,7 +2817,7 @@ function renderCart(){
   document.getElementById('payment-method')?.value;
 
   if(cart.length > 0){
-    total += 2;
+    total += entregaAtual.taxa || 2;
   }
 
   cart.forEach((item,index)=>{
@@ -2759,6 +2856,13 @@ function renderCart(){
 
   document.getElementById('cart-total')
   .innerText = `R$${total.toFixed(2).replace('.', ',')}`;
+
+  const detalhe = document.getElementById('entrega-detalhe');
+  if(detalhe && cart.length > 0 && entregaAtual.distanciaKm){
+    detalhe.innerText = `Taxa de entrega: R$${(entregaAtual.taxa || 2).toFixed(2).replace('.', ',')}`;
+  } else if(detalhe) {
+    detalhe.innerText = '';
+  }
 
   document.getElementById(
   'mobile-cart-count'
@@ -2815,7 +2919,8 @@ function saveUserData(){
   );
 
   alert('Dados salvos!');
-
+  
+  calcularEntrega();
 }
 
 function loadUser(){
@@ -2842,6 +2947,8 @@ function loadUser(){
 
   document.getElementById('user-complement').value =
   user.complement || '';
+
+  calcularEntrega();
 
 }
 
@@ -2870,6 +2977,14 @@ async function finishOrder(){
     alert('O restaurante está fechado no momento. Tente mais tarde!');
     return;
   }
+
+  await calcularEntrega();
+
+  if(!entregaAtual.entrega){
+    alert(entregaAtual.motivo || 'Seu endereço está fora da área de entrega.');
+    return;
+  }
+
 
   const payment =
     document.getElementById('payment-method').value;
@@ -3207,7 +3322,8 @@ const ADDON_PRICE = {
 function calculateTotal(){
 
   const baseTotal =
-    cart.reduce((sum, item) => sum + item.price, 0) + 2;
+    cart.reduce((sum,item)=>sum+item.price,0) + (cart.length > 0 ? (entregaAtual.taxa || 2) : 0);
+
 
   const addonTotal =
     (addons.tare * ADDON_PRICE.tare) +
