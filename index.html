@@ -2671,7 +2671,7 @@ function renderProducts(data){
           <button
             class="add-cart-btn"
             ${product.esgotado ? 'disabled' : ''}
-            onclick="addToCart('${product.name}',${product.price})"
+            onclick="addToCart('${product.name}')"
           >
             ${product.esgotado ? 'Esgotado' : 'Adicionar'}
           </button>
@@ -2760,19 +2760,28 @@ renderCombos();
 /* ADD CART */
 /* ========================= */
 
-function addToCart(name,price){
+function addToCart(name){
 
-cart.push({
-name,
-price
-});
+  const product =
+  products.find(p => p.name === name);
 
-saveCart();
+  if(!product) return;
 
-renderCart();
+  const existing =
+  cart.find(i => i.name === product.name);
 
+  if(existing){
+    existing.quantity += 1;
+  }else{
+    cart.push({
+      name: product.name,
+      quantity: 1
+    });
 }
 
+  saveCart();
+  renderCart();
+}
 /* ========================= */
 /* REMOVE */
 /* ========================= */
@@ -2822,7 +2831,19 @@ function renderCart(){
 
   cart.forEach((item,index)=>{
 
-  total += item.price;
+  const product =
+    products.find(p => p.name === item.name);
+
+  const combo =
+    combos.find(c => c.name === item.name);
+
+  const itemPrice =
+    product?.price ||
+    combo?.price ||
+    0;
+
+  total += itemPrice * (item.quantity || 1);
+
   cartItems.innerHTML += `
 
   <div class="cart-item">
@@ -2831,7 +2852,15 @@ function renderCart(){
 
   <strong>${item.name}</strong>
 
-  <p>R$${item.price}</p>
+  <p>
+  R$${(
+    (
+      products.find(p => p.name === item.name)?.price ||
+      combos.find(c => c.name === item.name)?.price ||
+      0
+    ) * (item.quantity || 1)
+  ).toFixed(2)}
+  </p>
 
   </div>
 
@@ -3019,14 +3048,30 @@ async function finishOrder(){
   const addonsCopy = { ...addons };
 
   let baseTotal =
-    cart.reduce((sum,item)=>sum + item.price, 0) +
-    (cart.length > 0 ? (entregaAtual.taxa || 2) : 0);
+    cart.reduce((sum,item)=>{
 
+      const product =
+        products.find(p => p.name === item.name);
+
+      const combo =
+        combos.find(c => c.name === item.name);
+
+      const price =
+        product?.price ||
+        combo?.price ||
+        0;
+
+      return sum + (price * (item.quantity || 1));
+
+    },0)
   const addonTotal =
     (addonsCopy.tare * 0.5) +
     (addonsCopy.teriyaki * 0.5);
 
-  let total = baseTotal + addonTotal;
+  let total =
+  baseTotal +
+  addonTotal +
+  (cart.length > 0 ? (entregaAtual.taxa || 0) : 0);
 
   // aplica taxa do cartão
   if(payment === 'Cartão'){
@@ -3040,7 +3085,13 @@ async function finishOrder(){
     complement: user.complement,
     payment,
     items: [...cart],
+
+    taxaEntrega: entregaAtual.taxa || 0,
+    distanciaKm: entregaAtual.distanciaKm || null,
+
+
     total,
+
     addons: addonsCopy,
     status: "Recebido",
     createdAt: Date.now()
@@ -3270,11 +3321,18 @@ function confirmAddCombo(){
 
   if(!selectedCombo) return;
 
-  cart.push({
-    name: selectedCombo.name,
-    price: selectedCombo.price
-  });
+  const existing =
+  cart.find(i => i.name === selectedCombo.name);
 
+  if(existing){
+    existing.quantity += 1;
+  }else{
+    cart.push({
+      name: selectedCombo.name,
+      quantity: 1,
+      isCombo: true
+    });
+  }
   saveCart();
   renderCart();
 
@@ -3325,11 +3383,22 @@ const ADDON_PRICE = {
 
 
 function calculateTotal(){
-
   const baseTotal =
-    cart.reduce((sum,item)=>sum+item.price,0) + (cart.length > 0 ? (entregaAtual.taxa || 2) : 0);
+    cart.reduce((sum,item)=>{
 
+      const product =
+        products.find(p => p.name === item.name);
 
+      const combo =
+        combos.find(c => c.name === item.name);
+
+      const price =
+        product?.price ||
+        combo?.price ||
+        0;
+
+      return sum + (price * (item.quantity || 1));
+  },0)
   const addonTotal =
     (addons.tare * ADDON_PRICE.tare) +
     (addons.teriyaki * ADDON_PRICE.teriyaki);
