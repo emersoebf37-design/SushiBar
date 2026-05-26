@@ -110,50 +110,25 @@ function calcularTaxa(distanciaKm, motoboy_on) {
 export default async function handler(req, res) {
 
   const allowedOrigin =
-  "https://sushi-bar-beige.vercel.app";
+    "https://sushi-bar-beige.vercel.app";
 
   const origin = req.headers.origin;
 
-  if (!origin || origin !== allowedOrigin) {
-  return res.status(403).json({
-    error: "Origem não permitida."
-  });
+  if (origin && origin !== allowedOrigin) {
+    return res.status(403).json({ error: "Origem não permitida." });
   }
 
   if (req.method === "OPTIONS") {
-
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    allowedOrigin
-  );
-
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, OPTIONS"
-  );
-
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type"
-  );
-
-  res.setHeader(
-  "Cache-Control",
-  "s-maxage=1800"
-  );
-
-  return res.status(200).end();
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Cache-Control", "s-maxage=1800");
+    return res.status(200).end();
   }
 
-  if(origin === allowedOrigin){
-    res.setHeader(
-      "Access-Control-Allow-Origin",
-      allowedOrigin
-    );
-  }
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
 
   if (req.method !== "GET") {
     return res
@@ -196,10 +171,10 @@ export default async function handler(req, res) {
   }
 
   if (address.length > 200) {
-  return res.status(400).json({
-    error: "Endereço muito grande."
-  });
-}
+    return res.status(400).json({
+      error: "Endereço muito grande."
+    });
+  }
 
   // ===========================
   // CACHE
@@ -312,7 +287,6 @@ export default async function handler(req, res) {
         resultado.motivo || null
     };
 
-    // salva cache
     setCache(
       normalizedAddress,
       finalData
@@ -333,4 +307,3 @@ export default async function handler(req, res) {
     });
   }
 }
-
