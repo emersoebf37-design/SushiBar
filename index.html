@@ -1886,7 +1886,7 @@ body{
       color:#444;
       line-height:1.8;
     ">
-    🛵 Calculando taxa de entrega...
+    🚲 Calculando taxa de entrega...
     </div>
 
   <div id="cart-items"></div>
@@ -2459,7 +2459,7 @@ async function calcularEntrega(){
   const enderecoCompleto = `${user.address}, ${user.number}, Brasil`;
 
   document.getElementById('entrega-info').innerHTML =
-    '🛵 Calculando taxa de entrega...';
+    '🚲 Calculando taxa de entrega...';
 
   try {
     const motoboy = siteConfig.motoboy_on ? 'true' : 'false';
@@ -2493,7 +2493,7 @@ async function calcularEntrega(){
       };
 
       document.getElementById('entrega-info').innerHTML = `
-        🛵 <strong>${data.distanciaTexto}</strong> — Taxa: <strong>R$${data.taxa.toFixed(2).replace('.', ',')}</strong>
+        🚲 <strong>${data.distanciaTexto}</strong> — Taxa: <strong>R$${data.taxa.toFixed(2).replace('.', ',')}</strong>
         <span style="color:#666;font-size:12px;"> · ⏱️ ~${data.duracaoTexto}</span>
       `;
 
@@ -2514,7 +2514,7 @@ async function calcularEntrega(){
   } catch(e) {
     console.warn('Erro ao calcular entrega:', e);
     document.getElementById('entrega-info').innerHTML =
-      '🛵 <strong>Entrega até 1km</strong> — R$2,00';
+      '🚲 <strong>Entrega até 1km</strong> — R$2,00';
     entregaAtual = { taxa: 2, entrega: true };
     renderCart();
   }
@@ -3221,7 +3221,7 @@ async function renderOrders(){
       return;
     }
 
-    const icons = { 'Recebido':'📨', 'Preparando':'🍣', 'Saiu para entrega':'🛵', 'Entregue':'✅' };
+    const icons = { 'Recebido':'📨', 'Preparando':'🍣', 'Saiu para entrega':'🚲', 'Entregue':'✅' };
     const iconClasses = { 'Recebido':'icon-received', 'Preparando':'icon-preparing', 'Saiu para entrega':'icon-out', 'Entregue':'icon-done' };
 
     orders.forEach(order => {
