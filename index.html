@@ -3208,7 +3208,8 @@ async function renderOrders(){
 
   try {
 
-    const response = await fetch(`/api/orders?phone=${encodeURIComponent(user.phone)}`);
+    const phoneLimpo = user.phone.replace(/\D/g, "");
+    const response = await fetch(`/api/orders?phone=${encodeURIComponent(phoneLimpo)}`);
     const data = await response.json();
 
     if(!response.ok) throw new Error(data.error);
