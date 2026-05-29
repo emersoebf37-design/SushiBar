@@ -242,24 +242,36 @@ export default async function handler(req, res) {
       }
  
       total += tare * 0.5;
+
+      // ========================
+      // TAXA DE ENTREGA
+      // ========================
+
+      const taxaEntrega = Number(order.taxaEntrega) || 0;
+      if (taxaEntrega < 0 || taxaEntrega > 50) {
+        return res.status(400).json({ error: "Taxa de entrega inválida." });
+      }
+      total += taxaEntrega;
  
       if (order.payment === "Cartão") total *= 1.05;
  
       total = Number(total.toFixed(2));
  
       const newOrder = {
-        customer:   order.customer,
-        phone:      order.phone,
-        address:    order.address,
-        number:     order.number,
-        complement: order.complement,
-        payment:    order.payment,
-        addons:     { tare, hashi },
-        items:      validatedItems,
+        customer:    order.customer,
+        phone:       order.phone,
+        address:     order.address,
+        number:      order.number,
+        complement:  order.complement,
+        payment:     order.payment,
+        addons:      { tare, hashi },
+        items:       validatedItems,
+        taxaEntrega,
+        distanciaKm: order.distanciaKm || null,
         total,
-        orderId:    nextId,
-        createdAt:  Date.now(),
-        status:     "Recebido",
+        orderId:     nextId,
+        createdAt:   Date.now(),
+        status:      "Recebido",
       };
  
       await db.collection("orders").add(newOrder);
