@@ -3067,10 +3067,6 @@ async function finishOrder(){
       return sum + (price * (item.quantity || 1));
 
     },0)
-  const addonTotal =
-    (addonsCopy.tare * 0.5) +
-    (addonsCopy.teriyaki * 0.5);
-
   let total =
   baseTotal +
   addonTotal +
@@ -3106,13 +3102,6 @@ async function finishOrder(){
     <p><strong>Endereço:</strong><br>${user.address}, ${user.number}</p>
     <p>${user.complement}</p>
     <p><strong>Pagamento:</strong> ${payment}</p>
-
-    <p><strong>Adicionais:</strong></p>
-    <p>
-      Hashi: ${addonsCopy.hashi || 0}<br>
-      Tarê: ${addonsCopy.tare || 0}<br>
-    </p>
-
     <div class="modal-total">
       R$${total.toFixed(2).replace('.', ',')}
     </div>
@@ -3376,15 +3365,7 @@ comboList.addEventListener('wheel', (e) => {
 
 let addons = {
   hashi: 0,
-  tare: 0,
-  teriyaki: 0
 };
-
-const ADDON_PRICE = {
-  tare: 0.5,
-  teriyaki: 0.5
-};
-
 
 function calculateTotal(){
   const baseTotal =
@@ -3403,11 +3384,7 @@ function calculateTotal(){
 
       return sum + (price * (item.quantity || 1));
   },0)
-  const addonTotal =
-    (addons.tare * ADDON_PRICE.tare) +
-    (addons.teriyaki * ADDON_PRICE.teriyaki);
-
-  return baseTotal + addonTotal;
+return baseTotal;
 }
 
 function updateModalTotal(){
@@ -3485,17 +3462,6 @@ window.updateModalTotal = updateModalTotal;
           <button onclick="changeAddon('hashi', 1)">+</button>
         </div>
       </div>
-
-      <div class="addon-item">
-        <span>🍯 Molho Tarê (+R$0,50)</span>
-        <div class="qty-control">
-          <button onclick="changeAddon('tare', -1)">−</button>
-          <span id="qty-tare">0</span>
-          <button onclick="changeAddon('tare', 1)">+</button>
-        </div>
-      </div>
-    </div>
-
     <div class="modal-buttons">
       <button class="modal-cancel" onclick="closeOrderModal()">Cancelar</button>
       <button class="modal-confirm" onclick="confirmOrder()">Confirmar</button>

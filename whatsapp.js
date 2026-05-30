@@ -89,7 +89,6 @@ ${order.items.map(i => `• ${i.name}`).join('\n')}
 
 🧾 *Adicionais:*
 🥢 Adaptador de Hashi: ${order.addons?.hashi || 0}
-🍯 Tarê: ${order.addons?.tare || 0}
 
 💰 *Total:* R$${order.total.toFixed(2)}
 💳 *Pagamento:* ${order.payment}

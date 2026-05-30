@@ -139,8 +139,6 @@ async function listenOrders() {
 
         \u001b[1;36mAdicionais:\u001b[0m
         🥢 Hashi: ${order.addons?.hashi || 0}
-        🍯 Tarê: ${order.addons?.tare || 0}
-        🍶 Teriyaki: ${order.addons?.teriyaki || 0}
 
         \u001b[1;32mTotal: R$${order.total.toFixed(2)}\u001b[0m
 
