@@ -85,7 +85,7 @@ function mensagemNovoPedido(order){
 Olá, *${order.customer}*! Seu pedido foi recebido com sucesso.
 
 📋 *Itens:*
-${order.items.map(i => `• ${i.name}`).join('\n')}
+${order.items.map(i => `• ${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`).join('\n')}
 
 🧾 *Adicionais:*
 🥢 Adaptador de Hashi: ${order.addons?.hashi || 0}

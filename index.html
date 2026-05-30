@@ -2816,6 +2816,25 @@ JSON.stringify(cart)
 /* RENDER CART */
 /* ========================= */
 
+function increaseCart(index) {
+  if(cart[index].quantity < 20) cart[index].quantity += 1;
+  saveCart();
+  renderCart();
+}
+
+function decreaseCart(index) {
+  if(cart[index].quantity > 1) {
+    cart[index].quantity -= 1;
+  } else {
+    cart.splice(index, 1);
+  }
+  saveCart();
+  renderCart();
+}
+
+window.increaseCart = increaseCart;
+window.decreaseCart = decreaseCart;
+
 function renderCart(){
 
   const cartItems =
@@ -2848,36 +2867,26 @@ function renderCart(){
   total += itemPrice * (item.quantity || 1);
 
   cartItems.innerHTML += `
-
-  <div class="cart-item">
-
-  <div>
-
-  <strong>${item.name}</strong>
-
-  <p>
-  R$${(
-    (
-      products.find(p => p.name === item.name)?.price ||
-      combos.find(c => c.name === item.name)?.price ||
-      0
-    ) * (item.quantity || 1)
-  ).toFixed(2)}
-  </p>
-
-  </div>
-
-  <button
-  class="trash-btn"
-  onclick="removeCart(${index})"
-  >
-
-  🗑️
-
-  </button>
-
-  </div>
-
+    <div class="cart-item">
+    <div style="flex:1;">
+      <strong>${item.name}</strong>
+      <p>R$${(itemPrice * (item.quantity || 1)).toFixed(2)}</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button onclick="decreaseCart(${index})" style="
+        width:28px;height:28px;border:none;border-radius:50%;
+        background:#9e0505;color:white;font-size:16px;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;
+      ">−</button>
+      <span style="font-weight:bold;min-width:20px;text-align:center;">${item.quantity || 1}x</span>
+      <button onclick="increaseCart(${index})" style="
+        width:28px;height:28px;border:none;border-radius:50%;
+        background:#9e0505;color:white;font-size:16px;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;
+      ">+</button>
+      <button class="trash-btn" onclick="removeCart(${index})">🗑️</button>
+    </div>
+    </div>
   `;
 
   });
@@ -3069,7 +3078,6 @@ async function finishOrder(){
     },0)
   let total =
   baseTotal +
-  addonTotal +
   (cart.length > 0 ? (entregaAtual.taxa || 0) : 0);
 
   // aplica taxa do cartão
@@ -3234,7 +3242,7 @@ async function renderOrders(){
           <p>Telefone: ${order.phone}</p>
           <p>Status: <strong>${order.status}</strong></p>
           <p>Pagamento: ${order.payment}</p>
-          <p>Itens: ${order.items.map(i => i.name).join(', ')}</p>
+          <p>Itens: ${order.items.map(i => `${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`).join(', ')}</p>
           <h2>R$${order.total.toFixed(2)}</h2>
           <p class="tempo-preparo">⏱️ Tempo estimado de preparo: 30 min</p>
         </div>`;
@@ -3462,6 +3470,7 @@ window.updateModalTotal = updateModalTotal;
           <button onclick="changeAddon('hashi', 1)">+</button>
         </div>
       </div>
+     </div>
     <div class="modal-buttons">
       <button class="modal-cancel" onclick="closeOrderModal()">Cancelar</button>
       <button class="modal-confirm" onclick="confirmOrder()">Confirmar</button>

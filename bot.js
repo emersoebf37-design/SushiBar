@@ -135,7 +135,7 @@ async function listenOrders() {
         \u001b[1;37mPagamento:\u001b[0m ${order.payment}
 
         \u001b[1;36mItens:\u001b[0m
-        ${order.items.map(i => i.name).join('\n')}
+        ${order.items.map(i => `${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`).join('\n')}
 
         \u001b[1;36mAdicionais:\u001b[0m
         🥢 Hashi: ${order.addons?.hashi || 0}
