@@ -2403,12 +2403,14 @@ function applyEsgotados(){
   renderCombos();
 }
 
+
 function checkRestauranteAberto(){
   const finishBtns = document.querySelectorAll('.finish-order-btn');
   const aviso = document.getElementById('aviso-fechado');
 
   if(!siteConfig.restaurante_aberto){
     finishBtns.forEach(btn => {
+      if(btn.classList.contains('close-cart-btn')) return; // ✅ nunca toca no botão Fechar
       btn.disabled = true;
       btn.style.background = '#aaa';
       btn.style.cursor = 'not-allowed';
@@ -2417,6 +2419,7 @@ function checkRestauranteAberto(){
     if(aviso) aviso.style.display = 'block';
   } else {
     finishBtns.forEach(btn => {
+      if(btn.classList.contains('close-cart-btn')) return; // ✅ idem
       btn.disabled = false;
       btn.style.background = '';
       btn.style.cursor = '';
