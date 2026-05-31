@@ -253,7 +253,7 @@ export default async function handler(req, res) {
       }
       total += taxaEntrega;
  
-      if (order.payment === "Cartão") total *= 1.05;
+      if (order.payment === "Cartão") total *= 1.10;
  
       total = Number(total.toFixed(2));
  
@@ -275,6 +275,7 @@ export default async function handler(req, res) {
       };
  
       await db.collection("orders").add(newOrder);
+
  
       return res.status(200).json({ success: true, orderId: nextId });
  
