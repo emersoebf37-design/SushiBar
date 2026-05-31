@@ -160,10 +160,59 @@ async function listenOrders() {
 
         /* WHATSAPP */
 
-        await enviarMensagem(order.phone, mensagemNovoPedido(order));
+        await enviarMensagem(
+          order.phone,
+          mensagemNovoPedido(order)
+        );
 
         if (order.payment?.toLowerCase().includes('pix')) {
-          await enviarMensagem(order.phone, mensagemPix(order));
+          await enviarMensagem(
+            order.phone,
+            mensagemPix(order)
+          );
+        }
+
+        /* MOTOBOY */
+
+        const MOTOBOY_PHONE = "5521997921690";
+
+        try {
+
+          console.log(
+            "Enviando mensagem para motoboy:",
+            MOTOBOY_PHONE
+          );
+
+          await enviarMensagem(
+            MOTOBOY_PHONE,
+            `🛵 *Novo pedido para entrega*
+
+        👤 Cliente: ${order.customer}
+
+        📍 Endereço:
+        ${order.address}, ${order.number}
+        ${order.complement || ""}
+
+        💰 Total: R$${order.total.toFixed(2)}
+
+        📞 Cliente:
+        ${order.phone}
+
+        🗺️ Google Maps:
+        https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+          `${order.address}, ${order.number}`
+        )}`
+          );
+
+          console.log("🛵 Motoboy notificado.");
+
+        } catch (err) {
+
+          console.error(
+            "Erro ao notificar motoboy:",
+            err
+          );
+
         }
 
       }
@@ -192,51 +241,7 @@ client.on('interactionCreate', async (interaction) => {
     content: `✅ Status atualizado para: ${value}`,
     ephemeral: true
   });
-
-  /* MOTObOY */
-
-const MOTOBOY_PHONE = "5521997921690";
-
-try {
-
-  await enviarMensagem(
-    MOTOBOY_PHONE,
-    `🛵 *Novo pedido para entrega*
-
-  👤 Cliente: ${order.customer}
-
-  📍 Endereço:
-  ${order.address}, ${order.number}
-  ${order.complement || ""}
-
-  💰 Total: R$${order.total.toFixed(2)}
-
-  📞 Cliente:
-  ${order.phone}
-
-  https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `${order.address}, ${order.number}`
-  )}`
-    );
-
-    console.log("🛵 Motoboy notificado.");
-
-  } catch(err) {
-
-    console.error(
-      "Erro ao notificar motoboy:",
-      err
-    );
-
-  }
-
-  console.log(
-    "Enviando mensagem para motoboy:",
-    MOTOBOY_PHONE
-  );
-
 });
-
 /* LOGIN */
 
 require('dotenv').config();
