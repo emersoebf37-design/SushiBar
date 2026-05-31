@@ -1,11 +1,6 @@
 const { initializeApp, getApps, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
- const {
-  enviarMensagem,
-  mensagemNovoPedido,
-  mensagemPix,
-  mensagemMotoboy
-} = require("../whatsapp.js");
+
 // ========================
 // RATE LIMIT
 // ========================
@@ -280,37 +275,6 @@ export default async function handler(req, res) {
       };
  
       await db.collection("orders").add(newOrder);
-
-      try {
-
-      const configSnap =
-        await db.collection("config")
-        .doc("settings")
-        .get();
-
-      const motoboyOn =
-        configSnap.exists &&
-        configSnap.data().motoboy_on === true;
-
-      if(motoboyOn){
-
-        await enviarMensagem(
-          "5521997921690",
-          mensagemMotoboy(newOrder)
-        );
-
-        console.log("🛵 Notificação enviada ao motoboy.");
-
-      }
-
-    } catch(err){
-
-      console.error(
-        "Erro ao notificar motoboy:",
-        err
-      );
-
-    }
  
       return res.status(200).json({ success: true, orderId: nextId });
  
