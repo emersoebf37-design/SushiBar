@@ -195,6 +195,48 @@ client.on('interactionCreate', async (interaction) => {
 
 });
 
+/* MOTObOY */
+
+const MOTOBOY_PHONE = "5521990759345";
+
+try {
+
+  await enviarMensagem(
+    MOTOBOY_PHONE,
+    `🛵 *Novo pedido para entrega*
+
+👤 Cliente: ${order.customer}
+
+📍 Endereço:
+${order.address}, ${order.number}
+${order.complement || ""}
+
+💰 Total: R$${order.total.toFixed(2)}
+
+📞 Cliente:
+${order.phone}
+
+https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  `${order.address}, ${order.number}`
+)}`
+  );
+
+  console.log("🛵 Motoboy notificado.");
+
+} catch(err) {
+
+  console.error(
+    "Erro ao notificar motoboy:",
+    err
+  );
+
+}
+
+console.log(
+  "Enviando mensagem para motoboy:",
+  MOTOBOY_PHONE
+);
+
 /* LOGIN */
 
 require('dotenv').config();
