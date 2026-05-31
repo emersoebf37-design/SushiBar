@@ -5,7 +5,7 @@ const { getFirestore } = require("firebase-admin/firestore");
   mensagemNovoPedido,
   mensagemPix,
   mensagemMotoboy
-} = require("./whatsapp.js");
+} = require("../whatsapp.js");
 // ========================
 // RATE LIMIT
 // ========================
