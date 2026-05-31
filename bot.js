@@ -197,7 +197,7 @@ client.on('interactionCreate', async (interaction) => {
 
 /* MOTObOY */
 
-const MOTOBOY_PHONE = "5521990759345";
+const MOTOBOY_PHONE = "5521997921690";
 
 try {
 
