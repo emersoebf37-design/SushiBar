@@ -56,7 +56,7 @@ function getPrivateKey() {
 // ========================
  
 const PRODUCTS = {
-  "Hot Roll Philadelphia Salmão (6 unidades)": 11,
+  "Hot Roll Philadelphia Salmão (6 unidades)": 12,
   "Temaki Frito": 26.99,
   "Temaki ": 19.99,
   "Hossomaki Philadelphia Salmão (6 unidades)": 10.50,
