@@ -193,9 +193,7 @@ client.on('interactionCreate', async (interaction) => {
     ephemeral: true
   });
 
-});
-
-/* MOTObOY */
+  /* MOTObOY */
 
 const MOTOBOY_PHONE = "5521997921690";
 
@@ -205,37 +203,39 @@ try {
     MOTOBOY_PHONE,
     `🛵 *Novo pedido para entrega*
 
-👤 Cliente: ${order.customer}
+  👤 Cliente: ${order.customer}
 
-📍 Endereço:
-${order.address}, ${order.number}
-${order.complement || ""}
+  📍 Endereço:
+  ${order.address}, ${order.number}
+  ${order.complement || ""}
 
-💰 Total: R$${order.total.toFixed(2)}
+  💰 Total: R$${order.total.toFixed(2)}
 
-📞 Cliente:
-${order.phone}
+  📞 Cliente:
+  ${order.phone}
 
-https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  `${order.address}, ${order.number}`
-)}`
+  https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${order.address}, ${order.number}`
+  )}`
+    );
+
+    console.log("🛵 Motoboy notificado.");
+
+  } catch(err) {
+
+    console.error(
+      "Erro ao notificar motoboy:",
+      err
+    );
+
+  }
+
+  console.log(
+    "Enviando mensagem para motoboy:",
+    MOTOBOY_PHONE
   );
 
-  console.log("🛵 Motoboy notificado.");
-
-} catch(err) {
-
-  console.error(
-    "Erro ao notificar motoboy:",
-    err
-  );
-
-}
-
-console.log(
-  "Enviando mensagem para motoboy:",
-  MOTOBOY_PHONE
-);
+});
 
 /* LOGIN */
 
