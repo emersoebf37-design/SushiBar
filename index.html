@@ -1798,6 +1798,9 @@ let entregaAtual = {
 };
 
 async function calcularEntrega(){
+  // ✅ Sempre garante config atualizado antes de calcular
+  await fetchConfig(true);
+
   const user = JSON.parse(localStorage.getItem('userData'));
 
   if(!user || !user.address || !user.number){
@@ -1808,10 +1811,13 @@ async function calcularEntrega(){
     return;
   }
 
-  const enderecoCompleto = `${user.address}, ${user.number}, Brasil`;
+  // ✅ Inclui bairro e cidade para o Google Maps resolver melhor
+  const enderecoCompleto = `${user.address}, ${user.number}, ${user.neighborhood || ''}, ${user.city || 'São João de Meriti / RJ'}, Brasil`;
+
   document.getElementById('entrega-info').innerHTML = '🚲 Calculando taxa de entrega...';
 
   try {
+    // ✅ motoboy_on vem do config recém-buscado
     const motoboy = siteConfig.motoboy_on ? 'true' : 'false';
     const res = await fetch(`/api/distance?address=${encodeURIComponent(enderecoCompleto)}&motoboy_on=${motoboy}`);
     const data = await res.json();
