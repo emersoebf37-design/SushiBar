@@ -1,7 +1,14 @@
 // api/distance.js
 
 const RESTAURANTE =
-  "Av. Estácio de Sá, 787, Parque Novo Rio, RJ, CEP 25585-000, Brasil";
+  "Av. Estácio de Sá, 787, Parque Novo Rio, São João de Meriti, RJ, CEP 25585-000, Brasil";
+
+// ===========================
+// RAIOS DE ENTREGA
+// ===========================
+
+const RAIO_SEM_MOTOBOY_KM = 3;  // sem motoboy: até 3 km
+const RAIO_COM_MOTOBOY_KM = 8;  // com motoboy: até 8 km
 
 // ===========================
 // RATE LIMIT
@@ -10,22 +17,17 @@ const RESTAURANTE =
 const rateLimit = new Map();
 
 function isRateLimited(ip) {
-
   const now = Date.now();
-
   const WINDOW = 5 * 60 * 1000; // 5 min
   const MAX_REQUESTS = 10;
 
-  if (!rateLimit.has(ip)) {
-    rateLimit.set(ip, []);
-  }
+  if (!rateLimit.has(ip)) rateLimit.set(ip, []);
 
   const requests = rateLimit
     .get(ip)
     .filter(time => now - time < WINDOW);
 
   requests.push(now);
-
   rateLimit.set(ip, requests);
 
   return requests.length > MAX_REQUESTS;
@@ -36,26 +38,20 @@ function isRateLimited(ip) {
 // ===========================
 
 const cache = new Map();
-
 const CACHE_TIME = 1000 * 60 * 30; // 30 min
 
-function getCache(address) {
-
-  const item = cache.get(address);
-
+function getCache(key) {
+  const item = cache.get(key);
   if (!item) return null;
-
   if (Date.now() > item.expires) {
-    cache.delete(address);
+    cache.delete(key);
     return null;
   }
-
   return item.data;
 }
 
-function setCache(address, data) {
-
-  cache.set(address, {
+function setCache(key, data) {
+  cache.set(key, {
     data,
     expires: Date.now() + CACHE_TIME
   });
@@ -65,42 +61,30 @@ function setCache(address, data) {
 // TAXA
 // ===========================
 
-function calcularTaxa(distanciaKm, motoboy_on) {
+function calcularTaxa(distanciaKm, motoboyAtivo) {
 
-  const km = Math.ceil(distanciaKm);
+  const km = distanciaKm; // usa float real, não arredondado
+  const raioMax = motoboyAtivo
+    ? RAIO_COM_MOTOBOY_KM
+    : RAIO_SEM_MOTOBOY_KM;
 
-  if (km > 8) {
-    return {
-      taxa: 0,
-      entrega: false,
-      motivo:
-        "Endereço fora do raio máximo de entrega (8km)."
-    };
+  // Fora do raio permitido
+  if (km > raioMax) {
+    const motivo = motoboyAtivo
+      ? `Endereço fora do raio máximo de entrega (${RAIO_COM_MOTOBOY_KM} km).`
+      : `Fora da área de entrega sem motoboy (máx. ${RAIO_SEM_MOTOBOY_KM} km). Entre em contato: (21) 3955-6573.`;
+
+    return { taxa: 0, entrega: false, motivo };
   }
 
-  let taxa = 2;
+  // Tabela de taxa por km real (arredondado para cima)
+  const kmCeil = Math.ceil(km);
+  let taxa = 2; // base: até 1 km
 
-  if (km > 1) {
-    taxa += 1;
-  }
+  if (kmCeil > 1) taxa += 1;             // 2 km  → R$3
+  if (kmCeil > 2) taxa += (kmCeil - 2) * 2; // 3 km  → R$5, 4 km → R$7, etc.
 
-  if (km > 2) {
-    taxa += (km - 2) * 2;
-  }
-
-  if (km > 3 && !motoboy_on) {
-    return {
-      taxa: 0,
-      entrega: false,
-      motivo:
-        "Fora da área de entrega. Entre em contato conosco no (21) 3955-6573."
-    };
-  }
-
-  return {
-    taxa,
-    entrega: true
-  };
+  return { taxa, entrega: true };
 }
 
 // ===========================
@@ -109,9 +93,7 @@ function calcularTaxa(distanciaKm, motoboy_on) {
 
 export default async function handler(req, res) {
 
-  const allowedOrigin =
-    "https://sushi-bar-beige.vercel.app";
-
+  const allowedOrigin = "https://sushi-bar-beige.vercel.app";
   const origin = req.headers.origin;
 
   if (origin && origin !== allowedOrigin) {
@@ -131,9 +113,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method !== "GET") {
-    return res
-      .status(405)
-      .json({ error: "Método não permitido." });
+    return res.status(405).json({ error: "Método não permitido." });
   }
 
   // ===========================
@@ -147,8 +127,7 @@ export default async function handler(req, res) {
 
   if (isRateLimited(ip)) {
     return res.status(429).json({
-      error:
-        "Muitas consultas realizadas. Aguarde alguns minutos."
+      error: "Muitas consultas realizadas. Aguarde alguns minutos."
     });
   }
 
@@ -159,151 +138,108 @@ export default async function handler(req, res) {
   let { address, motoboy_on } = req.query;
 
   if (!address) {
-    return res
-      .status(400)
-      .json({ error: "Endereço não informado." });
+    return res.status(400).json({ error: "Endereço não informado." });
   }
 
   if (address.length < 10) {
-    return res.status(400).json({
-      error: "Endereço inválido."
-    });
+    return res.status(400).json({ error: "Endereço inválido." });
   }
 
   if (address.length > 200) {
-    return res.status(400).json({
-      error: "Endereço muito grande."
-    });
+    return res.status(400).json({ error: "Endereço muito grande." });
   }
+
+  // Converte flag do motoboy corretamente
+  const motoboyAtivo = motoboy_on === "true";
 
   // ===========================
   // CACHE
+  // (chave inclui flag do motoboy pois o resultado muda)
   // ===========================
 
-  const normalizedAddress =
-    address.trim().toLowerCase();
-
-  const cached = getCache(normalizedAddress);
+  const cacheKey = `${address.trim().toLowerCase()}__motoboy:${motoboyAtivo}`;
+  const cached = getCache(cacheKey);
 
   if (cached) {
+    console.log(`📦 Cache hit: ${cacheKey}`);
     return res.status(200).json(cached);
   }
 
   // ===========================
-  // GOOGLE API
+  // GOOGLE MAPS API
   // ===========================
 
   const apiKey = process.env.GOOGLE_MAPS_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({
-      error:
-        "Chave do Google Maps não configurada."
-    });
+    return res.status(500).json({ error: "Chave do Google Maps não configurada." });
   }
 
   try {
-
-    const origem =
-      encodeURIComponent(RESTAURANTE);
-
-    const destino =
-      encodeURIComponent(address);
+    const origem  = encodeURIComponent(RESTAURANTE);
+    const destino = encodeURIComponent(address);
 
     const url =
-      `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origem}&destinations=${destino}&mode=driving&language=pt-BR&key=${apiKey}`;
+      `https://maps.googleapis.com/maps/api/distancematrix/json` +
+      `?origins=${origem}` +
+      `&destinations=${destino}` +
+      `&mode=driving` +
+      `&language=pt-BR` +
+      `&key=${apiKey}`;
 
-    // ===========================
-    // TIMEOUT
-    // ===========================
+    // Timeout de 7s
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
 
-    const controller =
-      new AbortController();
-
-    const timeout = setTimeout(() => {
-      controller.abort();
-    }, 7000);
-
-    const response = await fetch(url, {
-      signal: controller.signal
-    });
-
+    const response = await fetch(url, { signal: controller.signal });
     clearTimeout(timeout);
 
     const data = await response.json();
 
     if (data.status !== "OK") {
-      return res.status(400).json({
-        error:
-          "Não foi possível calcular a distância."
-      });
+      console.error("Google Maps status:", data.status, data.error_message);
+      return res.status(400).json({ error: "Não foi possível calcular a distância." });
     }
 
-    const element =
-      data.rows[0]?.elements[0];
+    const element = data.rows[0]?.elements[0];
 
     if (!element || element.status !== "OK") {
-      return res.status(400).json({
-        error:
-          "Endereço não encontrado."
-      });
+      console.error("Element status:", element?.status);
+      return res.status(400).json({ error: "Endereço não encontrado pelo Google Maps." });
     }
 
-    const distanciaMetros =
-      element.distance.value;
+    const distanciaKm    = element.distance.value / 1000;
+    const distanciaTexto = element.distance.text;
+    const duracaoTexto   = element.duration.text;
 
-    const distanciaKm =
-      distanciaMetros / 1000;
+    const resultado = calcularTaxa(distanciaKm, motoboyAtivo);
 
-    const distanciaTexto =
-      element.distance.text;
-
-    const duracaoTexto =
-      element.duration.text;
-
-    const motoboy =
-      motoboy_on === "true";
-
-    const resultado =
-      calcularTaxa(
-        distanciaKm,
-        motoboy
-      );
+    console.log(
+      `📍 Distância: ${distanciaKm.toFixed(2)} km | ` +
+      `Motoboy: ${motoboyAtivo} | ` +
+      `Entrega: ${resultado.entrega} | ` +
+      `Taxa: R$${resultado.taxa}`
+    );
 
     const finalData = {
-
-      distanciaKm:
-        Math.round(distanciaKm * 10) / 10,
-
+      distanciaKm:   Math.round(distanciaKm * 10) / 10,
       distanciaTexto,
-
       duracaoTexto,
-
-      taxa: resultado.taxa,
-
-      entrega: resultado.entrega,
-
-      motivo:
-        resultado.motivo || null
+      taxa:          resultado.taxa,
+      entrega:       resultado.entrega,
+      motivo:        resultado.motivo || null,
     };
 
-    setCache(
-      normalizedAddress,
-      finalData
-    );
+    setCache(cacheKey, finalData);
 
     return res.status(200).json(finalData);
 
   } catch (error) {
-
-    console.error(
-      "Erro ao calcular distância:",
-      error
-    );
-
-    return res.status(500).json({
-      error:
-        "Erro ao calcular distância."
-    });
+    if (error.name === "AbortError") {
+      console.error("Google Maps timeout");
+      return res.status(504).json({ error: "Timeout ao calcular distância." });
+    }
+    console.error("Erro ao calcular distância:", error);
+    return res.status(500).json({ error: "Erro ao calcular distância." });
   }
 }
