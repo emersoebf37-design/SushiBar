@@ -1,3 +1,37 @@
+module.exports = {
+  conectarWhatsApp,
+  enviarMensagem,
+  mensagemNovoPedido,
+  mensagemStatus,
+  mensagemPix,
+  mensagemMotoboy
+};
+
+function mensagemMotoboy(order){
+
+  const enderecoCompleto =
+    `${order.address}, ${order.number}`;
+
+  const mapsUrl =
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoCompleto)}`;
+
+  return `🛵 *NOVA ENTREGA - KAIZORA*
+
+  👤 Cliente: ${order.customer}
+
+  📍 Endereço:
+  ${enderecoCompleto}
+
+  🔗 Google Maps:
+  ${mapsUrl}
+
+  💰 Valor do pedido:
+  R$${order.total.toFixed(2)}
+
+  📞 Contato:
+  ${order.phone}`;
+}
+
 const makeWASocket =
   require('@whiskeysockets/baileys').default;
 

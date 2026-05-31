@@ -1,6 +1,11 @@
 const { initializeApp, getApps, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
- 
+ const {
+  enviarMensagem,
+  mensagemNovoPedido,
+  mensagemPix,
+  mensagemMotoboy
+} = require("./whatsapp");
 // ========================
 // RATE LIMIT
 // ========================
@@ -56,15 +61,15 @@ function getPrivateKey() {
 // ========================
  
 const PRODUCTS = {
-  "Hot Roll Philadelphia Salmão (12 unidades)": 21,
+  "Hot Roll Philadelphia Salmão (6 unidades)": 11,
   "Temaki Frito": 26.99,
   "Temaki ": 19.99,
-  "Hossomaki Philadelphia Salmão (12 unidades)": 19,
+  "Hossomaki Philadelphia Salmão (6 unidades)": 10.50,
   "Shimeji na Manteiga": 14.90,
-  "Hot Roll Skin (12 unidades) ": 12,
-  "Hossomaki Skin (12 unidades)": 9.99,
-  "Hot Roll Kani (12 unidades)": 15,
-  "Hossomaki Kani (12 unidades)": 12,
+  "Hot Roll Skin (6 unidades)": 5.99,
+  "Hossomaki Skin (6 unidades)": 4.99,
+  "Hot Roll Kani (6 unidades)": 7.99,
+  "Hossomaki Kani (6 unidades)": 5.99,
   "Lula à Dorê (6 unidades)": 25.90,
   "Harumaki de Legumes (3 unidades)": 12.99,
   "Harumaki de Salmão (3 unidades)": 19,
@@ -275,6 +280,37 @@ export default async function handler(req, res) {
       };
  
       await db.collection("orders").add(newOrder);
+
+      try {
+
+      const configSnap =
+        await db.collection("config")
+        .doc("settings")
+        .get();
+
+      const motoboyOn =
+        configSnap.exists &&
+        configSnap.data().motoboy_on === true;
+
+      if(motoboyOn){
+
+        await enviarMensagem(
+          "5521997921690",
+          mensagemMotoboy(newOrder)
+        );
+
+        console.log("🛵 Notificação enviada ao motoboy.");
+
+      }
+
+    } catch(err){
+
+      console.error(
+        "Erro ao notificar motoboy:",
+        err
+      );
+
+    }
  
       return res.status(200).json({ success: true, orderId: nextId });
  
