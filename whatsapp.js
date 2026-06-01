@@ -67,7 +67,7 @@ async function enviarMensagem(telefone, mensagem){
   }
 }
 
-/* FUNÇÕES DE MENSAGENS (Mantidas iguais) */
+/* FUNÇÕES DE MENSAGENS */
 function mensagemNovoPedido(order){
   return `🍣 *Kaizora — Confirmação de Pedido*
 
@@ -91,26 +91,20 @@ ${order.complement || ''}
 Acompanhe seu pedido por aqui. Obrigado! 🙏`;
 }
 
-
 function gerarPixCopiaECola(valor) {
   const chave = "e5da076d-f585-4274-83bd-acb0e26904fb";
   const nome = "KAIZORA SUSHI"; 
-  const cidade = "RIO DE JANEIRO";
-  const txid = "0000"; // 👈 '0000' é aceito por 100% dos bancos sem rejeição
+  const city = "RIO DE JANEIRO";
+  const txid = "0000"; 
 
-  // Garante duas casas decimais (Ex: 49.90)
   const valStr = valor.toFixed(2);
 
-  // Função auxiliar para calcular e formatar os blocos no padrão EMV (Tag + Tamanho + Valor)
   const formatarBloco = (tag, conteudo) => {
     const tamanho = String(conteudo.length).padStart(2, '0');
     return `${tag}${tamanho}${conteudo}`;
   };
 
-  // Montagem dinâmica dos blocos fundamentais
   const b00 = "000201";
-  
-  // Montagem do bloco 26 (Dados da Conta) de forma dinâmica
   const s00 = formatarBloco("00", "br.gov.bcb.pix");
   const s01 = formatarBloco("01", chave);
   const b26 = formatarBloco("26", s00 + s01);
@@ -120,18 +114,14 @@ function gerarPixCopiaECola(valor) {
   const b54 = formatarBloco("54", valStr);
   const b58 = "5802BR";
   const b59 = formatarBloco("59", nome);
-  const b60 = formatarBloco("60", cidade);
+  const b60 = formatarBloco("60", city);
   
-  // Montagem do bloco 62 (TxID) de forma dinâmica
   const s05 = formatarBloco("05", txid);
   const b62 = formatarBloco("62", s05);
   
   const b63Obrigatorio = "6304";
-
-  // Junta todas as partes para calcular o código verificador
   const payloadCompleto = b00 + b26 + b52 + b53 + b54 + b58 + b59 + b60 + b62 + b63Obrigatorio;
 
-  // Cálculo do Checksum CRC16 CCITT (XMODEM) obrigatório do Banco Central
   let crc = 0xFFFF;
   for (let c = 0; c < payloadCompleto.length; c++) {
     crc ^= payloadCompleto.charCodeAt(c) << 8;
@@ -145,7 +135,6 @@ function gerarPixCopiaECola(valor) {
   }
   
   const crcResultado = (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
-  
   return payloadCompleto + crcResultado;
 }
 
@@ -164,14 +153,18 @@ Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos s
 ⚠️ O pedido só será preparado após a confirmação do pagamento.`;
 }
 
+// ⚠️ NOVA FUNÇÃO: Gera o código isolado e envelopa na formatação de código do WhatsApp
+function mensagemCodigoPix(order) {
+  const codigoPuro = gerarPixCopiaECola(order.total);
+  return `\`\`\`${codigoPuro}\`\`\``;
+}
+
 function mensagemStatus(order, status, senha) {
   if (status === 'Saiu para entrega') {
     return `🍣 *Seu pedido mudou de status!*\n\n` +
            `Status atual: *${status}* 🛵💨\n\n` +
            `🔑 Para sua segurança, informe esta senha de confirmação ao entregador: *${senha || 'Não gerada'}*`;
   }
-  
-  // Mensagem padrão para outros status (Ex: Em preparo, Entregue)
   return `🍣 *Seu pedido mudou de status!*\n\n` +
          `Status atual: *${status}*`;
 }
@@ -192,5 +185,6 @@ module.exports = {
   mensagemNovoPedido,
   mensagemStatus,
   mensagemPix,
+  mensagemCodigoPix, // 👈 Exportado com sucesso aqui!
   mensagemMotoboy
 };

@@ -18,11 +18,13 @@ const PALAVRAS_SENHA = [
   'Gato', 'Cadeira', 'Morango', 'Zebra', 'Leão'
 ];
 
+// 🔄 IMPORTAÇÕES DO WHATSAPP (Adicionado a mensagemCodigoPix aqui no topo)
 const { 
   conectarWhatsApp, 
   enviarMensagem, 
   mensagemNovoPedido, 
   mensagemPix, 
+  mensagemCodigoPix, // 👈 Nova função adicionada aqui
   mensagemStatus,
   mensagemMotoboy 
 } = require('./whatsapp');
@@ -107,28 +109,27 @@ async function listenOrders() {
         await db.collection('orders').doc(orderId).update({ senhaEntrega: senhaSorteada });
         order.senhaEntrega = senhaSorteada; 
 
-        // 2. GERAR LINK DO GOOGLE MAPS (CORRIGIDO)
+        // 2. GERAR LINK DO GOOGLE MAPS (CORRIGIDO URL E INTERPOLAÇÃO DE TEXTO)
         const enderecoCompleto = `${order.address}, ${order.number} ${order.complement || ''}`;
         const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoCompleto)}`;
 
         // ==========================================
-        // DISPAROS DO WHATSAPP PARA O CLIENTE (ATUALIZADO)
+        // DISPAROS DO WHATSAPP PARA O CLIENTE
         // ==========================================
         if (order.phone) {
           const textoPedido = mensagemNovoPedido(order);
           await enviarMensagem(order.phone, textoPedido);
 
           if (order.payment === 'Pix') {
-            // 1. Envia a mensagem explicativa (sem o código gigante no meio)
+            // Envia a mensagem explicativa de introdução
             const textoPix = mensagemPix(order);
             await enviarMensagem(order.phone, textoPix);
 
-            // 2. IMPORTANTE: Importa a função geradora e envia APENAS o código isolado logo em seguida!
-            const { gerarPixCopiaECola } = require('./whatsapp'); 
-            const codigoPuroPix = gerarPixCopiaECola(order.total);
+            // Envia APENAS o código isolado formatado em bloco (copia com 1 clique)
+            const codigoFormatado = mensagemCodigoPix(order);
+            await enviarMensagem(order.phone, codigoFormatado);
             
-            await enviarMensagem(order.phone, codigoPuroPix);
-            console.log(`💸 Código Pix isolado enviado para o cliente: ${order.customer}`);
+            console.log(`💸 Código Pix isolado e formatado enviado para: ${order.customer}`);
           }
         }
 
