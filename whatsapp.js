@@ -181,5 +181,6 @@ module.exports = {
   enviarMensagem,
   mensagemNovoPedido,
   mensagemStatus,
-  mensagemPix  // 🆕 exportando a nova função
+  mensagemPix,
+  mensagemMotoboy
 };
