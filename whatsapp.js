@@ -156,7 +156,7 @@ Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos s
 // ⚠️ NOVA FUNÇÃO: Gera o código isolado e envelopa na formatação de código do WhatsApp
 function mensagemCodigoPix(order) {
   const codigoPuro = gerarPixCopiaECola(order.total);
-  return `\`\`\`${codigoPuro}\`\`\``;
+  return ${codigoPuro};
 }
 
 function mensagemStatus(order, status, senha) {
