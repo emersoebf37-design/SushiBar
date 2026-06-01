@@ -1,4 +1,3 @@
-// 1. CARREGAR VARIÁVEIS DE AMBIENTE LOGO NO INÍCIO
 require('dotenv').config();
 
 const {
@@ -13,10 +12,11 @@ const serviceAccount = require('./firebase-key.json');
 const fs = require('fs');
 
 /* FIREBASE */
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+}
 const db = admin.firestore();
 
 /* DISCORD */
@@ -24,10 +24,7 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
-/* CANAL */
 const CHANNEL_ID = '1503577826207600823';
-
-/* ARQUIVO DE IDs JÁ PROCESSADOS */
 const SENT_FILE = './sent_orders.json';
 
 function carregarEnviados() {
@@ -54,11 +51,11 @@ const sentOrders = carregarEnviados();
 
 /* BOT ONLINE */
 client.once('ready', () => {
-  console.log(`Bot online: ${client.user.tag}`);
+  console.log(`Bot do Discord online: ${client.user.tag}`);
   listenOrders();
 });
 
-/* ESCUTAR PEDIDOS */
+/* ESCUTAR PEDIDOS DO BANCO E EXIBIR NO DISCORD */
 async function listenOrders() {
   db.collection('orders')
     .orderBy('createdAt', 'desc')
@@ -70,17 +67,15 @@ async function listenOrders() {
         const orderId = change.doc.id;
 
         if (sentOrders.has(orderId)) {
-          console.log(`⏭️ Pedido ${orderId} já enviado, ignorando.`);
           continue;
         }
 
-        // Só processa pedidos dos últimos 5 minutos
+        // Filtro de segurança: ignora pedidos mais antigos que 5 minutos
         const order = change.doc.data();
         const agora = Date.now();
         const criado = order.createdAt || 0;
 
         if (agora - criado > 5 * 60 * 1000) {
-          console.log(`⏭️ Pedido ${orderId} é antigo, ignorando.`);
           sentOrders.add(orderId);
           salvarEnviados(sentOrders);
           continue;
@@ -89,9 +84,9 @@ async function listenOrders() {
         sentOrders.add(orderId);
         salvarEnviados(sentOrders);
 
-        console.log(`🛒 Novo pedido: ${orderId} — ${order.customer}`);
+        console.log(`📺 Exibindo painel no Discord para o pedido: #${order.orderId || '?'}`);
 
-        /* DISCORD */
+        /* ENVIAR EMBED/ANSI AO CANAL */
         try {
           const channel = await client.channels.fetch(CHANNEL_ID);
 
@@ -133,28 +128,24 @@ ${order.items ? order.items.map(i => `${i.quantity > 1 ? `${i.quantity}x ` : ''}
             components: [row]
           });
 
-          /* APAGAR APÓS 10 HORAS */
+          /* AUTO-DESTRUIÇÃO (10 HORAS) */
           setTimeout(async () => {
             try {
               await msg.delete();
-              console.log(`🗑️ Mensagem do pedido ${orderId} apagada.`);
+              console.log(`🗑️ Mensagem temporária do pedido ${orderId} removida do canal.`);
             } catch (err) {
-              console.error('Erro ao apagar mensagem:', err.message);
+              console.error('Erro ao deletar mensagem antiga:', err.message);
             }
           }, 10 * 60 * 60 * 1000);
 
         } catch (err) {
-          console.error('Erro ao enviar mensagem no Discord:', err.message);
+          console.error('Erro ao renderizar painel no Discord:', err.message);
         }
-
-        /* LOG DE DISTÂNCIA (APENAS PARA INFORMAÇÃO NO TERMINAL) */
-        const distanciaKm = Number(order.distanciaKm || 0);
-        console.log(`ℹ️ Pedido recebido no Discord | Distância informada: ${distanciaKm} km`);
       }
     });
 }
 
-/* ALTERAR STATUS */
+/* INTERAÇÃO: ALTERAR STATUS EXCLUSIVAMENTE NO BANCO */
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isStringSelectMenu()) return;
   if (!interaction.customId.startsWith('status_')) return;
@@ -163,21 +154,21 @@ client.on('interactionCreate', async (interaction) => {
     const value = interaction.values[0];
     const orderId = interaction.customId.replace('status_', '');
 
-    // Atualiza apenas o status no banco de dados (o outro arquivo monitora essa alteração e avisa o cliente se necessário)
+    // Altera somente a propriedade no documento do Firestore
     await db.collection('orders').doc(orderId).update({ status: value });
 
     await interaction.reply({
-      content: `✅ Status atualizado no banco de dados para: ${value}`,
+      content: `✅ Status sincronizado no banco de dados: ${value}`,
       ephemeral: true
     });
   } catch (err) {
-    console.error('Erro ao processar alteração de status:', err.message);
+    console.error('Erro ao persistir novo status:', err.message);
     await interaction.reply({
-      content: `❌ Erro ao atualizar status no banco.`,
+      content: `❌ Falha ao atualizar dados.`,
       ephemeral: true
     }).catch(() => {});
   }
 });
 
-/* LOGIN */
+/* AUTENTICAÇÃO DO BOT */
 client.login(process.env.DISCORD_TOKEN);

@@ -4,7 +4,6 @@ const { getFirestore } = require("firebase-admin/firestore");
 // ========================
 // RATE LIMIT
 // ========================
-
 const rateLimit = new Map();
 
 function isRateLimited(ip) {
@@ -27,7 +26,6 @@ function isRateLimited(ip) {
 // ========================
 // SANITIZAÇÃO
 // ========================
-
 function clean(text) {
   return String(text || "").replace(/[<>]/g, "").trim();
 }
@@ -35,7 +33,6 @@ function clean(text) {
 // ========================
 // FIREBASE
 // ========================
-
 function getPrivateKey() {
   const key = process.env.FIREBASE_PRIVATE_KEY;
   if (!key) throw new Error("FIREBASE_PRIVATE_KEY não definida");
@@ -54,7 +51,6 @@ function getPrivateKey() {
 // ========================
 // PRODUTOS
 // ========================
-
 const PRODUCTS = {
   "Hot Roll Philadelphia Salmão (6 unidades)": 12,
   "Temaki Frito": 23.99,
@@ -80,23 +76,14 @@ const PRODUCTS = {
 };
 
 // ========================
-// DISTÂNCIA MÍNIMA PARA MOTOBOY
+// API HANDLER
 // ========================
-
-const MOTOBOY_MIN_KM = 4;
-
-// ========================
-// API
-// ========================
-
 export default async function handler(req, res) {
-
   const allowedOrigins = [
     "https://sushi-bar-beige.vercel.app",
   ];
 
   const origin = req.headers.origin;
-
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
@@ -106,10 +93,7 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  // ========================
-  // FIREBASE DENTRO DO HANDLER
-  // ========================
-
+  // Inicializa Firebase
   let db;
   try {
     if (!getApps().length) {
@@ -127,10 +111,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Erro ao conectar ao banco de dados." });
   }
 
-  // ========================
-  // RATE LIMIT
-  // ========================
-
+  // Rate Limit
   const ip = (
     req.headers["x-forwarded-for"] ||
     req.socket?.remoteAddress ||
@@ -138,15 +119,12 @@ export default async function handler(req, res) {
   ).split(",")[0].trim();
 
   if (isRateLimited(ip)) {
-    return res.status(429).json({
-      error: "Muitas tentativas. Aguarde alguns minutos."
-    });
+    return res.status(429).json({ error: "Muitas tentativas. Aguarde alguns minutos." });
   }
 
   // ========================
-  // POST
+  // PROCESSAR NOVO PEDIDO (POST)
   // ========================
-
   if (req.method === "POST") {
     try {
       const order = req.body;
@@ -186,10 +164,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Complemento muito grande." });
       }
 
-      // ========================
-      // RECALCULA TOTAL
-      // ========================
-
+      // Recalcula Total
       let total = 0;
       const validatedItems = [];
 
@@ -212,10 +187,7 @@ export default async function handler(req, res) {
         validatedItems.push({ name: itemName, quantity, unitPrice, subtotal });
       }
 
-      // ========================
-      // CONTADOR
-      // ========================
-
+      // Transação do ID sequencial
       const counterRef = db.collection("meta").doc("orderCounter");
       let nextId = 1;
 
@@ -230,10 +202,7 @@ export default async function handler(req, res) {
         }
       });
 
-      // ========================
-      // ADICIONAIS
-      // ========================
-
+      // Adicionais e Taxas
       const addons = order.addons || {};
       const tare  = Math.max(0, parseInt(addons.tare  || 0));
       const hashi = Math.max(0, parseInt(addons.hashi || 0));
@@ -249,10 +218,6 @@ export default async function handler(req, res) {
 
       total += tare * 0.5;
 
-      // ========================
-      // TAXA DE ENTREGA
-      // ========================
-
       const taxaEntrega = Number(order.taxaEntrega) || 0;
       if (taxaEntrega < 0 || taxaEntrega > 50) {
         return res.status(400).json({ error: "Taxa de entrega inválida." });
@@ -260,12 +225,7 @@ export default async function handler(req, res) {
       total += taxaEntrega;
 
       if (order.payment === "Cartão") total *= 1.10;
-
       total = Number(total.toFixed(2));
-
-      // ========================
-      // DISTÂNCIA
-      // ========================
 
       const distanciaKm = Number(order.distanciaKm) || 0;
 
@@ -286,12 +246,12 @@ export default async function handler(req, res) {
         status:      "Recebido",
       };
 
+      // Salva no banco de dados
       await db.collection("orders").add(newOrder);
 
-      // ========================
-      // WHATSAPP — CLIENTE
-      // ========================
-
+      // ====================================================
+      // DISPAROS DE WHATSAPP (EXCLUSIVO DAQUI)
+      // ====================================================
       try {
         const {
           enviarMensagem,
@@ -300,90 +260,39 @@ export default async function handler(req, res) {
           mensagemMotoboy,
         } = require("../whatsapp");
 
-        // Mensagem de confirmação para o cliente
-        await enviarMensagem(
-          newOrder.phone,
-          mensagemNovoPedido(newOrder)
-        );
+        // 1. Mensagem de confirmação para o Cliente
+        await enviarMensagem(newOrder.phone, mensagemNovoPedido(newOrder));
 
-        // Cobrança Pix para o cliente (se pagamento for Pix)
+        // 2. Se for PIX, envia dados de pagamento para o Cliente
         if (newOrder.payment === "Pix") {
-          await enviarMensagem(
-            newOrder.phone,
-            mensagemPix(newOrder)
-          );
+          await enviarMensagem(newOrder.phone, mensagemPix(newOrder));
         }
 
-        // ========================
-        // WHATSAPP — MOTOBOY
-        // Só envia se:
-        // 1. motoboy_on = true no painel
-        // 2. distância > 3 km
-        // ========================
-
+        // 3. Verificação e Envio para o Motoboy
         let motoboyOn = false;
-
         try {
-
-          const configSnap =
-            await db.collection("config").doc("settings").get();
-
-          const raw =
-            configSnap.exists
-              ? configSnap.data().motoboy_on
-              : false;
-
-          motoboyOn =
-            raw === true || raw === "true";
-
-          console.log(
-            `🛵 Config motoboy: ${motoboyOn} | Distância: ${distanciaKm} km`
-          );
-
-        } catch(configErr){
-
-          console.warn(
-            "Erro ao ler configuração do motoboy:",
-            configErr.message
-          );
-
+          const configSnap = await db.collection("config").doc("settings").get();
+          const raw = configSnap.exists ? configSnap.data().motoboy_on : false;
+          motoboyOn = raw === true || raw === "true";
+        } catch (configErr) {
+          console.warn("Erro ao ler configuração do motoboy:", configErr.message);
         }
 
-        if(motoboyOn && distanciaKm > 3){
-
-          const motoboyPhone =
-            process.env.MOTOBOY_PHONE;
-
-          if(motoboyPhone){
-
-            await enviarMensagem(
-              motoboyPhone,
-              mensagemMotoboy(newOrder)
-            );
-
-            console.log(
-              `🛵 Motoboy avisado (${distanciaKm.toFixed(1)} km)`
-            );
-
+        // Condições: Painel ativo E distância maior que 3km
+        if (motoboyOn && distanciaKm > 3) {
+          const motoboyPhone = process.env.MOTOBOY_PHONE;
+          if (motoboyPhone) {
+            await enviarMensagem(motoboyPhone, mensagemMotoboy(newOrder));
+            console.log(`🛵 Motoboy avisado via WhatsApp (${distanciaKm.toFixed(1)} km)`);
           } else {
-
-            console.warn(
-              "MOTOBOY_PHONE não configurado."
-            );
-
+            console.warn("MOTOBOY_PHONE não configurado no arquivo .env");
           }
-
         } else {
-
-          console.log(
-            `ℹ️ Motoboy não avisado | Ativo: ${motoboyOn} | Distância: ${distanciaKm.toFixed(1)} km`
-          );
-
+          console.log(`ℹ️ Motoboy não notificado | Ativo: ${motoboyOn} | Distância: ${distanciaKm.toFixed(1)} km`);
         }
 
       } catch (waErr) {
-        // Falha no WhatsApp não impede o pedido de ser salvo
-        console.error("Erro ao enviar WhatsApp:", waErr.message);
+        console.error("Erro na rotina de disparos do WhatsApp:", waErr.message);
       }
 
       return res.status(200).json({ success: true, orderId: nextId });
@@ -395,15 +304,11 @@ export default async function handler(req, res) {
   }
 
   // ========================
-  // GET
+  // CONSULTAR PEDIDOS (GET)
   // ========================
-
   if (req.method === "GET") {
     const { phone } = req.query;
-
-    if (!phone) {
-      return res.status(400).json({ error: "Telefone não informado." });
-    }
+    if (!phone) return res.status(400).json({ error: "Telefone não informado." });
 
     try {
       const snapshot = await db
@@ -419,7 +324,6 @@ export default async function handler(req, res) {
       });
 
       return res.status(200).json({ orders });
-
     } catch (error) {
       console.error("Erro ao buscar pedidos:", error);
       return res.status(500).json({ error: "Erro ao buscar pedidos." });
