@@ -11,14 +11,15 @@ const admin = require('firebase-admin');
 const serviceAccount = require('./firebase-key.json');
 const fs = require('fs');
 
-// 1. IMPORTAR AS FUNÇÕES DO WHATSAPP
+// 1. ADICIONADO "mensagemMotoboy" NO IMPORT
 const { 
   conectarWhatsApp, 
   enviarMensagem, 
   mensagemNovoPedido, 
   mensagemPix, 
-  mensagemStatus 
-} = require('./whatsapp'); // Certifique se o whatsapp.js está na mesma pasta
+  mensagemStatus,
+  mensagemMotoboy 
+} = require('./whatsapp');
 
 /* FIREBASE */
 if (!admin.apps.length) {
@@ -61,10 +62,7 @@ const sentOrders = carregarEnviados();
 /* BOT ONLINE */
 client.once('ready', () => {
   console.log(`Bot do Discord online: ${client.user.tag}`);
-  
-  // 2. INICIALIZAR O WHATSAPP JUNTO COM O BOT
   conectarWhatsApp(); 
-  
   listenOrders();
 });
 
@@ -99,18 +97,49 @@ async function listenOrders() {
 
         console.log(`📺 Exibindo painel no Discord para o pedido: #${order.orderId || '?'}`);
 
-        // 3. ENVIAR WHATSAPP DE CONFIRMAÇÃO DO PEDIDO AUTOMATICAMENTE
+        // ==========================================
+        // DISPAROS DO WHATSAPP PARA O CLIENTE
+        // ==========================================
         if (order.phone) {
-          // Envia mensagem padrão de Novo Pedido
           const textoPedido = mensagemNovoPedido(order);
           await enviarMensagem(order.phone, textoPedido);
 
-          // Se a forma de pagamento for Pix, já envia a chave em seguida
           if (order.payment === 'Pix') {
             const textoPix = mensagemPix(order);
             await enviarMensagem(order.phone, textoPix);
           }
         }
+
+        // ==========================================
+        // ROTINA EXCLUSIVA DO MOTOBOY (NOVO LOCAL!)
+        // ==========================================
+        let motoboyOn = false;
+        try {
+          // Busca o estado do botão no Firebase config/settings
+          const configSnap = await db.collection('config').doc('settings').get();
+          const raw = configSnap.exists ? configSnap.data().motoboy_on : false;
+          motoboyOn = raw === true || raw === 'true';
+        } catch (configErr) {
+          console.warn('⚠️ Erro ao ler config do motoboy no Firebase:', configErr.message);
+        }
+
+        const distanciaKm = Number(order.distanciaKm) || 0;
+
+        // Validação: Painel ativo E distância maior que 3km
+        if (motoboyOn && distanciaKm > 3) {
+          const motoboyPhone = process.env.MOTOBOY_PHONE;
+          
+          if (motoboyPhone) {
+            const textoMotoboy = mensagemMotoboy(order);
+            await enviarMensagem(motoboyPhone, textoMotoboy);
+            console.log(`🛵 Motoboy avisado via WhatsApp (${distanciaKm.toFixed(1)} km)`);
+          } else {
+            console.warn('⚠️ MOTOBOY_PHONE não configurado no arquivo .env deste Bot!');
+          }
+        } else {
+          console.log(`ℹ️ Motoboy NÃO notificado | Ativo: ${motoboyOn} | Distância: ${distanciaKm.toFixed(1)} km`);
+        }
+        // ==========================================
 
         /* ENVIAR EMBED/ANSI AO CANAL DO DISCORD */
         try {
@@ -180,15 +209,12 @@ client.on('interactionCreate', async (interaction) => {
     const value = interaction.values[0];
     const orderId = interaction.customId.replace('status_', '');
 
-    // Altera a propriedade no documento do Firestore
     await db.collection('orders').doc(orderId).update({ status: value });
 
-    // 4. BUSCAR DADOS DO PEDIDO PARA NOTIFICAR O CLIENTE VIA WHATSAPP
     const orderDoc = await db.collection('orders').doc(orderId).get();
     
     if (orderDoc.exists) {
       const orderData = orderDoc.data();
-      
       if (orderData.phone) {
         const textoStatus = mensagemStatus(orderData, value);
         await enviarMensagem(orderData.phone, textoStatus);
