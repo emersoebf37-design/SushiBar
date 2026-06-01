@@ -1868,7 +1868,7 @@ function showPage(id){
   if(id === 'orders-page') renderOrders();
   if(id === 'home-page' && entregaAtual.distanciaKm === null) {
     calcularEntrega();
-  }
+  };
 }
 
 /* ========================= */
@@ -2237,12 +2237,6 @@ async function finishOrder(){
   if(!user){ alert('Preencha os dados da conta!'); showPage('account-page'); return; }
   if(!user.name || !user.phone || !user.address || !user.number || !user.complement){ alert('Complete todos os dados!'); showPage('account-page'); return; }
 
-  // Remove parênteses, espaços, traços e o "+55" se o mobile tiver inserido
-  let phoneLimpo = user.phone.replace(/\D/g, "");
-  if (phoneLimpo.startsWith("55") && phoneLimpo.length > 11) {
-    phoneLimpo = phoneLimpo.slice(2); // Remove o 55 do início
-  }
-
   const addonsCopy = { ...addons };
 
   let baseTotal = cart.reduce((sum,item)=>{
@@ -2257,7 +2251,7 @@ async function finishOrder(){
 
   pendingOrder = {
     customer: user.name,
-    phone: phoneLimpo,
+    phone: user.phone,
     address: user.address,
     number: user.number,
     complement: user.complement,
@@ -2273,7 +2267,7 @@ async function finishOrder(){
 
   document.getElementById('modal-content').innerHTML = `
     <p><strong>Cliente:</strong> ${user.name}</p>
-    <p><strong>Telefone:</strong> ${phoneLimpo}</p>
+    <p><strong>Telefone:</strong> ${user.phone}</p>
     <p><strong>Endereço:</strong><br>${user.address}, ${user.number}</p>
     <p>${user.complement}</p>
     <p><strong>Pagamento:</strong> ${payment}</p>
