@@ -1,30 +1,4 @@
-function mensagemMotoboy(order){
-
-  const enderecoCompleto =
-    `${order.address}, ${order.number}`;
-
-  const mapsUrl =
-    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoCompleto)}`;
-
-  return `🛵 *NOVA ENTREGA - KAIZORA*
-
-  👤 Cliente: ${order.customer}
-
-  📍 Endereço:
-  ${enderecoCompleto}
-
-  🔗 Google Maps:
-  ${mapsUrl}
-
-  💰 Valor do pedido:
-  R$${order.total.toFixed(2)}
-
-  📞 Contato:
-  ${order.phone}`;
-}
-
-const makeWASocket =
-  require('@whiskeysockets/baileys').default;
+const makeWASocket = require('@whiskeysockets/baileys').default;
 
 const {
   useMultiFileAuthState,
@@ -127,7 +101,7 @@ ${order.complement}
 Acompanhe seu pedido por aqui. Obrigado! 🙏`;
 }
 
-// 🆕 MENSAGEM DE COBRANÇA PIX
+/* MENSAGEM PIX */
 function mensagemPix(order){
   return `💸 *Kaizora — Pagamento via Pix*
 
@@ -167,6 +141,32 @@ Obrigado pela preferência! 🙏`;
 
 }
 
+/* MENSAGEM MOTOBOY */
+function mensagemMotoboy(order){
+
+  const enderecoCompleto = `${order.address}, ${order.number}`;
+
+  const mapsUrl =
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoCompleto)}`;
+
+  return `🛵 *NOVA ENTREGA - KAIZORA*
+
+👤 Cliente: ${order.customer}
+
+📍 Endereço:
+${enderecoCompleto}
+
+🔗 Google Maps:
+${mapsUrl}
+
+💰 Valor do pedido:
+R$${order.total.toFixed(2)}
+
+📞 Contato:
+${order.phone}`;
+}
+
+/* EXPORTS */
 module.exports = {
   conectarWhatsApp,
   enviarMensagem,
