@@ -12,11 +12,7 @@ const serviceAccount = require('./firebase-key.json');
 const fs = require('fs');
 
 // LISTA DE SENHAS SIMPLES PARA SORTEIO
-const PALAVRAS_SENHA = [
-  'Abacaxi', 'Prédio', 'Escada', 'Caneta', 'Chave', 
-  'Janela', 'Girafa', 'Tomate', 'Sorvete', 'Pastel', 
-  'Gato', 'Cadeira', 'Morango', 'Zebra', 'Leão'
-];
+const senhaSorteada = String(Math.floor(1000 + Math.random() * 9000));
 
 // 🔄 IMPORTAÇÕES DO WHATSAPP (Adicionado a mensagemCodigoPix aqui no topo)
 const { 
@@ -105,7 +101,7 @@ async function listenOrders() {
         console.log(`📺 Exibindo painel no Discord para o pedido: #${order.orderId || '?'}`);
 
         // 1. GERAR SENHA ALEATÓRIA E SALVAR NO FIRESTORE PARA USAR DEPOIS
-        const senhaSorteada = PALAVRAS_SENHA[Math.floor(Math.random() * PALAVRAS_SENHA.length)];
+        const senhaSorteada = String(Math.floor(1000 + Math.random() * 9000));
         await db.collection('orders').doc(orderId).update({ senhaEntrega: senhaSorteada });
         order.senhaEntrega = senhaSorteada; 
 

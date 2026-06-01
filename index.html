@@ -2040,7 +2040,8 @@ function renderCart(){
     detalhe.innerText = `Taxa de entrega: R$${(entregaAtual.taxa || 2).toFixed(2).replace('.', ',')}`;
   } else if(detalhe){ detalhe.innerText = ''; }
 
-  document.getElementById('mobile-cart-count').innerText = cart.length;
+  const totalItens = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  document.getElementById('mobile-cart-count').innerText = totalItens;
 
   const warning = document.getElementById('payment-warning');
   warning.innerText = '10% OFF para pagamentos no Pix e Dinheiro';
