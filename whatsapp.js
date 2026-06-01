@@ -144,26 +144,12 @@ Obrigado pela preferência! 🙏`;
 /* MENSAGEM MOTOBOY */
 function mensagemMotoboy(order){
 
-  const enderecoCompleto = `${order.address}, ${order.number}`;
+  return `
+🚨 TESTE 12345 🚨
+SE VOCÊ ESTÁ LENDO ISSO,
+O ENVIO VEIO DESTE ARQUIVO.
+`;
 
-  const mapsUrl =
-    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoCompleto)}`;
-
-  return `🛵 *NOVA ENTREGA - KAIZORA*
-
-  👤 Cliente: ${order.customer}
-
-  📍 Endereço:
-  ${enderecoCompleto}
-
-  🔗 Google Maps:
-  ${mapsUrl}
-
-  💰 Valor do pedido:
-  R$${order.total.toFixed(2)}
-
-  📞 Contato:
-  ${order.phone}`;
 }
 
 /* EXPORTS */
