@@ -91,15 +91,53 @@ ${order.complement || ''}
 Acompanhe seu pedido por aqui. Obrigado! 🙏`;
 }
 
-function mensagemPix(order){
+
+function gerarPixCopiaECola(valor) {
+  const chave = "e5da076d-f585-4274-83bd-acb0e26904fb";
+  const nome = "Emily da Silva de Araújo"; // Max 25 letras, sem acentos
+  const cidade = "São João De Meriti"; // Max 15 letras, sem acentos
+  
+  const valStr = valor.toFixed(2);
+  
+  // Montagem dos blocos do padrão EMV (Banco Central)
+  const b00 = "000201";
+  const b26 = `26580014br.gov.bcb.pix0136${chave}`;
+  const b52 = "52040000";
+  const b53 = "5303986";
+  const b54 = `54${String(valStr.length).padStart(2, '0')}${valStr}`;
+  const b58 = "5802BR";
+  const b59 = `59${String(nome.length).padStart(2, '0')}${nome}`;
+  const b60 = `60${String(cidade.length).padStart(2, '0')}${cidade}`;
+  const b62 = "62070503***";
+  const b63 = "6304";
+  
+  const payloadCompleto = b00 + b26 + b52 + b53 + b54 + b58 + b59 + b60 + b62 + b63;
+  
+  // Cálculo do Checksum (CRC16 CCITT) obrigatório do Pix
+  let crc = 0xFFFF;
+  for (let c = 0; c < payloadCompleto.length; c++) {
+    crc ^= payloadCompleto.charCodeAt(c) << 8;
+    for (let i = 0; i < 8; i++) {
+      if (crc & 0x8000) crc = (crc << 1) ^ 0x1021;
+      else crc = crc << 1;
+    }
+  }
+  const crcResultado = (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+  
+  return payloadCompleto + crcResultado;
+}
+
+function mensagemPix(order) {
+  const codigoCopiaCola = gerarPixCopiaECola(order.total);
+
   return `💸 *Kaizora — Pagamento via Pix*
 
-Olá, *${order.customer}*! Para confirmar seu pedido, realize o pagamento:
+Olá, *${order.customer}*! Para confirmar seu pedido, use o Pix Copia e Cola abaixo:
 
-💰 *Valor:* R$${order.total.toFixed(2)}
+💰 *Valor:* R$ ${order.total.toFixed(2)}
 
-🔑 *Chave Pix:*
-\`e5da076d-f585-4274-83bd-acb0e26904fb\`
+👇 *Toque duas vezes no código abaixo para copiar:*
+\`\`\`${codigoCopiaCola}\`\`\`
 
 Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos seu pedido. 🙏
 

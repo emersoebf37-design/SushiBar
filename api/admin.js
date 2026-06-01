@@ -125,7 +125,7 @@ export default async function handler(req, res) {
         restaurante_aberto: restaurante_aberto ?? true,
         produtos_esgotados: produtos_esgotados ?? [],
         combos_esgotados: combos_esgotados ?? [],
-        motoboys: motoboys ?? [], // 👈 ESSA LINHA SALVA O SEU CADASTRO!
+        motoboys: motoboys ?? [],
         updatedAt: Date.now(),
       });
 
