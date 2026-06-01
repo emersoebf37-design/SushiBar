@@ -214,7 +214,7 @@ export default async function handler(req, res) {
 
     const resultado = calcularTaxa(distanciaKm, motoboyAtivo);
 
-    console.log(db.collection("orders")
+    console.log(
       `📍 Distância: ${distanciaKm.toFixed(2)} km | ` +
       `Motoboy: ${motoboyAtivo} | ` +
       `Entrega: ${resultado.entrega} | ` +
