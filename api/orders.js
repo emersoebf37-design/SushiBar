@@ -316,38 +316,69 @@ export default async function handler(req, res) {
 
         // ========================
         // WHATSAPP — MOTOBOY
-        // Só avisa se:
-        //   1. motoboy_on está ativo no config (checado via env ou Firestore)
-        //   2. distância do pedido é superior a MOTOBOY_MIN_KM (4 km)
+        // Só envia se:
+        // 1. motoboy_on = true no painel
+        // 2. distância > 3 km
         // ========================
 
         let motoboyOn = false;
+
         try {
-          const configSnap = await db.collection("config").doc("settings").get();
-          console.log("🔧 CONFIG FIRESTORE:", JSON.stringify(configSnap.data()));
-          const raw = configSnap.exists ? configSnap.data().motoboy_on : false;
-          motoboyOn = raw === true || raw === "true";
-        } catch (configErr) {
-          console.warn("Não foi possível ler config do motoboy:", configErr.message);
+
+          const configSnap =
+            await db.collection("config").doc("settings").get();
+
+          const raw =
+            configSnap.exists
+              ? configSnap.data().motoboy_on
+              : false;
+
+          motoboyOn =
+            raw === true || raw === "true";
+
+          console.log(
+            `🛵 Config motoboy: ${motoboyOn} | Distância: ${distanciaKm} km`
+          );
+
+        } catch(configErr){
+
+          console.warn(
+            "Erro ao ler configuração do motoboy:",
+            configErr.message
+          );
+
         }
 
-        if (false) {
-          const motoboyPhone = process.env.MOTOBOY_PHONE;
-          if (motoboyPhone) {
+        if(motoboyOn && distanciaKm > 3){
+
+          const motoboyPhone =
+            process.env.MOTOBOY_PHONE;
+
+          if(motoboyPhone){
+
             await enviarMensagem(
               motoboyPhone,
               mensagemMotoboy(newOrder)
             );
+
             console.log(
-              `🛵 Motoboy avisado — distância: ${distanciaKm.toFixed(1)} km (acima de ${MOTOBOY_MIN_KM} km)`
+              `🛵 Motoboy avisado (${distanciaKm.toFixed(1)} km)`
             );
+
           } else {
-            console.warn("MOTOBOY_PHONE não definido nas variáveis de ambiente.");
+
+            console.warn(
+              "MOTOBOY_PHONE não configurado."
+            );
+
           }
-        } else if (motoboyOn && distanciaKm <= MOTOBOY_MIN_KM) {
+
+        } else {
+
           console.log(
-            `ℹ️ Motoboy NÃO avisado — distância: ${distanciaKm.toFixed(1)} km (abaixo de ${MOTOBOY_MIN_KM} km)`
+            `ℹ️ Motoboy não avisado | Ativo: ${motoboyOn} | Distância: ${distanciaKm.toFixed(1)} km`
           );
+
         }
 
       } catch (waErr) {
