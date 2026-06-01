@@ -159,6 +159,29 @@ body{ background:#1a0000; color:white; min-height:100vh; }
   border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
+/* INPUTS DE SEÇÃO */
+.section-input {
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 14px;
+}
+.section-input::placeholder { color: rgba(255,255,255,0.3); }
+
+.add-btn {
+  padding: 12px 20px;
+  background: #2ecc71;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.add-btn:hover { background: #27ae60; }
+
 /* ========================= */
 /* TOGGLE */
 /* ========================= */
@@ -338,7 +361,6 @@ body{ background:#1a0000; color:white; min-height:100vh; }
 </head>
 <body>
 
-<!-- LOGIN -->
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <h1>🍣 Kaizora</h1>
@@ -349,7 +371,6 @@ body{ background:#1a0000; color:white; min-height:100vh; }
   </div>
 </div>
 
-<!-- ADMIN PANEL -->
 <div class="admin-panel" id="admin-panel">
 
   <div class="admin-header">
@@ -357,7 +378,6 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     <button class="logout-btn" onclick="doLogout()">Sair</button>
   </div>
 
-  <!-- STATS -->
   <div class="cards-grid">
     <div class="stat-card">
       <div class="stat-value" id="stat-pedidos">—</div>
@@ -377,7 +397,6 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     </div>
   </div>
 
-  <!-- CONTROLES -->
   <div class="section">
     <h2>⚙️ Controles</h2>
 
@@ -394,8 +413,8 @@ body{ background:#1a0000; color:white; min-height:100vh; }
 
     <div class="toggle-row">
       <div class="toggle-label">
-        🛵 Motoboy ativo
-        <small>Permite entregas acima de 5km</small>
+        🛵 Sistema de Motoboy
+        <small>Ativa envio de alertas para entregadores (acima de 3km)</small>
       </div>
       <label class="toggle">
         <input type="checkbox" id="toggle-motoboy" onchange="saveConfig()">
@@ -404,19 +423,26 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     </div>
   </div>
 
-  <!-- PRODUTOS -->
+  <div class="section">
+    <h2>🛵 Equipe de Motoboys</h2>
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+      <input type="text" id="moto-name" class="section-input" placeholder="Nome do Motoboy" style="flex: 1; min-width: 150px;">
+      <input type="text" id="moto-phone" class="section-input" placeholder="WhatsApp (Ex: 5521999999999)" style="flex: 1; min-width: 200px;">
+      <button class="add-btn" onclick="addMotoboy()">+ Cadastrar</button>
+    </div>
+    <div id="motoboys-lista"></div>
+  </div>
+
   <div class="section">
     <h2>📦 Produtos</h2>
     <div id="produtos-lista"><div class="loading">Carregando...</div></div>
   </div>
 
-  <!-- COMBOS -->
   <div class="section">
     <h2>🎁 Combos</h2>
     <div id="combos-lista"><div class="loading">Carregando...</div></div>
   </div>
 
-  <!-- PEDIDOS DO DIA -->
   <div class="section">
     <h2>📋 Pedidos de hoje</h2>
     <div id="pedidos-lista"><div class="loading">Carregando...</div></div>
@@ -520,17 +546,78 @@ async function loadData(){
     document.getElementById('toggle-restaurante').checked = data.config.restaurante_aberto ?? true;
     document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
 
-    // Produtos
+    // Renderizações
+    renderMotoboys(data.config.motoboys || []);
     renderProdutos(data.config.produtos_esgotados || []);
-
-    // Combos
     renderCombos(data.config.combos_esgotados || []);
-
-    // Pedidos
     renderPedidos(data.pedidosHoje || []);
 
   } catch(e) {
     console.error('Erro ao carregar dados:', e);
+  }
+}
+
+// ========================
+// RENDER MOTOBOYS
+// ========================
+function renderMotoboys(motoboys) {
+  const container = document.getElementById('motoboys-lista');
+  if(!motoboys || motoboys.length === 0) {
+    container.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:14px; text-align:center; padding:10px;">Nenhum motoboy cadastrado.</p>';
+    return;
+  }
+  container.innerHTML = '';
+  motoboys.forEach((m, index) => {
+    container.innerHTML += `
+      <div class="produto-item">
+        <div class="produto-nome">
+          🏍️ <b>${m.name}</b>
+          <small>📞 ${m.phone}</small>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <label class="toggle">
+            <input type="checkbox" ${m.active ? 'checked' : ''} onchange="toggleMotoboyStatus(${index}, this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+          <button onclick="removeMotoboy(${index})" style="background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 16px;">🗑️</button>
+        </div>
+      </div>`;
+  });
+}
+
+function addMotoboy() {
+  const nameInput = document.getElementById('moto-name');
+  const phoneInput = document.getElementById('moto-phone');
+  const name = nameInput.value.trim();
+  const phone = phoneInput.value.trim().replace(/\D/g, '');
+
+  if(!name || !phone) {
+    alert('Por favor, insira o Nome e o WhatsApp (somente números) do motoboy.');
+    return;
+  }
+
+  if(!currentConfig.motoboys) currentConfig.motoboys = [];
+  currentConfig.motoboys.push({ name, phone, active: true });
+
+  nameInput.value = '';
+  phoneInput.value = '';
+  
+  renderMotoboys(currentConfig.motoboys);
+  saveConfig();
+}
+
+function toggleMotoboyStatus(index, isChecked) {
+  if(currentConfig.motoboys && currentConfig.motoboys[index]) {
+    currentConfig.motoboys[index].active = isChecked;
+    saveConfig();
+  }
+}
+
+function removeMotoboy(index) {
+  if(confirm(`Deseja remover este motoboy da lista?`)) {
+    currentConfig.motoboys.splice(index, 1);
+    renderMotoboys(currentConfig.motoboys);
+    saveConfig();
   }
 }
 
@@ -640,6 +727,7 @@ async function saveConfig(){
     restaurante_aberto: document.getElementById('toggle-restaurante').checked,
     produtos_esgotados: currentConfig.produtos_esgotados || [],
     combos_esgotados: currentConfig.combos_esgotados || [],
+    motoboys: currentConfig.motoboys || [] // ENVIA A LISTA DE MOTOBOYS ATUALIZADA
   };
 
   try {
@@ -654,7 +742,6 @@ async function saveConfig(){
     if(!res.ok) throw new Error('Erro ao salvar');
     currentConfig = { ...currentConfig, ...config };
 
-    // Atualiza stat status
     document.getElementById('stat-status').innerText = config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
 
   } catch(e) {
