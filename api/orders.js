@@ -324,9 +324,9 @@ export default async function handler(req, res) {
         let motoboyOn = false;
         try {
           const configSnap = await db.collection("config").doc("settings").get();
-          motoboyOn = configSnap.exists
-            ? configSnap.data().motoboy_on === true
-            : false;
+          console.log("🔧 CONFIG FIRESTORE:", JSON.stringify(configSnap.data()));
+          const raw = configSnap.exists ? configSnap.data().motoboy_on : false;
+          motoboyOn = raw === true || raw === "true";
         } catch (configErr) {
           console.warn("Não foi possível ler config do motoboy:", configErr.message);
         }

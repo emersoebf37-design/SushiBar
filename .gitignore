@@ -79,3 +79,6 @@ jspm_packages/
 *.local
 
 firebase-adminsdk*.json
+
+# .gitignore
+Impressora/
