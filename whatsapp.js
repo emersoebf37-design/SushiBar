@@ -151,19 +151,19 @@ function mensagemMotoboy(order){
 
   return `🛵 *NOVA ENTREGA - KAIZORA*
 
-👤 Cliente: ${order.customer}
+  👤 Cliente: ${order.customer}
 
-📍 Endereço:
-${enderecoCompleto}
+  📍 Endereço:
+  ${enderecoCompleto}
 
-🔗 Google Maps:
-${mapsUrl}
+  🔗 Google Maps:
+  ${mapsUrl}
 
-💰 Valor do pedido:
-R$${order.total.toFixed(2)}
+  💰 Valor do pedido:
+  R$${order.total.toFixed(2)}
 
-📞 Contato:
-${order.phone}`;
+  📞 Contato:
+  ${order.phone}`;
 }
 
 /* EXPORTS */

@@ -331,7 +331,7 @@ export default async function handler(req, res) {
           console.warn("Não foi possível ler config do motoboy:", configErr.message);
         }
 
-        if (motoboyOn && distanciaKm > MOTOBOY_MIN_KM) {
+        if (false) {
           const motoboyPhone = process.env.MOTOBOY_PHONE;
           if (motoboyPhone) {
             await enviarMensagem(
