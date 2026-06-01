@@ -112,15 +112,23 @@ async function listenOrders() {
         const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoCompleto)}`;
 
         // ==========================================
-        // DISPAROS DO WHATSAPP PARA O CLIENTE
+        // DISPAROS DO WHATSAPP PARA O CLIENTE (ATUALIZADO)
         // ==========================================
         if (order.phone) {
           const textoPedido = mensagemNovoPedido(order);
           await enviarMensagem(order.phone, textoPedido);
 
           if (order.payment === 'Pix') {
+            // 1. Envia a mensagem explicativa (sem o código gigante no meio)
             const textoPix = mensagemPix(order);
             await enviarMensagem(order.phone, textoPix);
+
+            // 2. IMPORTANTE: Importa a função geradora e envia APENAS o código isolado logo em seguida!
+            const { gerarPixCopiaECola } = require('./whatsapp'); 
+            const codigoPuroPix = gerarPixCopiaECola(order.total);
+            
+            await enviarMensagem(order.phone, codigoPuroPix);
+            console.log(`💸 Código Pix isolado enviado para o cliente: ${order.customer}`);
           }
         }
 

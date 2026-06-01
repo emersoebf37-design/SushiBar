@@ -150,16 +150,14 @@ function gerarPixCopiaECola(valor) {
 }
 
 function mensagemPix(order) {
-  const codigoCopiaCola = gerarPixCopiaECola(order.total);
-
   return `💸 *Kaizora — Pagamento via Pix*
 
-Olá, *${order.customer}*! Para confirmar seu pedido, use o Pix Copia e Cola abaixo:
+Olá, *${order.customer}*! Para confirmar seu pedido, realize o pagamento.
 
 💰 *Valor:* R$ ${order.total.toFixed(2)}
 
-👇 *Toque duas vezes no código abaixo para copiar:*
-\`\`\`${codigoCopiaCola}\`\`\`
+👇 *Copie o código que vamos enviar na PRÓXIMA mensagem abaixo:*
+(Basta pressionar e segurar a mensagem de baixo para copiar o código direto!)
 
 Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos seu pedido. 🙏
 
