@@ -1,19 +1,12 @@
 const makeWASocket = require('@whiskeysockets/baileys').default;
-
-const {
-  useMultiFileAuthState,
-  DisconnectReason
-} = require('@whiskeysockets/baileys');
-
+const { useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const qrcode = require('qrcode-terminal');
 
 let sock = null;
 
 /* CONECTAR WHATSAPP */
 async function conectarWhatsApp(){
-
-  const { state, saveCreds } =
-    await useMultiFileAuthState('auth_whatsapp');
+  const { state, saveCreds } = await useMultiFileAuthState('auth_whatsapp');
 
   sock = makeWASocket({
     auth: state,
@@ -23,7 +16,6 @@ async function conectarWhatsApp(){
   sock.ev.on('creds.update', saveCreds);
 
   sock.ev.on('connection.update', async(update) => {
-
     const { connection, lastDisconnect, qr } = update;
 
     if(qr){
@@ -32,52 +24,50 @@ async function conectarWhatsApp(){
     }
 
     if(connection === 'close'){
-
-      const shouldReconnect =
-        lastDisconnect?.error?.output?.statusCode
-        !== DisconnectReason.loggedOut;
-
-      console.log('Conexão encerrada. Reconectando:', shouldReconnect);
-
+      const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+      console.log('Conexão do WhatsApp encerrada. Reconectando:', shouldReconnect);
       if(shouldReconnect){
         await conectarWhatsApp();
       }
-
     } else if(connection === 'open'){
-      console.log('✅ WhatsApp conectado!');
+      console.log('✅ WhatsApp conectado com sucesso e pronto para envios!');
     }
-
   });
-
 }
 
-/* ENVIAR MENSAGEM */
+/* ENVIAR MENSAGEM (CORRIGIDO COM VALIDAÇÃO DE JID) */
 async function enviarMensagem(telefone, mensagem){
-
   if(!sock){
-    console.log('WhatsApp não conectado.');
+    console.log('❌ Erro: WhatsApp não está conectado.');
     return;
   }
 
   try {
+    let numero = telefone.replace(/\D/g, '');
+    
+    // Garante o código do país (Brasil = 55)
+    if(!numero.startsWith('55')){
+      numero = `55${numero}`;
+    }
 
-    const numero = telefone.replace(/\D/g, '');
+    // Procura o JID real no servidor do WhatsApp (resolve o problema do 9º dígito no Brasil)
+    const [result] = await sock.onWhatsApp(numero);
+    
+    if (!result || !result.exists) {
+      console.log(`❌ O número ${telefone} não possui WhatsApp válido.`);
+      return;
+    }
 
-    const jid = numero.startsWith('55')
-      ? `${numero}@s.whatsapp.net`
-      : `55${numero}@s.whatsapp.net`;
-
-    await sock.sendMessage(jid, { text: mensagem });
-
-    console.log(`✅ WhatsApp enviado para ${telefone}`);
+    // Envia para o JID correto retornado pelo servidor
+    await sock.sendMessage(result.jid, { text: mensagem });
+    console.log(`✅ WhatsApp enviado com sucesso para: ${result.jid}`);
 
   } catch(err) {
-    console.error('Erro ao enviar WhatsApp:', err.message);
+    console.error('Erro ao despachar mensagem no WhatsApp:', err.message);
   }
-
 }
 
-/* MENSAGEM DE NOVO PEDIDO */
+/* FUNÇÕES DE MENSAGENS (Mantidas iguais) */
 function mensagemNovoPedido(order){
   return `🍣 *Kaizora — Confirmação de Pedido*
 
@@ -94,14 +84,13 @@ ${order.items.map(i => `• ${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`
 
 📍 *Entrega em:*
 ${order.address}, ${order.number}
-${order.complement}
+${order.complement || ''}
 
 ⏳ *Status:* ${order.status}
 
 Acompanhe seu pedido por aqui. Obrigado! 🙏`;
 }
 
-/* MENSAGEM PIX */
 function mensagemPix(order){
   return `💸 *Kaizora — Pagamento via Pix*
 
@@ -117,15 +106,12 @@ Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos s
 ⚠️ O pedido só será preparado após a confirmação do pagamento.`;
 }
 
-/* MENSAGEM DE STATUS */
 function mensagemStatus(order, novoStatus){
-
   const emojis = {
     'Em preparo':        '👨‍🍳 Seu pedido está sendo preparado!',
     'Saiu para entrega': '🛵 Seu pedido saiu para entrega!',
     'Entregue':          '✅ Seu pedido foi entregue!'
   };
-
   const texto = emojis[novoStatus] || `Status atualizado: ${novoStatus}`;
 
   return `🍣 *Kaizora — Atualização do Pedido*
@@ -138,21 +124,17 @@ ${texto}
 📍 *Endereço:* ${order.address}, ${order.number}
 
 Obrigado pela preferência! 🙏`;
-
 }
 
-/* MENSAGEM MOTOBOY */
 function mensagemMotoboy(order){
-
-  return `
-🚨 TESTE 12345 🚨
-SE VOCÊ ESTÁ LENDO ISSO,
-O ENVIO VEIO DESTE ARQUIVO.
-`;
-
+  return `🛵 *Nova Entrega Kaizora — Pedido #${order.orderId || '?' }*
+  
+Cliente: ${order.customer}
+Endereço: ${order.address}, ${order.number}
+Distância: ${Number(order.distanciaKm).toFixed(1)} km
+Total a receber/maquininha: R$ ${order.total.toFixed(2)} (Pagamento: ${order.payment})`;
 }
 
-/* EXPORTS */
 module.exports = {
   conectarWhatsApp,
   enviarMensagem,

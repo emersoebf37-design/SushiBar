@@ -11,6 +11,15 @@ const admin = require('firebase-admin');
 const serviceAccount = require('./firebase-key.json');
 const fs = require('fs');
 
+// 1. IMPORTAR AS FUNÇÕES DO WHATSAPP
+const { 
+  conectarWhatsApp, 
+  enviarMensagem, 
+  mensagemNovoPedido, 
+  mensagemPix, 
+  mensagemStatus 
+} = require('./whatsapp'); // Certifique se o whatsapp.js está na mesma pasta
+
 /* FIREBASE */
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -52,6 +61,10 @@ const sentOrders = carregarEnviados();
 /* BOT ONLINE */
 client.once('ready', () => {
   console.log(`Bot do Discord online: ${client.user.tag}`);
+  
+  // 2. INICIALIZAR O WHATSAPP JUNTO COM O BOT
+  conectarWhatsApp(); 
+  
   listenOrders();
 });
 
@@ -86,7 +99,20 @@ async function listenOrders() {
 
         console.log(`📺 Exibindo painel no Discord para o pedido: #${order.orderId || '?'}`);
 
-        /* ENVIAR EMBED/ANSI AO CANAL */
+        // 3. ENVIAR WHATSAPP DE CONFIRMAÇÃO DO PEDIDO AUTOMATICAMENTE
+        if (order.phone) {
+          // Envia mensagem padrão de Novo Pedido
+          const textoPedido = mensagemNovoPedido(order);
+          await enviarMensagem(order.phone, textoPedido);
+
+          // Se a forma de pagamento for Pix, já envia a chave em seguida
+          if (order.payment === 'Pix') {
+            const textoPix = mensagemPix(order);
+            await enviarMensagem(order.phone, textoPix);
+          }
+        }
+
+        /* ENVIAR EMBED/ANSI AO CANAL DO DISCORD */
         try {
           const channel = await client.channels.fetch(CHANNEL_ID);
 
@@ -145,7 +171,7 @@ ${order.items ? order.items.map(i => `${i.quantity > 1 ? `${i.quantity}x ` : ''}
     });
 }
 
-/* INTERAÇÃO: ALTERAR STATUS EXCLUSIVAMENTE NO BANCO */
+/* INTERAÇÃO: ALTERAR STATUS NO BANCO E NOTIFICAR CLIENTE */
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isStringSelectMenu()) return;
   if (!interaction.customId.startsWith('status_')) return;
@@ -154,17 +180,30 @@ client.on('interactionCreate', async (interaction) => {
     const value = interaction.values[0];
     const orderId = interaction.customId.replace('status_', '');
 
-    // Altera somente a propriedade no documento do Firestore
+    // Altera a propriedade no documento do Firestore
     await db.collection('orders').doc(orderId).update({ status: value });
 
+    // 4. BUSCAR DADOS DO PEDIDO PARA NOTIFICAR O CLIENTE VIA WHATSAPP
+    const orderDoc = await db.collection('orders').doc(orderId).get();
+    
+    if (orderDoc.exists) {
+      const orderData = orderDoc.data();
+      
+      if (orderData.phone) {
+        const textoStatus = mensagemStatus(orderData, value);
+        await enviarMensagem(orderData.phone, textoStatus);
+      }
+    }
+
     await interaction.reply({
-      content: `✅ Status sincronizado no banco de dados: ${value}`,
+      content: `✅ Status sincronizado no banco e enviado ao WhatsApp: ${value}`,
       ephemeral: true
     });
+    
   } catch (err) {
-    console.error('Erro ao persistir novo status:', err.message);
+    console.error('Erro ao persistir novo status / enviar WhatsApp:', err.message);
     await interaction.reply({
-      content: `❌ Falha ao atualizar dados.`,
+      content: `❌ Falha ao atualizar dados ou notificar cliente.`,
       ephemeral: true
     }).catch(() => {});
   }
