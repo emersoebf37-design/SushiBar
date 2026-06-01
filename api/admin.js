@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  // ✅ Firebase inicializado DENTRO do handler
+  // Firebase inicializado DENTRO do handler
   let db;
   try {
     if (!getApps().length) {
@@ -70,6 +70,7 @@ export default async function handler(req, res) {
         restaurante_aberto: true,
         produtos_esgotados: [],
         combos_esgotados: [],
+        motoboys: [], // 👈 Adicionado fallback aqui
       };
 
       const hoje = new Date();
@@ -115,13 +116,16 @@ export default async function handler(req, res) {
   // ========================
   if (req.method === "POST" && req.query.action === "update") {
     try {
-      const { motoboy_on, restaurante_aberto, produtos_esgotados, combos_esgotados } = req.body;
+      // 1. Desestruturando "motoboys" que vem lá do admin.html
+      const { motoboy_on, restaurante_aberto, produtos_esgotados, combos_esgotados, motoboys } = req.body;
 
+      // 2. Gravando no Firestore incluindo a lista de motoboys
       await db.collection("config").doc("settings").set({
         motoboy_on: motoboy_on ?? false,
         restaurante_aberto: restaurante_aberto ?? true,
         produtos_esgotados: produtos_esgotados ?? [],
         combos_esgotados: combos_esgotados ?? [],
+        motoboys: motoboys ?? [], // 👈 ESSA LINHA SALVA O SEU CADASTRO!
         updatedAt: Date.now(),
       });
 
