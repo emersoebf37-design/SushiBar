@@ -1,12 +1,3 @@
-module.exports = {
-  conectarWhatsApp,
-  enviarMensagem,
-  mensagemNovoPedido,
-  mensagemStatus,
-  mensagemPix,
-  mensagemMotoboy
-};
-
 function mensagemMotoboy(order){
 
   const enderecoCompleto =
