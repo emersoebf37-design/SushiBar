@@ -1,3 +1,6 @@
+// 1. CARREGAR VARIÁVEIS DE AMBIENTE LOGO NO INÍCIO
+require('dotenv').config();
+
 const {
   Client,
   GatewayIntentBits,
@@ -5,20 +8,11 @@ const {
   StringSelectMenuBuilder
 } = require('discord.js');
 
-const {
-  conectarWhatsApp,
-  enviarMensagem,
-  mensagemNovoPedido,
-  mensagemStatus,
-  mensagemPix
-} = require('./whatsapp');
-
 const admin = require('firebase-admin');
 const serviceAccount = require('./firebase-key.json');
 const fs = require('fs');
 
 /* FIREBASE */
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
@@ -26,17 +20,14 @@ admin.initializeApp({
 const db = admin.firestore();
 
 /* DISCORD */
-
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
 /* CANAL */
-
 const CHANNEL_ID = '1503577826207600823';
 
 /* ARQUIVO DE IDs JÁ PROCESSADOS */
-
 const SENT_FILE = './sent_orders.json';
 
 function carregarEnviados() {
@@ -62,23 +53,18 @@ function salvarEnviados(set) {
 const sentOrders = carregarEnviados();
 
 /* BOT ONLINE */
-
 client.once('ready', () => {
   console.log(`Bot online: ${client.user.tag}`);
-  conectarWhatsApp();
   listenOrders();
 });
 
 /* ESCUTAR PEDIDOS */
-
 async function listenOrders() {
-
   db.collection('orders')
     .orderBy('createdAt', 'desc')
     .onSnapshot(async (snapshot) => {
 
       for (const change of snapshot.docChanges()) {
-
         if (change.type !== 'added') continue;
 
         const orderId = change.doc.id;
@@ -106,143 +92,92 @@ async function listenOrders() {
         console.log(`🛒 Novo pedido: ${orderId} — ${order.customer}`);
 
         /* DISCORD */
-
-        const channel = await client.channels.fetch(CHANNEL_ID);
-
-        const menu = new StringSelectMenuBuilder()
-          .setCustomId(`status_${orderId}`)
-          .setPlaceholder('Atualizar status')
-          .addOptions([
-            { label: 'Em preparo',        value: 'Em preparo'        },
-            { label: 'Saiu para entrega', value: 'Saiu para entrega' },
-            { label: 'Entregue',          value: 'Entregue'          }
-          ]);
-
-        const row = new ActionRowBuilder().addComponents(menu);
-
-        const msg = await channel.send({
-          content:
-          `\`\`\`ansi
-        \u001b[1;33m🍣 NOVO PEDIDO — #${order.orderId || '?'}\u001b[0m
-
-        \u001b[1;37mCliente:\u001b[0m ${order.customer}
-        \u001b[1;37mTelefone:\u001b[0m ${order.phone}
-
-        \u001b[1;37mEndereço:\u001b[0m
-        ${order.address}, ${order.number}
-        ${order.complement}
-
-        \u001b[1;37mPagamento:\u001b[0m ${order.payment}
-
-        \u001b[1;36mItens:\u001b[0m
-        ${order.items.map(i => `${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`).join('\n')}
-
-        \u001b[1;36mAdicionais:\u001b[0m
-        🥢 Hashi: ${order.addons?.hashi || 0}
-
-        \u001b[1;32mTotal: R$${order.total.toFixed(2)}\u001b[0m
-
-        \u001b[1;31mStatus: ${order.status}\u001b[0m
-        \`\`\``,
-          components: [row]
-        });
-
-        /* APAGAR APÓS 30 SEGUNDOS */
-
-        setTimeout(async () => {
-          try {
-            await msg.delete();
-            console.log(`🗑️ Mensagem do pedido ${orderId} apagada.`);
-          } catch (err) {
-            console.error('Erro ao apagar mensagem:', err.message);
-          }
-        }, 10 * 60 * 60 * 1000); /* 10 horas */
-
-        /* WHATSAPP */
-
-        await enviarMensagem(
-          order.phone,
-          mensagemNovoPedido(order)
-        );
-
-        if (order.payment?.toLowerCase().includes('pix')) {
-          await enviarMensagem(
-            order.phone,
-            mensagemPix(order)
-          );
-        }
-
-        /* MOTOBOY */
-
-        const MOTOBOY_PHONE = "5521990759345";
-
         try {
+          const channel = await client.channels.fetch(CHANNEL_ID);
 
-          console.log(
-            "Enviando mensagem para motoboy:",
-            MOTOBOY_PHONE
-          );
+          const menu = new StringSelectMenuBuilder()
+            .setCustomId(`status_${orderId}`)
+            .setPlaceholder('Atualizar status')
+            .addOptions([
+              { label: 'Em preparo',        value: 'Em preparo'        },
+              { label: 'Saiu para entrega', value: 'Saiu para entrega' },
+              { label: 'Entregue',          value: 'Entregue'          }
+            ]);
 
-          await enviarMensagem(
-            MOTOBOY_PHONE,
-            `🛵 *Novo pedido para entrega*
+          const row = new ActionRowBuilder().addComponents(menu);
 
-        👤 Cliente: ${order.customer}
+          const msg = await channel.send({
+            content:
+`\`\`\`ansi
+\u001b[1;33m🍣 NOVO PEDIDO — #${order.orderId || '?'}\u001b[0m
 
-        📍 Endereço:
-        ${order.address}, ${order.number}
-        ${order.complement || ""}
+\u001b[1;37mCliente:\u001b[0m ${order.customer}
+\u001b[1;37mTelefone:\u001b[0m ${order.phone}
 
-        💰 Total: R$${order.total.toFixed(2)}
+\u001b[1;37mEndereço:\u001b[0m
+${order.address}, ${order.number}
+${order.complement || ''}
 
-        📞 Cliente:
-        ${order.phone}
+\u001b[1;37mPagamento:\u001b[0m ${order.payment}
 
-        🗺️ Google Maps:
-        https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-          `${order.address}, ${order.number}`
-        )}`
-          );
+\u001b[1;36mItens:\u001b[0m
+${order.items ? order.items.map(i => `${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`).join('\n') : 'Nenhum item'}
 
-          console.log("🛵 Motoboy notificado.");
+\u001b[1;36mAdicionais:\u001b[0m
+🥢 Hashi: ${order.addons?.hashi || 0}
+
+\u001b[1;32mTotal: R$${order.total ? order.total.toFixed(2) : '0.00'}\u001b[0m
+
+\u001b[1;31mStatus: ${order.status || 'Pendente'}\u001b[0m
+\`\`\``,
+            components: [row]
+          });
+
+          /* APAGAR APÓS 10 HORAS */
+          setTimeout(async () => {
+            try {
+              await msg.delete();
+              console.log(`🗑️ Mensagem do pedido ${orderId} apagada.`);
+            } catch (err) {
+              console.error('Erro ao apagar mensagem:', err.message);
+            }
+          }, 10 * 60 * 60 * 1000);
 
         } catch (err) {
-
-          console.error(
-            "Erro ao notificar motoboy:",
-            err
-          );
-
+          console.error('Erro ao enviar mensagem no Discord:', err.message);
         }
 
+        /* LOG DE DISTÂNCIA (APENAS PARA INFORMAÇÃO NO TERMINAL) */
+        const distanciaKm = Number(order.distanciaKm || 0);
+        console.log(`ℹ️ Pedido recebido no Discord | Distância informada: ${distanciaKm} km`);
       }
-
     });
-
 }
 
 /* ALTERAR STATUS */
-
 client.on('interactionCreate', async (interaction) => {
-
   if (!interaction.isStringSelectMenu()) return;
+  if (!interaction.customId.startsWith('status_')) return;
 
-  const value   = interaction.values[0];
-  const orderId = interaction.customId.replace('status_', '');
+  try {
+    const value = interaction.values[0];
+    const orderId = interaction.customId.replace('status_', '');
 
-  await db.collection('orders').doc(orderId).update({ status: value });
+    // Atualiza apenas o status no banco de dados (o outro arquivo monitora essa alteração e avisa o cliente se necessário)
+    await db.collection('orders').doc(orderId).update({ status: value });
 
-  const orderDoc  = await db.collection('orders').doc(orderId).get();
-  const orderData = orderDoc.data();
-
-  await enviarMensagem(orderData.phone, mensagemStatus(orderData, value));
-
-  await interaction.reply({
-    content: `✅ Status atualizado para: ${value}`,
-    ephemeral: true
-  });
+    await interaction.reply({
+      content: `✅ Status atualizado no banco de dados para: ${value}`,
+      ephemeral: true
+    });
+  } catch (err) {
+    console.error('Erro ao processar alteração de status:', err.message);
+    await interaction.reply({
+      content: `❌ Erro ao atualizar status no banco.`,
+      ephemeral: true
+    }).catch(() => {});
+  }
 });
-/* LOGIN */
 
-require('dotenv').config();
+/* LOGIN */
 client.login(process.env.DISCORD_TOKEN);
