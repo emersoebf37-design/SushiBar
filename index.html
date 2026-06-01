@@ -1799,7 +1799,7 @@ let entregaAtual = {
 
 async function calcularEntrega(){
   // ✅ Sempre garante config atualizado antes de calcular
-  await fetchConfig(true);
+  await fetchConfig(FontFaceSetLoadEvent);
 
   const user = JSON.parse(localStorage.getItem('userData'));
 
@@ -1866,7 +1866,9 @@ function showPage(id){
   if(cartBtn) cartBtn.style.display = (id === 'home-page') ? 'flex' : 'none';
 
   if(id === 'orders-page') renderOrders();
-  if(id === 'home-page') calcularEntrega();
+  if(id === 'home-page' && entregaAtual.distanciaKm === null) {
+    calcularEntrega();
+  }
 }
 
 /* ========================= */
