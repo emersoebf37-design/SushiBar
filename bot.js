@@ -11,7 +11,13 @@ const admin = require('firebase-admin');
 const serviceAccount = require('./firebase-key.json');
 const fs = require('fs');
 
-// 1. ADICIONADO "mensagemMotoboy" NO IMPORT
+// LISTA DE SENHAS SIMPLES PARA SORTEIO
+const PALAVRAS_SENHA = [
+  'Abacaxi', 'Prédio', 'Escada', 'Caneta', 'Chave', 
+  'Janela', 'Girafa', 'Tomate', 'Sorvete', 'Pastel', 
+  'Gato', 'Cadeira', 'Morango', 'Zebra', 'Leão'
+];
+
 const { 
   conectarWhatsApp, 
   enviarMensagem, 
@@ -81,7 +87,6 @@ async function listenOrders() {
           continue;
         }
 
-        // Filtro de segurança: ignora pedidos mais antigos que 5 minutos
         const order = change.doc.data();
         const agora = Date.now();
         const criado = order.createdAt || 0;
@@ -97,6 +102,15 @@ async function listenOrders() {
 
         console.log(`📺 Exibindo painel no Discord para o pedido: #${order.orderId || '?'}`);
 
+        // 1. GERAR SENHA ALEATÓRIA E SALVAR NO FIRESTORE PARA USAR DEPOIS
+        const senhaSorteada = PALAVRAS_SENHA[Math.floor(Math.random() * PALAVRAS_SENHA.length)];
+        await db.collection('orders').doc(orderId).update({ senhaEntrega: senhaSorteada });
+        order.senhaEntrega = senhaSorteada; // Atualiza a propriedade no objeto local também
+
+        // 2. GERAR LINK DO GOOGLE MAPS
+        const enderecoCompleto = `${order.address}, ${order.number} ${order.complement || ''}`;
+        const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoCompleto)}`;
+
         // ==========================================
         // DISPAROS DO WHATSAPP PARA O CLIENTE
         // ==========================================
@@ -111,11 +125,10 @@ async function listenOrders() {
         }
 
         // ==========================================
-        // ROTINA EXCLUSIVA DO MOTOBOY (NOVO LOCAL!)
+        // ROTINA DO MOTOBOY
         // ==========================================
         let motoboyOn = false;
         try {
-          // Busca o estado do botão no Firebase config/settings
           const configSnap = await db.collection('config').doc('settings').get();
           const raw = configSnap.exists ? configSnap.data().motoboy_on : false;
           motoboyOn = raw === true || raw === 'true';
@@ -125,16 +138,16 @@ async function listenOrders() {
 
         const distanciaKm = Number(order.distanciaKm) || 0;
 
-        // Validação: Painel ativo E distância maior que 3km
         if (motoboyOn && distanciaKm > 3) {
           const motoboyPhone = process.env.MOTOBOY_PHONE;
           
           if (motoboyPhone) {
-            const textoMotoboy = mensagemMotoboy(order);
+            // Passamos a senha sorteada e o link do Maps criados aqui para a função de mensagem
+            const textoMotoboy = mensagemMotoboy(order, senhaSorteada, googleMapsLink);
             await enviarMensagem(motoboyPhone, textoMotoboy);
-            console.log(`🛵 Motoboy avisado via WhatsApp (${distanciaKm.toFixed(1)} km)`);
+            console.log(`🛵 Motoboy avisado via WhatsApp (${distanciaKm.toFixed(1)} km) com senha: ${senhaSorteada}`);
           } else {
-            console.warn('⚠️ MOTOBOY_PHONE não configurado no arquivo .env deste Bot!');
+            console.warn('⚠️ MOTOBOY_PHONE não configurado no arquivo .env!');
           }
         } else {
           console.log(`ℹ️ Motoboy NÃO notificado | Ativo: ${motoboyOn} | Distância: ${distanciaKm.toFixed(1)} km`);
@@ -183,14 +196,10 @@ ${order.items ? order.items.map(i => `${i.quantity > 1 ? `${i.quantity}x ` : ''}
             components: [row]
           });
 
-          /* AUTO-DESTRUIÇÃO (10 HORAS) */
           setTimeout(async () => {
             try {
               await msg.delete();
-              console.log(`🗑️ Mensagem temporária do pedido ${orderId} removida do canal.`);
-            } catch (err) {
-              console.error('Erro ao deletar mensagem antiga:', err.message);
-            }
+            } catch (err) {}
           }, 10 * 60 * 60 * 1000);
 
         } catch (err) {
@@ -216,7 +225,8 @@ client.on('interactionCreate', async (interaction) => {
     if (orderDoc.exists) {
       const orderData = orderDoc.data();
       if (orderData.phone) {
-        const textoStatus = mensagemStatus(orderData, value);
+        // Passamos a senha resgatada do banco para a mensagem de status do cliente
+        const textoStatus = mensagemStatus(orderData, value, orderData.senhaEntrega);
         await enviarMensagem(orderData.phone, textoStatus);
       }
     }

@@ -106,33 +106,26 @@ Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos s
 ⚠️ O pedido só será preparado após a confirmação do pagamento.`;
 }
 
-function mensagemStatus(order, novoStatus){
-  const emojis = {
-    'Em preparo':        '👨‍🍳 Seu pedido está sendo preparado!',
-    'Saiu para entrega': '🛵 Seu pedido saiu para entrega!',
-    'Entregue':          '✅ Seu pedido foi entregue!'
-  };
-  const texto = emojis[novoStatus] || `Status atualizado: ${novoStatus}`;
-
-  return `🍣 *Kaizora — Atualização do Pedido*
-
-Olá, *${order.customer}*!
-
-${texto}
-
-💰 *Total:* R$${order.total.toFixed(2)}
-📍 *Endereço:* ${order.address}, ${order.number}
-
-Obrigado pela preferência! 🙏`;
+function mensagemStatus(order, status, senha) {
+  if (status === 'Saiu para entrega') {
+    return `🍣 *Seu pedido mudou de status!*\n\n` +
+           `Status atual: *${status}* 🛵💨\n\n` +
+           `🔑 Para sua segurança, informe esta senha de confirmação ao entregador: *${senha || 'Não gerada'}*`;
+  }
+  
+  // Mensagem padrão para outros status (Ex: Em preparo, Entregue)
+  return `🍣 *Seu pedido mudou de status!*\n\n` +
+         `Status atual: *${status}*`;
 }
 
-function mensagemMotoboy(order){
-  return `🛵 *Nova Entrega Kaizora — Pedido #${order.orderId || '?' }*
-  
-Cliente: ${order.customer}
-Endereço: ${order.address}, ${order.number}
-Distância: ${Number(order.distanciaKm).toFixed(1)} km
-Total a receber/maquininha: R$ ${order.total.toFixed(2)} (Pagamento: ${order.payment})`;
+function mensagemMotoboy(order, senha, mapsLink) {
+  return `🛵 *NOTIFICAÇÃO DE ENTREGA (MOTOBOY)*\n\n` +
+         `*Pedido:* #${order.orderId || '?'}\n` +
+         `*Cliente:* ${order.customer}\n` +
+         `*Endereço:* ${order.address}, ${order.number}\n` +
+         `*Complemento:* ${order.complement || 'Não informado'}\n\n` +
+         `📍 *Rota no Google Maps:* ${mapsLink}\n\n` +
+         `🔑 *Senha para confirmação:* ${senha}`;
 }
 
 module.exports = {
