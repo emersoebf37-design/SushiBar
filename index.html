@@ -1428,6 +1428,139 @@ body{
   to{ transform:rotate(360deg); }
 }
 
+/* ========================================== */
+/* ESTILOS DA ROLETA GAMIFICADA               */
+/* ========================================== */
+
+.wheel-outer-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px;
+  text-align: center;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.wheel-header h2 {
+  font-size: 24px;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.wheel-header p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.wheel-pointer {
+  font-size: 28px;
+  color: #c40000;
+  z-index: 10;
+  margin-bottom: -12px;
+  animation: pointerBounce 0.4s infinite alternate;
+}
+
+.wheel-plate-bg {
+  position: relative;
+  width: 290px;
+  height: 290px;
+  border-radius: 50%;
+  border: 10px solid #222;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.wheel-plate {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 4s cubic-bezier(0.2, 0.85, 0.4, 1);
+}
+
+/* Criação das fatias usando propriedades CSS modernas */
+.wheel-segment {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  background-color: var(--bg-color);
+  transform-origin: 100% 100%;
+  transform: rotate(calc(60deg * var(--i))) skewY(30deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wheel-segment span {
+  position: absolute;
+  transform: skewY(-30deg) rotate(-30deg);
+  left: 15px;
+  bottom: 35px;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+  white-space: nowrap;
+}
+
+.spin-main-button {
+  background: #008a2e;
+  color: white;
+  border: none;
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,138,46,0.3);
+  width: 100%;
+  transition: 0.2s ease;
+}
+
+.spin-main-button:active {
+  transform: scale(0.96);
+}
+
+.postpone-button {
+  background: none;
+  border: none;
+  color: #777;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+.win-announcement {
+  background: #e6f6ec;
+  border: 2px dashed #008a2e;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.back-to-cart-btn {
+  background: #222;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-top: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+@keyframes pointerBounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(4px); }
+}
+
+
 </style>
 </head>
 
@@ -1668,6 +1801,49 @@ body{
 </div>
 
 </main>
+
+
+<div id="wheel-page" class="page" style="display: none;">
+  <div class="wheel-outer-wrapper">
+    
+    <div class="wheel-header">
+      <h2>🎰 Seu Giro da Sorte!</h2>
+      <p>Você completou 3 pedidos! Gire a roleta agora para turbinar sua janta com um prêmio exclusivo.</p>
+    </div>
+
+    <div class="wheel-pointer">▼</div>
+
+    <div class="wheel-plate-bg">
+      <div class="wheel-plate" id="lucky-wheel">
+        <div class="wheel-segment" style="--i:1; --bg-color: #9e0505;"><span>+4 Hot Rolls</span></div>
+        <div class="wheel-segment" style="--i:2; --bg-color: #1a1a1a;"><span>Coca Lata</span></div>
+        <div class="wheel-segment" style="--i:3; --bg-color: #9e0505;"><span>R$ 10,00 OFF</span></div>
+        <div class="wheel-segment" style="--i:4; --bg-color: #1a1a1a;"><span>1 Temaki</span></div>
+        <div class="wheel-segment" style="--i:5; --bg-color: #9e0505;"><span>10% OFF</span></div>
+        <div class="wheel-segment" style="--i:6; --bg-color: #1a1a1a;"><span>Suco Natural</span></div>
+      </div>
+    </div>
+
+    <div class="wheel-actions">
+      <button id="spin-btn" class="spin-main-button" onclick="rodarRoletaFront()">
+        🚀 GIRAR ROLETA
+      </button>
+      
+      <button id="postpone-btn" class="postpone-button" onclick="adiarGiro()">
+        Deixar para a próxima compra
+      </button>
+    </div>
+
+    <div id="wheel-win-box" class="win-announcement" style="display: none;">
+      <h3>🎉 Parabéns!</h3>
+      <p id="wheel-win-text">Você ganhou item x!</p>
+      <button class="back-to-cart-btn" onclick="toggleCart(); showPage('home-page');">
+        Ver meu prêmio no Carrinho
+      </button>
+    </div>
+
+  </div>
+</div>
 
 <!-- TOAST -->
 <div class="acc-toast" id="acc-toast"></div>
@@ -2032,6 +2208,13 @@ function renderCart(){
   });
 
   if(payment === 'Cartão') total *= 1.10;
+
+  if (desagioFidelidadeFixo > 0) {
+  total = Math.max(0, total - desagioFidelidadeFixo);
+  }
+  if (desagioFidelidadePorcentagem > 0) {
+    total = Math.max(0, total * (1 - desagioFidelidadePorcentagem));
+  }
 
   document.getElementById('cart-total').innerText = `R$${total.toFixed(2).replace('.', ',')}`;
 
@@ -2534,6 +2717,89 @@ window.addEventListener('popstate', (e) => {
   // Volta para a página anterior (Conta ou Pedidos) sem empurrar novo estado
   originalShowPage(page);
 });
+
+/* ========================================== */
+/* 🎰 MOTOR DA ROLETA DE FIDELIDADE (FRONT)    */
+/* ========================================== */
+
+// Variaveis globais de controle das ofertas da roleta
+let desagioFidelidadeFixo = 0; // Descontos em reais (Ex: R$10)
+let desagioFidelidadePorcentagem = 0; // Descontos percentuais (Ex: 10%)
+let roletaJaGiradaNestaSessao = false;
+
+// 1. ATUALIZAÇÃO DA FUNÇÃO DO BOTÃO VOLTAR MOBILE PARA INCLUIR A ROLETA
+// (Substitua a sua função getCurrentPage antiga por esta)
+function getCurrentPage(){
+  const pages = ['home-page', 'orders-page', 'account-page', 'wheel-page'];
+  return pages.find(id => document.getElementById(id).style.display !== 'none') || 'home-page';
+}
+
+// 2. LOGICA DO BOTÃO ADIAR O GIRO
+function adiarGiro() {
+  // Envia o usuário de volta para o cardápio e abre o checkout original dele
+  showPage('home-page');
+  finishOrder(); // Dispara o modal de confirmação do pedido normalmente
+}
+
+// 3. EVENTO DE ROTAÇÃO MOCKADO (Front-end temporário antes da conexão com a API)
+function rodarRoletaFront() {
+  if (roletaJaGiradaNestaSessao) return;
+  roletaJaGiradaNestaSessao = true;
+
+  // Desativa botões durante o giro
+  document.getElementById('spin-btn').disabled = true;
+  document.getElementById('spin-btn').style.background = '#aaa';
+  document.getElementById('postpone-btn').style.display = 'none';
+
+  // Lista de prêmios mapeados conforme os setores da roleta e seus respectivos ângulos
+  const premios = [
+    { nome: "+4 Hot Rolls", tipo: "item", valor: "🎁 +4 Hot Rolls Fixo" },
+    { nome: "Coca Lata", tipo: "item", valor: "🎁 Coca-Cola Lata Grátis" },
+    { nome: "R$ 10,00 OFF", tipo: "desconto_dinheiro", valor: 10 },
+    { nome: "1 Temaki", tipo: "item", valor: "🎁 1 Temaki Cortesia" },
+    { nome: "10% OFF", tipo: "desconto_porcentagem", valor: 0.10 },
+    { nome: "Suco Natural", tipo: "item", valor: "🎁 Suco Natural Grátis" }
+  ];
+
+  // Sorteia um índice (0 a 5)
+  const indiceSorteado = Math.floor(Math.random() * premios.length);
+  const premioGanho = premios[indiceSorteado];
+
+  // Calcula rotação: 3600 graus (10 voltas completas) + compensação do setor selecionado
+  // Cada setor ocupa 60 graus (360/6). Multiplicamos para alinhar o ponteiro
+  const grausPorSetor = 60;
+  const anguloAlvo = 3600 + (360 - (indiceSorteado * grausPorSetor));
+
+  const wheelEl = document.getElementById('lucky-wheel');
+  wheelEl.style.transform = `rotate(${anguloAlvo}deg)`;
+
+  // Aguarda 4 segundos (tempo da animação CSS acabar) para aplicar o prêmio em tempo real
+  setTimeout(() => {
+    aplicarPremioNoCarrinho(premioGanho);
+
+    // Exibe a caixa de vitória
+    document.getElementById('wheel-win-text').innerText = `Você ganhou: ${premioGanho.nome}! O benefício já foi inserido automaticamente no seu pedido atual.`;
+    document.getElementById('wheel-win-box').style.display = 'block';
+  }, 4000);
+}
+
+// 4. INJEÇÃO DOS PRÊMIOS NO PEDIDO EM TEMPO REAL
+function aplicarPremioNoCarrinho(premio) {
+  if (premio.tipo === 'item') {
+    // Insere o brinde diretamente na lista do carrinho com preço R$ 0,00
+    // Como ele não existe no array 'products', o renderCart original assume preço 0 automaticamente!
+    cart.push({ name: premio.valor, quantity: 1 });
+    saveCart();
+  } else if (premio.tipo === 'desconto_dinheiro') {
+    desagioFidelidadeFixo = premio.valor;
+  } else if (premio.tipo === 'desconto_porcentagem') {
+    desagioFidelidadePorcentagem = premio.valor;
+  }
+
+  // Recalcula e redesenha o carrinho com as novas regras de preço aplicadas
+  renderCart();
+}
+
 
 </script>
 
