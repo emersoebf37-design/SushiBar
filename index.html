@@ -2031,36 +2031,13 @@ function renderCart(){
     `;
   });
 
-
-  // ========================
-  // PROMOÇÃO ENTREGA GRÁTIS
-  // ========================
-  const taxa = entregaAtual.taxa || 0;
-  const minimoParaGratis = taxa * 10;
-  const subtotalItens = cart.reduce((sum, item) => {
-    const product = products.find(p => p.name === item.name);
-    const combo = combos.find(c => c.name === item.name);
-    const price = product?.price || combo?.price || 0;
-    return sum + (price * (item.quantity || 1));
-  }, 0);
-  const entregaGratis = taxa > 0 && subtotalItens >= minimoParaGratis;
-  if(entregaGratis) total -= taxa;
-
-
   if(payment === 'Cartão') total *= 1.10;
 
   document.getElementById('cart-total').innerText = `R$${total.toFixed(2).replace('.', ',')}`;
 
   const detalhe = document.getElementById('entrega-detalhe');
   if(detalhe && cart.length > 0 && entregaAtual.distanciaKm){
-    if(entregaGratis){
-      detalhe.innerHTML = `🎉 <strong style="color:#008a2e;">Entrega grátis!</strong> Taxa de R$${taxa.toFixed(2).replace('.', ',')} abonada.`;
-    } else if(taxa > 0 && minimoParaGratis > 0){
-      const falta = minimoParaGratis - subtotalItens;
-      detalhe.innerHTML = `Taxa de entrega: R$${taxa.toFixed(2).replace('.', ',')} · <span style="color:#9e0505;font-weight:bold;">Falta R$${falta.toFixed(2).replace('.', ',')} para entrega grátis 🎁</span>`;
-    } else {
-      detalhe.innerText = `Taxa de entrega: R$${taxa.toFixed(2).replace('.', ',')}`;
-    }
+    detalhe.innerText = `Taxa de entrega: R$${(entregaAtual.taxa || 2).toFixed(2).replace('.', ',')}`;
   } else if(detalhe){ detalhe.innerText = ''; }
 
   const totalItens = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
@@ -2271,8 +2248,6 @@ async function finishOrder(){
   },0);
 
   let total = baseTotal + (cart.length > 0 ? (entregaAtual.taxa || 0) : 0);
-
-
   if(payment === 'Cartão') total *= 1.10;
 
   pendingOrder = {
