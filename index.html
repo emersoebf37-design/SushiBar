@@ -2415,9 +2415,29 @@ window.openComboModal = openComboModal;
 window.closeComboModal = closeComboModal;
 window.confirmAddCombo = confirmAddCombo;
 
+/* ========================= */
+/* CARRINHO COM HISTÓRICO   */
+/* ========================= */
+
+let carrinhoFechadoManualmente = false;
+
 function toggleCart(){
-  const cart = document.querySelector('.cart-container');
-  cart.classList.toggle('active');
+  const cartEl = document.querySelector('.cart-container');
+  if(!cartEl) return;
+
+  // Verifica se o carrinho está abrindo (não tem a classe active ainda)
+  if(!cartEl.classList.contains('active')){
+    cartEl.classList.add('active');
+    // Adiciona um estado temporário de "carrinho aberto" no histórico do celular
+    history.pushState({ isCart: true }, '', '');
+  } else {
+    // Se o cliente fechou clicando no próprio botão do site
+    cartEl.classList.remove('active');
+    if(history.state?.isCart) {
+      carrinhoFechadoManualmente = true;
+      history.back(); // Remove o estado do carrinho para não bugar o botão voltar depois
+    }
+  }
 }
 
 window.toggleCart = toggleCart;
@@ -2468,9 +2488,8 @@ window.changeAddon = changeAddon;
 window.resetAddonUI = resetAddonUI;
 window.updateModalTotal = updateModalTotal;
 
-
 // ========================
-// BOTÃO VOLTAR MOBILE
+// BOTÃO VOLTAR MOBILE INTEGRADO
 // ========================
 
 function getCurrentPage(){
@@ -2488,17 +2507,31 @@ window.showPage = function(id){
 // Estado inicial
 history.replaceState({ page: 'home-page' }, '', '');
 
-// Intercepta o botão voltar
+// Intercepta o clique no botão voltar físico ou virtual do celular
 window.addEventListener('popstate', (e) => {
+  // Se o carrinho foi fechado pelo clique do botão no site, ignora o evento para evitar loops
+  if (carrinhoFechadoManualmente) {
+    carrinhoFechadoManualmente = false;
+    return;
+  }
+
+  const cartEl = document.querySelector('.cart-container');
+  
+  // 📱 SE O CARRINHO ESTIVER ABERTO: O botão voltar do celular apenas fecha ele
+  if (cartEl && cartEl.classList.contains('active')) {
+    cartEl.classList.remove('active');
+    return; // Para a execução aqui para não mudar de página nem sair do navegador
+  }
+
   const page = e.state?.page || 'home-page';
 
   if(page === 'home-page' && getCurrentPage() === 'home-page'){
-    // Já está no menu — deixa sair do browser normalmente
+    // Já está no menu principal — deixa sair do browser normalmente
     history.back();
     return;
   }
 
-  // Volta para a página anterior sem empurrar novo estado
+  // Volta para a página anterior (Conta ou Pedidos) sem empurrar novo estado
   originalShowPage(page);
 });
 
