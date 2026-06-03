@@ -2468,6 +2468,40 @@ window.changeAddon = changeAddon;
 window.resetAddonUI = resetAddonUI;
 window.updateModalTotal = updateModalTotal;
 
+
+// ========================
+// BOTÃO VOLTAR MOBILE
+// ========================
+
+function getCurrentPage(){
+  const pages = ['home-page', 'orders-page', 'account-page'];
+  return pages.find(id => document.getElementById(id).style.display !== 'none') || 'home-page';
+}
+
+// Empurra um estado no histórico ao trocar de página
+const originalShowPage = showPage;
+window.showPage = function(id){
+  originalShowPage(id);
+  history.pushState({ page: id }, '', '');
+};
+
+// Estado inicial
+history.replaceState({ page: 'home-page' }, '', '');
+
+// Intercepta o botão voltar
+window.addEventListener('popstate', (e) => {
+  const page = e.state?.page || 'home-page';
+
+  if(page === 'home-page' && getCurrentPage() === 'home-page'){
+    // Já está no menu — deixa sair do browser normalmente
+    history.back();
+    return;
+  }
+
+  // Volta para a página anterior sem empurrar novo estado
+  originalShowPage(page);
+});
+
 </script>
 
 <!-- LOADING OVERLAY -->
