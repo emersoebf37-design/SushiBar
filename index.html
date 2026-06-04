@@ -1827,8 +1827,8 @@ const products = [
     esgotado: false,
     isVariable: true,
     sizes: [
-      { id: 'M', label: 'Médio (500g)', price: 18.90 },
-      { id: 'G', label: 'Grande (700g)', price: 25.90 }
+      { id: 'M', label: 'Médio', price: 18.90 },
+      { id: 'G', label: 'Grande', price: 25.90 }
     ]
   },
   {
@@ -1899,6 +1899,7 @@ const categories = [
 { image:'Imagens/Harumaki.png', name:'Harumaki' },
 { image:'Imagens/Porções.png', name:'Porções' },
 { image:'Imagens/Saladas.png', name:'Saladas' }
+{ image:'Imagens/Porções.png', name:'Porções' },
 ];
 
 /* ========================= */
@@ -2100,25 +2101,18 @@ function renderProducts(data){
 
     // VERIFICA SE O PRODUTO TEM VARIANTES DE TAMANHO
     if (product.isVariable) {
-      // Extrai os preços para calcular o menor e o maior (Range)
       const prices = product.sizes.map(s => s.price);
       const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-      
-      // Calcula os preços riscados antigos baseados no range
       const minCardPrice = gercardPrice(minPrice);
-      const maxCardPrice = gercardPrice(maxPrice);
 
       priceHTML = `
         <div style="color:#c40000;text-decoration:line-through;font-size:14px;margin-bottom:5px;">
-          R$${formatPrice(minCardPrice)} - R$${formatPrice(maxCardPrice)}
+          R$${formatPrice(minCardPrice)}
         </div>
-        <div class="price">R$${formatPrice(minPrice)} - R$${formatPrice(maxPrice)}</div>
+        <div class="price">A partir de R$${formatPrice(minPrice)}</div>
       `;
-      
-      // Se for variável, o botão vai abrir o modal de escolha
-      buttonAction = `abrirModalTamanhos('${product.name}')`;
 
+      buttonAction = `abrirModalTamanhos('${product.name}')`;
     } else {
       // PRODUTO NORMAL (Mantém a sua lógica original intacta)
       const cardPrice = gercardPrice(product.price);
