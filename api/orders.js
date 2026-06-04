@@ -220,7 +220,7 @@ export default async function handler(req, res) {
 
       // Adicionais e Taxas
       const addons = order.addons || {};
-      const tare  = Math.max(0, parseInt(addons.tare  || 0));
+      const tare  = 0
       const hashi = Math.max(0, parseInt(addons.hashi || 0));
 
       if (tare > 20 || hashi > 20) {
@@ -231,8 +231,6 @@ export default async function handler(req, res) {
       if (!validPayments.includes(order.payment)) {
         return res.status(400).json({ error: "Pagamento inválido." });
       }
-
-      total += tare * 0.5;
 
       const taxaEntrega = Number(order.taxaEntrega) || 0;
       if (taxaEntrega < 0 || taxaEntrega > 50) {
