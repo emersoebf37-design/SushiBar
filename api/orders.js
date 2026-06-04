@@ -74,18 +74,21 @@ const PRODUCTS = {
   "Combo Primavera": 37.90,
   "Mega Combo Hot Roll": 39.90,
 
-  // 🍣 3 NOVOS PRODUTOS COM FRACIONAMENTO DE PREÇO SEGURO
-  "Yakisoba de Frango (P)": 34.90,
-  "Yakisoba de Frango (M)": 48.90,
-  "Yakisoba de Frango (G)": 62.90,
-  
-  "Yakisoba de Calabresa (P)": 29.90,
-  "Yakisoba de Calabresa (M)": 42.90,
-  "Yakisoba de Calabresa (G)": 56.90,
 
-  "Yakisoba Misto(P)": 27.90,
-  "Yakisoba Misto(M)": 39.90,
-  "Yakisoba Misto(G)": 52.90,
+  "Yakisoba de Frango (M)": 18.90,
+  "Yakisoba de Frango (G)": 25.90,
+  
+  "Yakisoba de Calabresa (M)": 18.90,
+  "Yakisoba de Calabresa (G)": 25.90,
+
+  "Yakisoba de Legumes (M)": 16.90,
+  "Yakisoba de Legumes (G)": 19.90,
+  
+  "Yakisoba de Carne (M)": 20.90,
+  "Yakisoba de Carne (G)": 27.90,
+
+  "Yakisoba Misto(M)": 24.90,
+  "Yakisoba Misto(G)": 29.90,
 };
 
 // ========================
