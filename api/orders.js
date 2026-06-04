@@ -84,7 +84,7 @@ const PRODUCTS = {
   "Yakisoba de Legumes (M)": 16.90,
   "Yakisoba de Legumes (G)": 19.90,
   
-  "Yakisoba de Carne (M)": 20.90,
+  "Yakisoba de Carne (M)": 21.90,
   "Yakisoba de Carne (G)": 27.90,
 
   "Yakisoba Misto(M)": 24.90,
