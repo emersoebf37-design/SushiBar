@@ -2162,32 +2162,28 @@ let tamanhoEscolhidoNoModal = null;
 
 // Abre o modal buscando o produto pelo nome
 function abrirModalTamanhos(productName) {
-  // Procura o produto dentro do seu array global 'products'
   const produto = products.find(p => p.name === productName);
   if (!produto) return;
 
   produtoSelecionadoNoModal = produto;
-  tamanhoEscolhidoNoModal = null; // Reseta seleção anterior
+  tamanhoEscolhidoNoModal = null;
 
   document.getElementById('m-title').innerText = produto.name;
   const container = document.getElementById('m-options-box');
   container.innerHTML = "";
 
-  // Cria os botões de tamanho dentro do modal
   produto.sizes.forEach((size, index) => {
     const itemOpt = document.createElement('div');
     itemOpt.id = `opt-size-${produto.name.replace(/\s/g,'-')}-${size.id}`;
-    itemOpt.style = "display:flex; justify-content:space-between; padding:14px; border:2px solid #eae5dc; border-radius:10px; cursor:pointer; font-weight:600; font-size:14px; transition:0.2s;";
-    
+    itemOpt.style.cssText = "display:flex; justify-content:space-between; padding:14px; border:2px solid #eae5dc; border-radius:10px; cursor:pointer; font-weight:600; font-size:14px; transition:0.2s; color:#333; background:#fff;";
+
     itemOpt.onclick = () => {
       tamanhoEscolhidoNoModal = size;
-      // Reseta as bordas dos outros tamanhos
       document.querySelectorAll(`[id^="opt-size-${produto.name.replace(/\s/g,'-')}-"]`).forEach(el => {
         el.style.borderColor = "#eae5dc";
         el.style.background = "#fff";
         el.style.color = "#333";
       });
-      // Destaca o tamanho selecionado
       itemOpt.style.borderColor = "#c40000";
       itemOpt.style.background = "#fdf3f3";
       itemOpt.style.color = "#c40000";
@@ -2196,7 +2192,6 @@ function abrirModalTamanhos(productName) {
     itemOpt.innerHTML = `<span>${size.label}</span><span>R$ ${formatPrice(size.price)}</span>`;
     container.appendChild(itemOpt);
 
-    // Pré-seleciona o primeiro tamanho automaticamente
     if (index === 0) {
       tamanhoEscolhidoNoModal = size;
       itemOpt.style.borderColor = "#c40000";
