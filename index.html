@@ -1428,6 +1428,116 @@ body{
   to{ transform:rotate(360deg); }
 }
 
+
+/* ========================================== */
+/* ESTILIZAÇÃO DO MODAL DE TAMANHOS VARIÁVEIS */
+/* ========================================== */
+
+/* Fundo escurecido e borrado */
+.modal-size-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px); /* Suporte para iOS/Safari */
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Caixa central (Card) */
+.modal-size-card {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 390px;
+  padding: 24px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  animation: modalScaleOpen 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+
+/* Cabeçalho */
+.modal-size-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.modal-size-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.btn-modal-size-close {
+  background: #f3f4f6;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.btn-modal-size-close:hover {
+  background: #e5e7eb;
+}
+
+/* Subtítulo informativo */
+.modal-size-subtitle {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 20px 0;
+  line-height: 1.4;
+}
+
+/* Lista que envelopa as opções */
+.modal-size-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+/* Botão de Ação Principal */
+.btn-modal-size-confirm {
+  width: 100%;
+  background: #008a2e;
+  color: #ffffff;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 138, 46, 0.2);
+  transition: transform 0.1s ease, background 0.2s;
+}
+
+.btn-modal-size-confirm:active {
+  transform: scale(0.98);
+}
+
+/* Animação de entrada suave */
+@keyframes modalScaleOpen {
+  from { opacity: 0; transform: scale(0.93); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 </style>
 </head>
 
@@ -1667,6 +1777,22 @@ body{
   </div>
 </div>
 
+<!-- ========================= -->
+<!-- PRODUCTS SIZES -->
+<!-- ========================= -->
+
+<div id="size-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:9999; align-items:center; justify-content:center; padding:15px; box-sizing:border-box;">
+  <div style="background:#fff; border-radius:18px; padding:22px; width:100%; max-width:380px; box-shadow:0 10px 25px rgba(0,0,0,0.2); font-family:sans-serif;">
+    <div style="display:flex; justify-content:between; align-items:center; margin-bottom:15px;">
+      <h3 id="m-title" style="margin:0; font-size:18px; color:#1a1a1a;">Escolha o tamanho</h3>
+      <button onclick="fecharModalTamanhos()" style="background:none; border:none; font-size:18px; cursor:pointer; color:#999; margin-left:auto;">✕</button>
+    </div>
+    <div id="m-options-box" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+      </div>
+    <button onclick="salvarTamanhoNoCarrinho()" style="width:100%; background:#008a2e; color:#fff; border:none; padding:14px; font-weight:bold; font-size:15px; border-radius:10px; cursor:pointer;">Adicionar ao Pedido</button>
+  </div>
+</div>
+
 </main>
 
 <!-- TOAST -->
@@ -1694,6 +1820,45 @@ const products = [
 { name:'Harumaki de queijo (3 unidades)', price:12.99, category:'Harumaki', description:'Rolinho primavera recheado com queijo e oregano, envolto em massa crocante.', image:'Imagens/Harumaki Queijo.jpg', esgotado: false },
 { name:'Harumaki de Frango com Cream Cheese (3 unidades)', price:12.99, category:'Harumaki', description:'Rolinho primavera recheado com frango e cream cheese, envolto em massa crocante.', image:'Imagens/Harumaki Frango.jpg', esgotado: false },
 { name:'Salada Sunomono', price:5, category:'Saladas', description:'Tradicional salada japonesa feita com pepino fatiado, molho agridoce suave e gergelim.', image:'Imagens/salada-sunomono.jpeg', esgotado: false },
+{
+    name: 'Yakisoba de Frango',
+    category: 'Porções',
+    description: 'Macarrão oriental selado na chapa com frango suculento, legumes selecionados e molho artesanal.',
+    image: 'Imagens/Poke-Salmao.jpg', // Lembre de colocar a imagem na pasta
+    esgotado: false,
+    isVariable: true,
+    sizes: [
+      { id: 'P', label: 'Pequeno (350g)', price: 34.90 },
+      { id: 'M', label: 'Médio (500g)', price: 48.90 },
+      { id: 'G', label: 'Grande (700g)', price: 62.90 }
+    ]
+  },
+  {
+    name: 'Yakisoba de Calabresa',
+    category: 'Porções',
+    description: 'Macarrão oriental selado na chapa com carne bovina macia, legumes selecionados e molho artesanal.',
+    image: 'Imagens/Yakisoba.jpg',
+    esgotado: false,
+    isVariable: true,
+    sizes: [
+      { id: 'P', label: 'Pequeno (400g)', price: 29.90 },
+      { id: 'M', label: 'Médio (650g)', price: 42.90 },
+      { id: 'G', label: 'Grande (900g)', price: 56.90 }
+    ]
+  },
+  {
+    name: 'Yakisoba Misto',
+    category: 'Porções',
+    description: 'Macarrão oriental selado na chapa com carne bovina macia, legumes selecionados e molho artesanal.',
+    image: 'Imagens/Yakisoba.jpg',
+    esgotado: false,
+    isVariable: true,
+    sizes: [
+      { id: 'P', label: 'Pequeno (150g)', price: 27.90 },
+      { id: 'M', label: 'Médio (250g)', price: 39.90 },
+      { id: 'G', label: 'Grande (400g)', price: 52.90 }
+    ]
+  }
 ];
 
 const combos = [
@@ -1907,7 +2072,46 @@ function renderProducts(data){
   const container = document.getElementById('products');
   container.innerHTML = '';
   data.forEach(product => {
-    const cardPrice = gercardPrice(product.price);
+    
+    let priceHTML = '';
+    let buttonAction = '';
+
+    // VERIFICA SE O PRODUTO TEM VARIANTES DE TAMANHO
+    if (product.isVariable) {
+      // Extrai os preços para calcular o menor e o maior (Range)
+      const prices = product.sizes.map(s => s.price);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      
+      // Calcula os preços riscados antigos baseados no range
+      const minCardPrice = gercardPrice(minPrice);
+      const maxCardPrice = gercardPrice(maxPrice);
+
+      priceHTML = `
+        <div style="color:#c40000;text-decoration:line-through;font-size:14px;margin-bottom:5px;">
+          R$${formatPrice(minCardPrice)} - R$${formatPrice(maxCardPrice)}
+        </div>
+        <div class="price">R$${formatPrice(minPrice)} - R$${formatPrice(maxPrice)}</div>
+      `;
+      
+      // Se for variável, o botão vai abrir o modal de escolha
+      buttonAction = `abrirModalTamanhos('${product.name}')`;
+
+    } else {
+      // PRODUTO NORMAL (Mantém a sua lógica original intacta)
+      const cardPrice = gercardPrice(product.price);
+      
+      priceHTML = `
+        <div style="color:#c40000;text-decoration:line-through;font-size:16px;margin-bottom:5px;">
+          R$${formatPrice(cardPrice)}
+        </div>
+        <div class="price">R$${formatPrice(product.price)}</div>
+      `;
+      
+      // Se for normal, adiciona direto ao carrinho
+      buttonAction = `addToCart('${product.name}')`;
+    }
+
     container.innerHTML += `
       <div class="product-card ${product.esgotado ? 'esgotado' : ''}">
         <div style="position:relative;">
@@ -1917,10 +2121,11 @@ function renderProducts(data){
         <div class="product-content">
           <h3>${product.name}</h3>
           <p>${product.description}</p>
-          <div style="color:#c40000;text-decoration:line-through;font-size:16px;margin-bottom:5px;">R$${formatPrice(cardPrice)}</div>
-          <div class="price">R$${formatPrice(product.price)}</div>
+          
+          ${priceHTML}
+          
           <div style="color:#008a2e;font-size:14px;font-weight:bold;margin-top:5px;">10% OFF no Pix e Dinheiro</div>
-          <button class="add-cart-btn" ${product.esgotado ? 'disabled' : ''} onclick="addToCart('${product.name}')">
+          <button class="add-cart-btn" ${product.esgotado ? 'disabled' : ''} onclick="${buttonAction}">
             ${product.esgotado ? 'Esgotado' : 'Adicionar'}
           </button>
         </div>
@@ -1928,8 +2133,87 @@ function renderProducts(data){
     `;
   });
 }
-
 renderProducts(products);
+
+let produtoSelecionadoNoModal = null;
+let tamanhoEscolhidoNoModal = null;
+
+// Abre o modal buscando o produto pelo nome
+function abrirModalTamanhos(productName) {
+  // Procura o produto dentro do seu array global 'products'
+  const produto = products.find(p => p.name === productName);
+  if (!produto) return;
+
+  produtoSelecionadoNoModal = produto;
+  tamanhoEscolhidoNoModal = null; // Reseta seleção anterior
+
+  document.getElementById('m-title').innerText = produto.name;
+  const container = document.getElementById('m-options-box');
+  container.innerHTML = "";
+
+  // Cria os botões de tamanho dentro do modal
+  produto.sizes.forEach((size) => {
+    const itemOpt = document.createElement('div');
+    itemOpt.id = `opt-size-${size.id}`;
+    itemOpt.style = "display:flex; justify-content:space-between; padding:14px; border:2px solid #eae5dc; border-radius:10px; cursor:pointer; font-weight:600; font-size:14px; transition:0.2s;";
+    
+    itemOpt.onclick = () => {
+      tamanhoEscolhidoNoModal = size;
+      // Reseta as bordas dos outros tamanhos
+      document.querySelectorAll('[id^="opt-size-"]').forEach(el => {
+        el.style.borderColor = "#eae5dc";
+        el.style.background = "#fff";
+        el.style.color = "#333";
+      });
+      // Destaca o tamanho selecionado
+      itemOpt.style.borderColor = "#c40000";
+      itemOpt.style.background = "#fdf3f3";
+      itemOpt.style.color = "#c40000";
+    };
+
+    itemOpt.innerHTML = `<span>${size.label}</span><span>R$ ${formatPrice(size.price)}</span>`;
+    container.appendChild(itemOpt);
+  });
+
+  document.getElementById('size-modal-overlay').style.display = "flex";
+}
+
+function fecharModalTamanhos() {
+  document.getElementById('size-modal-overlay').style.display = "none";
+}
+
+// Finaliza a escolha e joga no seu carrinho global
+function salvarTamanhoNoCarrinho() {
+  if (!tamanhoEscolhidoNoModal) {
+    alert("Por favor, selecione um tamanho antes de adicionar!");
+    return;
+  }
+
+  // Monta o nome extamente como cadastramos na sua API PRODUCTS: "Nome do Produto (ID)"
+  // Exemplo: "Poke de Salmão Tradicional (M)"
+  const itemFinal = {
+    name: `${produtoSelecionadoNoModal.name} (${tamanhoEscolhidoNoModal.id})`,
+    price: tamanhoEscolhidoNoModal.price,
+    quantity: 1
+  };
+
+  // Insere o item na sua estrutura de carrinho (geralmente chamada de 'cart')
+  // Altere 'cart' abaixo caso sua variável global de carrinho tenha outro nome
+  if (typeof cart !== 'undefined') {
+    const jaExiste = cart.find(item => item.name === itemFinal.name);
+    if (jaExiste) {
+      jaExiste.quantity += 1;
+    } else {
+      cart.push(itemFinal);
+    }
+  }
+
+  // Executa as suas funções de atualização do carrinho na tela
+  if (typeof saveCart === "function") saveCart();
+  if (typeof renderCart === "function") renderCart();
+
+  fecharModalTamanhos();
+}
 
 function renderCombos(){
   const container = document.getElementById('combo-list');

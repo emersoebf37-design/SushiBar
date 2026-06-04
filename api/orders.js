@@ -49,7 +49,7 @@ function getPrivateKey() {
 }
 
 // ========================
-// PRODUTOS
+// PRODUTOS (ATUALIZADO COM OS NOVOS TAMANHOS)
 // ========================
 const PRODUCTS = {
   "Hot Roll Philadelphia Salmão (6 unidades)": 12,
@@ -73,6 +73,19 @@ const PRODUCTS = {
   "Combo Premium": 74.90,
   "Combo Primavera": 37.90,
   "Mega Combo Hot Roll": 39.90,
+
+  // 🍣 3 NOVOS PRODUTOS COM FRACIONAMENTO DE PREÇO SEGURO
+  "Yakisoba de Frango (P)": 34.90,
+  "Yakisoba de Frango (M)": 48.90,
+  "Yakisoba de Frango (G)": 62.90,
+  
+  "Yakisoba de Calabresa (P)": 29.90,
+  "Yakisoba de Calabresa (M)": 42.90,
+  "Yakisoba de Calabresa (G)": 56.90,
+
+  "Yakisoba Misto(P)": 27.90,
+  "Yakisoba Misto(M)": 39.90,
+  "Yakisoba Misto(G)": 52.90,
 };
 
 // ========================
