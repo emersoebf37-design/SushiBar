@@ -2175,7 +2175,7 @@ function abrirModalTamanhos(productName) {
   container.innerHTML = "";
 
   // Cria os botões de tamanho dentro do modal
-  produto.sizes.forEach((size) => {
+  produto.sizes.forEach((size, index) => {
     const itemOpt = document.createElement('div');
     itemOpt.id = `opt-size-${size.id}`;
     itemOpt.style = "display:flex; justify-content:space-between; padding:14px; border:2px solid #eae5dc; border-radius:10px; cursor:pointer; font-weight:600; font-size:14px; transition:0.2s;";
@@ -2196,6 +2196,14 @@ function abrirModalTamanhos(productName) {
 
     itemOpt.innerHTML = `<span>${size.label}</span><span>R$ ${formatPrice(size.price)}</span>`;
     container.appendChild(itemOpt);
+
+    // Pré-seleciona o primeiro tamanho automaticamente
+    if (index === 0) {
+      tamanhoEscolhidoNoModal = size;
+      itemOpt.style.borderColor = "#c40000";
+      itemOpt.style.background = "#fdf3f3";
+      itemOpt.style.color = "#c40000";
+    }
   });
 
   document.getElementById('size-modal-overlay').style.display = "flex";
