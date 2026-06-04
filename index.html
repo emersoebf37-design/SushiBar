@@ -2322,7 +2322,7 @@ function renderCart(){
   cart.forEach((item,index)=>{
     const product = products.find(p => p.name === item.name);
     const combo = combos.find(c => c.name === item.name);
-    const itemPrice = product?.price || combo?.price || 0;
+    const itemPrice = item.price || product?.price || combo?.price || 0;
     total += itemPrice * (item.quantity || 1);
     cartItems.innerHTML += `
       <div class="cart-item">
