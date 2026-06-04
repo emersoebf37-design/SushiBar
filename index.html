@@ -1844,7 +1844,7 @@ const products = [
     ]
   },
   {
-    name: 'Yakisoba Carne',
+    name: 'Yakisoba de Carne',
     category: 'Porções',
     description: 'Macarrão oriental selado na chapa com carne bovina macia, legumes selecionados e molho artesanal.',
     image: 'Imagens/Yakisoba.jpg',
@@ -1857,7 +1857,7 @@ const products = [
   },
 
     {
-    name: 'Yakisoba Legumes',
+    name: 'Yakisoba de Legumes',
     category: 'Porções',
     description: 'Macarrão oriental selado na chapa com carne bovina macia, legumes selecionados e molho artesanal.',
     image: 'Imagens/Yakisoba.jpg',
@@ -2552,7 +2552,7 @@ async function finishOrder(){
   let baseTotal = cart.reduce((sum,item)=>{
     const product = products.find(p => p.name === item.name);
     const combo = combos.find(c => c.name === item.name);
-    const price = product?.price || combo?.price || 0;
+    const price = item.price || product?.price || combo?.price || 0;
     return sum + (price * (item.quantity || 1));
   },0);
 
@@ -2765,7 +2765,7 @@ function calculateTotal(){
   return cart.reduce((sum,item)=>{
     const product = products.find(p => p.name === item.name);
     const combo = combos.find(c => c.name === item.name);
-    const price = product?.price || combo?.price || 0;
+    const price = item.price || product?.price || combo?.price || 0;
     return sum + (price * (item.quantity || 1));
   },0);
 }
