@@ -82,3 +82,5 @@ firebase-adminsdk*.json
 
 # .gitignore
 Impressora/
+
+ecosystem.config.cjs
