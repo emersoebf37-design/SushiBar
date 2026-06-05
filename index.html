@@ -1902,12 +1902,58 @@ const categories = [
 { image:'Imagens/Saladas.png', name:'Saladas' },
 ];
 
+
+function getUserData(){
+  try {
+    return JSON.parse(localStorage.getItem('userData')) || null;
+  } catch(e) {
+    console.warn('localStorage indisponível:', e);
+    return null;
+  }
+}
+
+function saveUserDataLocal(data){
+  try {
+    localStorage.setItem('userData', JSON.stringify(data));
+    return true;
+  } catch(e) {
+    console.warn('localStorage indisponível:', e);
+    return false;
+  }
+}
+
+function getCartData(){
+  try {
+    return JSON.parse(localStorage.getItem('cart')) || [];
+  } catch(e) {
+    return [];
+  }
+}
+
+async function fetchComTimeout(url, options = {}, timeoutMs = 10000){
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return res;
+  } catch(e) {
+    clearTimeout(id);
+    throw e;
+  }
+}
+
 /* ========================= */
 /* STORAGE */
 /* ========================= */
 
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
-let orders = JSON.parse(localStorage.getItem('orders')) || [];
+let cart = getCartData() || [];
+let orders = [];
+try {
+  orders = JSON.parse(localStorage.getItem('orders')) || [];
+} catch(e) {
+  console.warn('Não foi possível ler os pedidos do localStorage:', e);
+}
 
 let siteConfig = {
   motoboy_on: false,
@@ -1923,7 +1969,7 @@ async function fetchConfig(force = false){
   const agora = Date.now();
   if(!force && agora - lastConfigFetch < CONFIG_CACHE_MS) return;
   try {
-    const res = await fetch('/api/config');
+    const res = await fetchComTimeout('/api/config');
     const data = await res.json();
     siteConfig = data;
     lastConfigFetch = agora;
@@ -1986,10 +2032,10 @@ let entregaAtual = {
 };
 
 async function calcularEntrega(){
-  // ✅ Sempre garante config atualizado antes de calcular
-  await fetchConfig(FontFaceSetLoadEvent);
+  // ✅ Agora sim garante o config atualizado de verdade antes de prosseguir
+  await fetchConfig();
 
-  const user = JSON.parse(localStorage.getItem('userData'));
+  const user = getUserData();
 
   if(!user || !user.address || !user.number){
     document.getElementById('entrega-info').innerHTML =
@@ -1999,15 +2045,14 @@ async function calcularEntrega(){
     return;
   }
 
-  // ✅ Inclui bairro e cidade para o Google Maps resolver melhor
   const enderecoCompleto = `${user.address}, ${user.number}, ${user.neighborhood || ''}, ${user.city || 'São João de Meriti / RJ'}, Brasil`;
 
   document.getElementById('entrega-info').innerHTML = '🚲 Calculando taxa de entrega...';
 
   try {
-    // ✅ motoboy_on vem do config recém-buscado
-    const motoboy = siteConfig.motoboy_on ? 'true' : 'false';
-    const res = await fetch(`/api/distance?address=${encodeURIComponent(enderecoCompleto)}&motoboy_on=${motoboy}`);
+    const motoboyOn = (siteConfig && siteConfig.motoboy_on) ? 'true' : 'false';
+    // ✅ Corrigido de ${motoboy} para ${motoboyOn}
+    const res = await fetch(`/api/distance?address=${encodeURIComponent(enderecoCompleto)}&motoboy_on=${motoboyOn}`);
     const data = await res.json();
 
     if(!res.ok || !data.entrega){
@@ -2285,7 +2330,11 @@ function removeCart(index){
 }
 
 function saveCart(){
-  localStorage.setItem('cart', JSON.stringify(cart));
+  try {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  } catch(e) {
+    console.warn('Não foi possível salvar o carrinho no localStorage:', e);
+  }
 }
 
 /* ========================= */
@@ -2488,7 +2537,7 @@ function saveUserData(){
     city: document.getElementById('user-city').value.trim(),
   };
 
-  localStorage.setItem('userData', JSON.stringify(user));
+  saveUserDataLocal(user);
   accShowToast('✅ Dados salvos com sucesso!');
   calcularEntrega();
 }
@@ -2498,7 +2547,7 @@ function saveUserData(){
 /* ========================= */
 
 function loadUser(){
-  const user = JSON.parse(localStorage.getItem('userData'));
+  const user = getUserData();
   if(!user) return;
 
   const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val || ''; };
@@ -2526,60 +2575,91 @@ let pendingOrder = null;
 /* ========================= */
 
 async function finishOrder(){
-  if(cart.length === 0){ alert('Carrinho vazio!'); return; }
+  try {
 
-  await fetchConfig();
-  if(!siteConfig.restaurante_aberto){ alert('O restaurante está fechado no momento. Tente mais tarde!'); return; }
+    if(cart.length === 0){ alert('Carrinho vazio!'); return; }
 
-  await calcularEntrega();
-  if(!entregaAtual.entrega){ alert(entregaAtual.motivo || 'Seu endereço está fora da área de entrega.'); return; }
+    await fetchConfig();
+    if(!siteConfig.restaurante_aberto){
+      alert('O restaurante está fechado no momento. Tente mais tarde!');
+      return;
+    }
 
-  const payment = document.getElementById('payment-method').value;
-  if(payment === ''){ alert('Escolha uma forma de pagamento!'); return; }
+    try {
+      await calcularEntrega();
+    } catch(e) {
+      console.warn('Erro ao calcular entrega:', e);
+    }
 
-  const user = JSON.parse(localStorage.getItem('userData'));
-  if(!user){ alert('Preencha os dados da conta!'); showPage('account-page'); return; }
-  if(!user.name || !user.phone || !user.address || !user.number || !user.complement){ alert('Complete todos os dados!'); showPage('account-page'); return; }
+    if(entregaAtual && entregaAtual.entrega === false){
+      alert(entregaAtual.motivo || 'Seu endereço está fora da área de entrega.');
+      return;
+    }
 
-  const addonsCopy = { ...addons };
+    const payment = document.getElementById('payment-method').value;
+    if(payment === ''){ alert('Escolha uma forma de pagamento!'); return; }
 
-  let baseTotal = cart.reduce((sum,item)=>{
-    const product = products.find(p => p.name === item.name);
-    const combo = combos.find(c => c.name === item.name);
-    const price = item.price || product?.price || combo?.price || 0;
-    return sum + (price * (item.quantity || 1));
-  },0);
+    const user = getUserData();
 
-  let total = baseTotal + (cart.length > 0 ? (entregaAtual.taxa || 0) : 0);
-  if(payment === 'Cartão') total *= 1.10;
+    if(!user || !user.name || !user.phone || !user.address || !user.number){
+      alert('Preencha seus dados de entrega antes de finalizar o pedido!');
+      const cartEl = document.querySelector('.cart-container');
+      if(cartEl && cartEl.classList.contains('active')){
+        cartEl.classList.remove('active');
+      }
+      showPage('account-page');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
 
-  pendingOrder = {
-    customer: user.name,
-    phone: user.phone,
-    address: user.address,
-    number: user.number,
-    complement: user.complement,
-    payment,
-    items: [...cart],
-    taxaEntrega: entregaAtual.taxa || 0,
-    distanciaKm: entregaAtual.distanciaKm || null,
-    total,
-    addons: addonsCopy,
-    status: "Recebido",
-    createdAt: Date.now()
-  };
+    const addonsCopy = { ...addons };
 
-  document.getElementById('modal-content').innerHTML = `
-    <p><strong>Cliente:</strong> ${user.name}</p>
-    <p><strong>Telefone:</strong> ${user.phone}</p>
-    <p><strong>Endereço:</strong><br>${user.address}, ${user.number}</p>
-    <p>${user.complement}</p>
-    <p><strong>Pagamento:</strong> ${payment}</p>
-    <div class="modal-total">R$${total.toFixed(2).replace('.', ',')}</div>
-  `;
+    let baseTotal = cart.reduce((sum, item) => {
+      const product = products.find(p => p.name === item.name);
+      const combo = combos.find(c => c.name === item.name);
+      const price = item.price || product?.price || combo?.price || 0;
+      return sum + (price * (item.quantity || 1));
+    }, 0);
 
-  document.getElementById('order-modal').style.display = 'flex';
-  requestAnimationFrame(() => { document.querySelector('.modal-box').scrollTop = 0; });
+    let total = baseTotal + (cart.length > 0 ? (entregaAtual.taxa || 0) : 0);
+    if(payment === 'Cartão') total *= 1.10;
+
+    pendingOrder = {
+      customer: user.name,
+      phone: user.phone,
+      address: user.address,
+      number: user.number,
+      complement: user.complement || '',
+      payment,
+      items: [...cart],
+      taxaEntrega: entregaAtual.taxa || 0,
+      distanciaKm: entregaAtual.distanciaKm || null,
+      total,
+      addons: addonsCopy,
+      status: 'Recebido',
+      createdAt: Date.now()
+    };
+
+    document.getElementById('modal-content').innerHTML = `
+      <p><strong>Cliente:</strong> ${user.name}</p>
+      <p><strong>Telefone:</strong> ${user.phone}</p>
+      <p><strong>Endereço:</strong><br>${user.address}, ${user.number}</p>
+      <p>${user.complement || ''}</p>
+      <p><strong>Pagamento:</strong> ${payment}</p>
+      <div class="modal-total">R$${total.toFixed(2).replace('.', ',')}</div>
+    `;
+
+    document.getElementById('order-modal').style.display = 'flex';
+
+    requestAnimationFrame(() => {
+      const box = document.querySelector('.modal-box');
+      if(box) box.scrollTop = 0;
+    });
+
+  } catch(e) {
+    console.error('Erro no finishOrder:', e);
+    alert('Ocorreu um erro ao processar seu pedido. Tente novamente.');
+  }
 }
 
 function closeOrderModal(){
@@ -2591,22 +2671,22 @@ async function confirmOrder(){
   document.getElementById('loading-overlay').classList.add('active');
   document.querySelector('.modal-confirm').disabled = true;
   try {
-    const response = await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(pendingOrder),
-    });
-    const data = await response.json();
-    if(!response.ok) throw new Error(data.error || 'Erro desconhecido');
-    cart = [];
-    saveCart();
-    renderCart();
-    resetAddonUI();
-    closeOrderModal();
-    alert(`Pedido #${data.orderId} realizado com sucesso! 🍣`);
-  } catch(error){
-    alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
-  } finally {
+        const response = await fetchComTimeout('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pendingOrder),
+        });
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.error || 'Erro desconhecido');
+        cart = [];
+        saveCart();
+        renderCart();
+        resetAddonUI();
+        closeOrderModal();
+        alert(`Pedido #${data.orderId} realizado com sucesso! 🍣`);
+      } catch(error){
+        alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
+      } finally {
     document.getElementById('loading-overlay').classList.remove('active');
     const btn = document.querySelector('.modal-confirm');
     if(btn) btn.disabled = false;
@@ -2633,7 +2713,7 @@ window.renderCart = renderCart;
 
 async function renderOrders(){
   const container = document.getElementById('order-history');
-  const user = JSON.parse(localStorage.getItem('userData'));
+  const user = getUserData();
 
   if(!user || !user.phone){
     container.innerHTML = '<p>Preencha seus dados na aba Conta para ver seus pedidos.</p>';
@@ -2728,17 +2808,20 @@ function toggleCart(){
   const cartEl = document.querySelector('.cart-container');
   if(!cartEl) return;
 
-  // Verifica se o carrinho está abrindo (não tem a classe active ainda)
   if(!cartEl.classList.contains('active')){
     cartEl.classList.add('active');
-    // Adiciona um estado temporário de "carrinho aberto" no histórico do celular
-    history.pushState({ isCart: true }, '', '');
+    try {
+      history.pushState({ isCart: true }, '', '');
+    } catch(e) {
+      console.warn('pushState não suportado:', e);
+    }
   } else {
-    // Se o cliente fechou clicando no próprio botão do site
     cartEl.classList.remove('active');
-    if(history.state?.isCart) {
-      carrinhoFechadoManualmente = true;
-      history.back(); // Remove o estado do carrinho para não bugar o botão voltar depois
+    carrinhoFechadoManualmente = true;
+    try {
+      if(history.state?.isCart) history.back();
+    } catch(e) {
+      console.warn('history.back não suportado:', e);
     }
   }
 }
@@ -2759,7 +2842,7 @@ function calculateTotal(){
   return cart.reduce((sum,item)=>{
     const product = products.find(p => p.name === item.name);
     const combo = combos.find(c => c.name === item.name);
-    const price = item.price || product?.price || combo?.price || 0;
+    const price = item.price || (product ? product.price : 0) || (combo ? combo.price : 0) || 0;
     return sum + (price * (item.quantity || 1));
   },0);
 }
@@ -2804,7 +2887,11 @@ function getCurrentPage(){
 const originalShowPage = showPage;
 window.showPage = function(id){
   originalShowPage(id);
-  history.pushState({ page: id }, '', '');
+  try {
+    history.pushState({ page: id }, '', '');
+  } catch(e) {
+    console.warn('pushState não suportado:', e);
+  }
 };
 
 // Estado inicial
@@ -2823,14 +2910,19 @@ window.addEventListener('popstate', (e) => {
   // 📱 SE O CARRINHO ESTIVER ABERTO: O botão voltar do celular apenas fecha ele
   if (cartEl && cartEl.classList.contains('active')) {
     cartEl.classList.remove('active');
-    return; // Para a execução aqui para não mudar de página nem sair do navegador
+    return; // Para aqui para não mudar de página indesejadamente
+  }
+
+  // Se o estado disparado for o do carrinho (vindo de outra página), apenas garante que ele suma
+  if (e.state && e.state.isCart) {
+    return;
   }
 
   const page = e.state?.page || 'home-page';
 
-  if(page === 'home-page' && getCurrentPage() === 'home-page'){
-    // Já está no menu principal — deixa sair do browser normalmente
-    history.back();
+  // ✅ CORREÇÃO SAFARI/MOBILE: Se já está na home e o histórico diz que o destino é a home,
+  // não force um history.back(). Apenas saia da função e deixe o navegador fechar/voltar naturalmente.
+  if (page === 'home-page' && getCurrentPage() === 'home-page') {
     return;
   }
 
