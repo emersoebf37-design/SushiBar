@@ -2839,18 +2839,26 @@ let addons = {
 };
 
 function calculateTotal(){
-  return cart.reduce((sum,item)=>{
+  const payment = document.getElementById('payment-method')?.value;
+
+  let total = cart.reduce((sum, item) => {
     const product = products.find(p => p.name === item.name);
     const combo = combos.find(c => c.name === item.name);
     const price = item.price || (product ? product.price : 0) || (combo ? combo.price : 0) || 0;
     return sum + (price * (item.quantity || 1));
-  },0);
+  }, 0);
+
+  total += cart.length > 0 ? (entregaAtual.taxa || 0) : 0;
+
+  if(payment === 'Cartão') total *= 1.10;
+
+  return total;
 }
 
 function updateModalTotal(){
   const total = calculateTotal();
   const el = document.querySelector('.modal-total');
-  if(el) el.innerText = `R$${total.toFixed(2)}`;
+  if(el) el.innerText = `R$${total.toFixed(2).replace('.', ',')}`;
 }
 
 function changeAddon(type, value){
