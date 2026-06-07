@@ -2668,25 +2668,42 @@ function closeOrderModal(){
 
 async function confirmOrder(){
   if(!pendingOrder) return;
+
+  // Atualiza addons com o estado atual antes de enviar
+  pendingOrder.addons = { ...addons };
+
+  // Recalcula total com addons atuais
+  const payment = document.getElementById('payment-method')?.value;
+  let total = cart.reduce((sum, item) => {
+    const product = products.find(p => p.name === item.name);
+    const combo = combos.find(c => c.name === item.name);
+    const price = item.price || (product ? product.price : 0) || (combo ? combo.price : 0) || 0;
+    return sum + (price * (item.quantity || 1));
+  }, 0);
+  total += cart.length > 0 ? (entregaAtual.taxa || 0) : 0;
+  if(payment === 'Cartão') total *= 1.10;
+  pendingOrder.total = Number(total.toFixed(2));
+
   document.getElementById('loading-overlay').classList.add('active');
   document.querySelector('.modal-confirm').disabled = true;
+
   try {
-        const response = await fetchComTimeout('/api/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pendingOrder),
-        });
-        const data = await response.json();
-        if(!response.ok) throw new Error(data.error || 'Erro desconhecido');
-        cart = [];
-        saveCart();
-        renderCart();
-        resetAddonUI();
-        closeOrderModal();
-        alert(`Pedido #${data.orderId} realizado com sucesso! 🍣`);
-      } catch(error){
-        alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
-      } finally {
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pendingOrder),
+    });
+    const data = await response.json();
+    if(!response.ok) throw new Error(data.error || 'Erro desconhecido');
+    cart = [];
+    saveCart();
+    renderCart();
+    resetAddonUI();
+    closeOrderModal();
+    alert(`Pedido #${data.orderId} realizado com sucesso! 🍣`);
+  } catch(error){
+    alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
+  } finally {
     document.getElementById('loading-overlay').classList.remove('active');
     const btn = document.querySelector('.modal-confirm');
     if(btn) btn.disabled = false;

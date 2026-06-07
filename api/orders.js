@@ -220,10 +220,9 @@ export default async function handler(req, res) {
 
       // Adicionais e Taxas
       const addons = order.addons || {};
-      const tare  = 0
       const hashi = Math.max(0, parseInt(addons.hashi || 0));
 
-      if (tare > 20 || hashi > 20) {
+      if (hashi > 20) {
         return res.status(400).json({ error: "Quantidade de adicionais inválida." });
       }
 
@@ -250,7 +249,7 @@ export default async function handler(req, res) {
         number:      order.number,
         complement:  order.complement,
         payment:     order.payment,
-        addons:      { tare, hashi },
+        addons:      { hashi },
         items:       validatedItems,
         taxaEntrega,
         distanciaKm,
