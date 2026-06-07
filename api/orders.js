@@ -52,15 +52,15 @@ function getPrivateKey() {
 // PRODUTOS (ATUALIZADO COM OS NOVOS TAMANHOS)
 // ========================
 const PRODUCTS = {
-  "Hot Roll Philadelphia Salmão (6 unidades)": 12,
+"Hot Roll Philadelphia Salmão (8 unidades)": 16,
   "Temaki Frito": 23.99,
   "Temaki": 19.99,
-  "Hossomaki Philadelphia Salmão (6 unidades)": 10.50,
+  "Hossomaki Philadelphia Salmão (8 unidades)": 14,
   "Shimeji na Manteiga": 14.90,
-  "Hot Roll Skin (6 unidades)": 5.99,
-  "Hossomaki Skin (6 unidades)": 4.99,
-  "Hot Roll Kani (6 unidades)": 7.99,
-  "Hossomaki Kani (6 unidades)": 5.99,
+  "Hot Roll Skin (8 unidades)": 7.99,
+  "Hossomaki Skin (8 unidades)": 6.65,
+  "Hot Roll Kani (8 unidades)": 10.65,
+  "Hossomaki Kani (8 unidades)": 7.99,
   "Lula à Dorê (6 unidades)": 25.90,
   "Harumaki de Legumes (3 unidades)": 12.99,
   "Harumaki de Salmão (3 unidades)": 19,
