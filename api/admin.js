@@ -1,6 +1,9 @@
-const { initializeApp, getApps, cert } = require("firebase-admin/app");
-const { getFirestore } = require("firebase-admin/firestore");
+import { initializeApp, getApps, cert } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 
+// ========================
+// FIREBASE CONFIG
+// ========================
 function getPrivateKey() {
   const key = process.env.FIREBASE_PRIVATE_KEY;
   if (!key) throw new Error("FIREBASE_PRIVATE_KEY não definida");
@@ -16,6 +19,9 @@ function getPrivateKey() {
   return `-----BEGIN PRIVATE KEY-----\n${lines}\n-----END PRIVATE KEY-----\n`;
 }
 
+// ========================
+// API HANDLER (ESM)
+// ========================
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
@@ -23,7 +29,6 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  // Firebase inicializado DENTRO do handler
   let db;
   try {
     if (!getApps().length) {
@@ -41,10 +46,11 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Erro ao conectar ao banco de dados." });
   }
 
-  // ========================
-  // POST /api/admin?action=login
-  // ========================
-  if (req.method === "POST" && req.query.action === "login") {
+  // ✅ CORREÇÃO: Extração do escopo global da requisição para todas as condicionais usarem com segurança
+  const action = req.query.action;
+
+  // ─── POST: LOGIN ───
+  if (req.method === "POST" && action === "login") {
     const { password } = req.body;
     if (password === process.env.ADMIN_PASSWORD) {
       return res.status(200).json({ success: true, token: process.env.ADMIN_PASSWORD });
@@ -52,36 +58,58 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Senha incorreta." });
   }
 
-  // Verifica token em todas as outras rotas
+  // Porteiro de autenticação das demais rotas do painel
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (token !== process.env.ADMIN_PASSWORD) {
     return res.status(401).json({ error: "Não autorizado." });
   }
 
-  // ========================
-  // GET /api/admin
-  // ========================
-  if (req.method === "GET") {
+  // ─── GET: CLIENTES VIP ───
+  if (req.method === "GET" && action === "vip_clientes") {
     try {
-      const configRef = db.collection("config").doc("settings");
-      const configSnap = await configRef.get();
+      const agora = Date.now();
+      const snap = await db.collection("customers").where("isVip", "==", true).get();
+      const clientes = [];
+
+      snap.forEach(doc => {
+        const d = doc.data();
+        if (d.isVip && agora <= (d.vipExpires || 0)) {
+          clientes.push({
+            phone:           d.phone,
+            pedidosRecentes: (d.pedidosRecentes || []).length,
+            vipSince:        d.vipSince,
+            vipExpires:      d.vipExpires,
+          });
+        }
+      });
+
+      return res.status(200).json({ clientes });
+    } catch (error) {
+      console.error("Erro ao buscar VIPs:", error);
+      return res.status(500).json({ error: "Erro ao buscar clientes VIP." });
+    }
+  }
+
+  // ─── GET: DASHBOARD PRINCIPAL ───
+  if (req.method === "GET" && !action) {
+    try {
+      const configSnap = await db.collection("config").doc("settings").get();
       const config = configSnap.exists ? configSnap.data() : {
         motoboy_on: false,
         restaurante_aberto: true,
         produtos_esgotados: [],
         combos_esgotados: [],
-        motoboys: [], // 👈 Adicionado fallback aqui
+        motoboys: [],
+        promocoes: {},
+        vip_config: {},
+        vip_beneficios: {},
       };
 
       const hoje = new Date();
       hoje.setHours(0, 0, 0, 0);
       const hojeTimestamp = hoje.getTime();
 
-      const ordersSnap = await db
-        .collection("orders")
-        .orderBy("createdAt", "desc")
-        .get();
-
+      const ordersSnap = await db.collection("orders").orderBy("createdAt", "desc").get();
       const pedidosHoje = [];
       let totalDia = 0;
 
@@ -93,40 +121,40 @@ export default async function handler(req, res) {
         }
       });
 
-      const ticketMedio = pedidosHoje.length > 0
-        ? totalDia / pedidosHoje.length
-        : 0;
+      const ticketMedio = pedidosHoje.length > 0 ? totalDia / pedidosHoje.length : 0;
 
-      return res.status(200).json({
-        config,
-        pedidosHoje,
-        totalDia,
-        ticketMedio,
-        totalPedidos: pedidosHoje.length,
+      return res.status(200).json({ 
+        config, 
+        pedidosHoje, 
+        totalDia, 
+        ticketMedio, 
+        totalPedidos: pedidosHoje.length 
       });
-
     } catch (error) {
       console.error("Erro no admin GET:", error);
       return res.status(500).json({ error: "Erro ao buscar dados." });
     }
   }
 
-  // ========================
-  // POST /api/admin?action=update
-  // ========================
-  if (req.method === "POST" && req.query.action === "update") {
+  // ─── POST: SALVAR ATUALIZAÇÕES CONFIG ───
+  if (req.method === "POST" && action === "update") {
     try {
-      // 1. Desestruturando "motoboys" que vem lá do admin.html
-      const { motoboy_on, restaurante_aberto, produtos_esgotados, combos_esgotados, motoboys } = req.body;
+      const {
+        motoboy_on, restaurante_aberto,
+        produtos_esgotados, combos_esgotados,
+        motoboys, promocoes, vip_config, vip_beneficios,
+      } = req.body;
 
-      // 2. Gravando no Firestore incluindo a lista de motoboys
       await db.collection("config").doc("settings").set({
-        motoboy_on: motoboy_on ?? false,
+        motoboy_on:         motoboy_on         ?? false,
         restaurante_aberto: restaurante_aberto ?? true,
         produtos_esgotados: produtos_esgotados ?? [],
-        combos_esgotados: combos_esgotados ?? [],
-        motoboys: motoboys ?? [],
-        updatedAt: Date.now(),
+        combos_esgotados:   combos_esgotados   ?? [],
+        motoboys:           motoboys           ?? [],
+        promocoes:          promocoes          ?? {},
+        vip_config:         vip_config         ?? {},
+        vip_beneficios:     vip_beneficios     ?? {},
+        updatedAt:          Date.now(),
       });
 
       return res.status(200).json({ success: true });

@@ -2354,19 +2354,32 @@ function decreaseCart(index) {
 
 window.increaseCart = increaseCart;
 window.decreaseCart = decreaseCart;
-
 function renderCart(){
   const cartItems = document.getElementById('cart-items');
   cartItems.innerHTML='';
-  let total = 0;
   const payment = document.getElementById('payment-method')?.value;
-  if(cart.length > 0) total += entregaAtual.taxa || 2;
 
+  // Subtotal dos itens (sem frete)
+  let subtotal = cart.reduce((sum, item) => {
+    const product = products.find(p => p.name === item.name);
+    const combo   = combos.find(c => c.name === item.name);
+    const price   = item.price || product?.price || combo?.price || 0;
+    return sum + (price * (item.quantity || 1));
+  }, 0);
+
+  // Calcular promoções
+  const { freteGratis, lulaGratis, temakiGratis, promosList } = calcularPromocoes(cart, subtotal, clienteIsVip);
+
+  // Taxa de entrega
+  let taxaFinal = freteGratis ? 0 : (entregaAtual.taxa || 2);
+  let total = subtotal + (cart.length > 0 ? taxaFinal : 0);
+  if(payment === 'Cartão') total *= 1.10;
+
+  // Renderiza itens
   cart.forEach((item,index)=>{
     const product = products.find(p => p.name === item.name);
-    const combo = combos.find(c => c.name === item.name);
+    const combo   = combos.find(c => c.name === item.name);
     const itemPrice = item.price || product?.price || combo?.price || 0;
-    total += itemPrice * (item.quantity || 1);
     cartItems.innerHTML += `
       <div class="cart-item">
         <div style="flex:1;">
@@ -2379,18 +2392,62 @@ function renderCart(){
           <button onclick="increaseCart(${index})" style="width:28px;height:28px;border:none;border-radius:50%;background:#9e0505;color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
           <button class="trash-btn" onclick="removeCart(${index})">🗑️</button>
         </div>
-      </div>
-    `;
+      </div>`;
   });
 
-  if(payment === 'Cartão') total *= 1.10;
+  // Itens grátis (visuais, não entram no total)
+  if (lulaGratis && cart.length > 0) {
+    cartItems.innerHTML += `
+      <div class="cart-item" style="background:#f0fff4;border:1px solid #2ecc71;">
+        <div style="flex:1;"><strong>🦑 Lula à Dorê (6 unidades)</strong><p style="color:#27ae60;">GRÁTIS 🎁</p></div>
+      </div>`;
+  }
+  if (temakiGratis && cart.length > 0) {
+    cartItems.innerHTML += `
+      <div class="cart-item" style="background:#f0fff4;border:1px solid #2ecc71;">
+        <div style="flex:1;"><strong>🍣 Temaki Frito</strong><p style="color:#27ae60;">GRÁTIS 🎁</p></div>
+      </div>`;
+  }
+
+  // Banner de promoções ativas
+  let promoBanner = document.getElementById('promo-banner-cart');
+  if (!promoBanner) {
+    promoBanner = document.createElement('div');
+    promoBanner.id = 'promo-banner-cart';
+    promoBanner.style.cssText = 'margin-bottom:10px;padding:10px 14px;background:#f0fff4;border-left:4px solid #2ecc71;border-radius:8px;font-size:13px;color:#27ae60;font-weight:bold;';
+    cartItems.parentNode.insertBefore(promoBanner, cartItems);
+  }
+  if (promosList.length > 0) {
+    promoBanner.style.display = 'block';
+    promoBanner.innerHTML = promosList.join(' &nbsp;·&nbsp; ');
+  } else {
+    promoBanner.style.display = 'none';
+  }
+
+  // VIP badge no carrinho
+  let vipCartBadge = document.getElementById('vip-cart-badge');
+  if (!vipCartBadge) {
+    vipCartBadge = document.createElement('div');
+    vipCartBadge.id = 'vip-cart-badge';
+    const cartTitle = document.querySelector('.cart-container h2');
+    if (cartTitle) cartTitle.insertAdjacentElement('afterend', vipCartBadge);
+  }
+  vipCartBadge.innerHTML = clienteIsVip
+    ? `<div style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#f6b900,#ff7800);color:white;font-size:11px;font-weight:bold;padding:3px 10px;border-radius:999px;margin-bottom:10px;">⭐ Você é VIP — benefícios aplicados!</div>`
+    : '';
 
   document.getElementById('cart-total').innerText = `R$${total.toFixed(2).replace('.', ',')}`;
 
   const detalhe = document.getElementById('entrega-detalhe');
-  if(detalhe && cart.length > 0 && entregaAtual.distanciaKm){
-    detalhe.innerText = `Taxa de entrega: R$${(entregaAtual.taxa || 2).toFixed(2).replace('.', ',')}`;
-  } else if(detalhe){ detalhe.innerText = ''; }
+  if (detalhe && cart.length > 0) {
+    if (freteGratis) {
+      detalhe.innerHTML = `<span style="color:#27ae60;font-weight:bold;">🚚 Entrega GRÁTIS!</span>`;
+    } else if (entregaAtual.distanciaKm) {
+      detalhe.innerText = `Taxa de entrega: R$${taxaFinal.toFixed(2).replace('.', ',')}`;
+    } else {
+      detalhe.innerText = '';
+    }
+  } else if (detalhe) { detalhe.innerText = ''; }
 
   const totalItens = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
   document.getElementById('mobile-cart-count').innerText = totalItens;
@@ -2542,6 +2599,90 @@ function saveUserData(){
   calcularEntrega();
 }
 
+// ========================
+// VIP — CONSULTA E BADGE
+// ========================
+
+let clienteIsVip = false;
+
+async function consultarVipCliente(phone) {
+  if (!phone) return;
+  try {
+    const numeroPuro = phone.replace(/\D/g, '');
+    const res = await fetch(`/api/vip?phone=${numeroPuro}`);
+    const data = await res.json();
+    clienteIsVip = data.isVip || false;
+    renderVipBadge(data);
+    renderCart(); // re-renderiza carrinho com benefícios VIP
+  } catch(e) {
+    clienteIsVip = false;
+  }
+}
+
+function renderVipBadge(data) {
+  let el = document.getElementById('vip-badge-acc');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'vip-badge-acc';
+    const banner = document.querySelector('.acc-banner-text');
+    if (banner) banner.appendChild(el);
+  }
+
+  if (data.isVip) {
+    const expira = data.vipExpires
+      ? new Date(data.vipExpires).toLocaleDateString('pt-BR')
+      : '—';
+    el.innerHTML = `
+      <div style="
+        display:inline-flex;align-items:center;gap:6px;
+        background:linear-gradient(135deg,#f6b900,#ff7800);
+        color:white;font-size:12px;font-weight:bold;
+        padding:4px 12px;border-radius:999px;margin-top:8px;
+        letter-spacing:.05em;
+      ">⭐ CLIENTE VIP · <span style="font-weight:normal;opacity:.85;">expira ${expira}</span></div>`;
+  } else {
+    const faltam = data.totalPedidos !== undefined ? Math.max(0, (siteConfig?.vip_config?.pedidos_para_vip || 5) - data.totalPedidos) : null;
+    el.innerHTML = faltam !== null && faltam > 0
+      ? `<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:6px;">Faltam ${faltam} pedido${faltam > 1 ? 's' : ''} para você virar VIP ⭐</div>`
+      : '';
+  }
+}
+
+// ========================
+// PROMOÇÕES — APLICAR NO CARRINHO
+// ========================
+
+function calcularPromocoes(cartItems, subtotal, isVip) {
+  const promos = siteConfig?.promocoes || {};
+  const vipBen = siteConfig?.vip_beneficios || {};
+  const promosList = [];
+
+  // Frete grátis global
+  let freteGratis = promos.frete_gratis || false;
+
+  // Frete grátis VIP
+  if (isVip && vipBen.frete_gratis) freteGratis = true;
+
+  // Lula grátis (global)
+  const lulaGratis = promos.lula_gratis || false;
+
+  // Temaki Frito grátis — acima de R$75 (subtotal sem frete)
+  let temakiGratis = false;
+  if (promos.temaki_gratis && subtotal >= 75) {
+    temakiGratis = true;
+  }
+  // Temaki Frito grátis VIP — acima de R$50
+  if (isVip && vipBen.temaki_gratis && subtotal >= 50) {
+    temakiGratis = true;
+  }
+
+  if (freteGratis) promosList.push('🚚 Entrega grátis');
+  if (lulaGratis)  promosList.push('🦑 Lula à Dorê grátis');
+  if (temakiGratis) promosList.push('🍣 Temaki Frito grátis');
+
+  return { freteGratis, lulaGratis, temakiGratis, promosList };
+}
+
 /* ========================= */
 /* LOAD USER */
 /* ========================= */
@@ -2564,6 +2705,9 @@ function loadUser(){
   accUpdateAvatar();
   if(user.address) document.getElementById('acc-cep-ok').classList.add('active');
   calcularEntrega();
+
+  // Consulta status VIP do cliente
+  if(user.phone) consultarVipCliente(user.phone);
 }
 
 loadUser();
@@ -2600,13 +2744,10 @@ async function finishOrder(){
     if(payment === ''){ alert('Escolha uma forma de pagamento!'); return; }
 
     const user = getUserData();
-
     if(!user || !user.name || !user.phone || !user.address || !user.number){
       alert('Preencha seus dados de entrega antes de finalizar o pedido!');
       const cartEl = document.querySelector('.cart-container');
-      if(cartEl && cartEl.classList.contains('active')){
-        cartEl.classList.remove('active');
-      }
+      if(cartEl && cartEl.classList.contains('active')) cartEl.classList.remove('active');
       showPage('account-page');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
@@ -2614,31 +2755,48 @@ async function finishOrder(){
 
     const addonsCopy = { ...addons };
 
+    // Subtotal dos itens (sem frete)
     let baseTotal = cart.reduce((sum, item) => {
       const product = products.find(p => p.name === item.name);
-      const combo = combos.find(c => c.name === item.name);
-      const price = item.price || product?.price || combo?.price || 0;
+      const combo   = combos.find(c => c.name === item.name);
+      const price   = item.price || product?.price || combo?.price || 0;
       return sum + (price * (item.quantity || 1));
     }, 0);
 
-    let total = baseTotal + (cart.length > 0 ? (entregaAtual.taxa || 0) : 0);
+    // Calcular promoções
+    const { freteGratis, lulaGratis, temakiGratis, promosList } = calcularPromocoes(cart, baseTotal, clienteIsVip);
+    const taxaFinal = freteGratis ? 0 : (entregaAtual.taxa || 0);
+
+    // Itens grátis adicionados ao pedido
+    const itensComPromos = [...cart];
+    if (lulaGratis)   itensComPromos.push({ name: 'Lula à Dorê (6 unidades)', quantity: 1, unitPrice: 0, gratis: true });
+    if (temakiGratis) itensComPromos.push({ name: 'Temaki Frito',             quantity: 1, unitPrice: 0, gratis: true });
+
+    let total = baseTotal + (cart.length > 0 ? taxaFinal : 0);
     if(payment === 'Cartão') total *= 1.10;
 
     pendingOrder = {
-      customer: user.name,
-      phone: user.phone,
-      address: user.address,
-      number: user.number,
-      complement: user.complement || '',
+      customer:    user.name,
+      phone:       user.phone,
+      address:     user.address,
+      number:      user.number,
+      complement:  user.complement || '',
       payment,
-      items: [...cart],
-      taxaEntrega: entregaAtual.taxa || 0,
+      items:       itensComPromos,
+      taxaEntrega: taxaFinal,
       distanciaKm: entregaAtual.distanciaKm || null,
       total,
-      addons: addonsCopy,
-      status: 'Recebido',
-      createdAt: Date.now()
+      addons:      addonsCopy,
+      isVip:       clienteIsVip,
+      promos_aplicadas: promosList,
+      status:      'Recebido',
+      createdAt:   Date.now()
     };
+
+    // Monta resumo no modal
+    const promosHtml = promosList.length > 0
+      ? `<p style="color:#27ae60;font-weight:bold;font-size:13px;">🎁 ${promosList.join(' · ')}</p>`
+      : '';
 
     document.getElementById('modal-content').innerHTML = `
       <p><strong>Cliente:</strong> ${user.name}</p>
@@ -2646,6 +2804,8 @@ async function finishOrder(){
       <p><strong>Endereço:</strong><br>${user.address}, ${user.number}</p>
       <p>${user.complement || ''}</p>
       <p><strong>Pagamento:</strong> ${payment}</p>
+      ${clienteIsVip ? '<p style="color:#f6b900;font-weight:bold;">⭐ Pedido VIP</p>' : ''}
+      ${promosHtml}
       <div class="modal-total">R$${total.toFixed(2).replace('.', ',')}</div>
     `;
 

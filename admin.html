@@ -6,357 +6,155 @@
 <title>Kaizora Admin</title>
 <style>
 *{ margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
-
 body{ background:#1a0000; color:white; min-height:100vh; }
 
-/* ========================= */
-/* LOGIN */
-/* ========================= */
-
-.login-screen{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-  padding:20px;
-}
-
-.login-box{
-  background:#2a0101;
-  border-radius:24px;
-  padding:40px;
-  width:100%;
-  max-width:400px;
-  text-align:center;
-}
-
-.login-box h1{
-  font-size:32px;
-  margin-bottom:8px;
-}
-
-.login-box p{
-  color:rgba(255,255,255,0.6);
-  margin-bottom:30px;
-}
-
-.login-box input{
-  width:100%;
-  padding:16px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.1);
-  background:rgba(255,255,255,0.05);
-  color:white;
-  font-size:16px;
-  margin-bottom:15px;
-  text-align:center;
-}
-
+.login-screen{ display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
+.login-box{ background:#2a0101; border-radius:24px; padding:40px; width:100%; max-width:400px; text-align:center; }
+.login-box h1{ font-size:32px; margin-bottom:8px; }
+.login-box p{ color:rgba(255,255,255,0.6); margin-bottom:30px; }
+.login-box input{ width:100%; padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:white; font-size:16px; margin-bottom:15px; text-align:center; }
 .login-box input::placeholder{ color:rgba(255,255,255,0.3); }
-
-.login-btn{
-  width:100%;
-  padding:16px;
-  border:none;
-  border-radius:12px;
-  background:#9e0505;
-  color:white;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.2s;
-}
-
+.login-btn{ width:100%; padding:16px; border:none; border-radius:12px; background:#9e0505; color:white; font-size:16px; font-weight:bold; cursor:pointer; transition:0.2s; }
 .login-btn:hover{ background:#c20707; }
+.login-error{ color:#ff6b6b; margin-top:12px; font-size:14px; display:none; }
 
-.login-error{
-  color:#ff6b6b;
-  margin-top:12px;
-  font-size:14px;
-  display:none;
-}
-
-/* ========================= */
-/* ADMIN PANEL */
-/* ========================= */
-
-.admin-panel{
-  display:none;
-  padding:30px;
-  max-width:900px;
-  margin:0 auto;
-}
-
-.admin-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:30px;
-}
-
+.admin-panel{ display:none; padding:30px; max-width:900px; margin:0 auto; }
+.admin-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; }
 .admin-header h1{ font-size:28px; }
+.logout-btn{ background:rgba(255,255,255,0.1); border:none; color:white; padding:10px 20px; border-radius:10px; cursor:pointer; font-size:14px; }
 
-.logout-btn{
-  background:rgba(255,255,255,0.1);
-  border:none;
-  color:white;
-  padding:10px 20px;
-  border-radius:10px;
-  cursor:pointer;
-  font-size:14px;
-}
+.cards-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:25px; }
+@media(max-width:600px){ .cards-grid{ grid-template-columns:1fr; } .admin-panel{ padding:15px; } }
 
-/* ========================= */
-/* CARDS */
-/* ========================= */
+.stat-card{ background:#2a0101; border-radius:18px; padding:25px; text-align:center; }
+.stat-card .stat-value{ font-size:36px; font-weight:bold; color:#ff6b6b; margin-bottom:8px; }
+.stat-card .stat-label{ color:rgba(255,255,255,0.6); font-size:14px; }
 
-.cards-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:20px;
-  margin-bottom:25px;
-}
+.section{ background:#2a0101; border-radius:18px; padding:25px; margin-bottom:20px; }
+.section h2{ font-size:20px; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); }
 
-@media(max-width:600px){
-  .cards-grid{ grid-template-columns:1fr; }
-  .admin-panel{ padding:15px; }
-}
+.section-input{ padding:12px; border-radius:8px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); font-size:14px; }
+.section-input::placeholder{ color:rgba(255,255,255,0.3); }
 
-.stat-card{
-  background:#2a0101;
-  border-radius:18px;
-  padding:25px;
-  text-align:center;
-}
+.add-btn{ padding:12px 20px; background:#2ecc71; border:none; color:white; border-radius:8px; font-weight:bold; cursor:pointer; transition:0.2s; }
+.add-btn:hover{ background:#27ae60; }
 
-.stat-card .stat-value{
-  font-size:36px;
-  font-weight:bold;
-  color:#ff6b6b;
-  margin-bottom:8px;
-}
-
-.stat-card .stat-label{
-  color:rgba(255,255,255,0.6);
-  font-size:14px;
-}
-
-/* ========================= */
-/* SECTION */
-/* ========================= */
-
-.section{
-  background:#2a0101;
-  border-radius:18px;
-  padding:25px;
-  margin-bottom:20px;
-}
-
-.section h2{
-  font-size:20px;
-  margin-bottom:20px;
-  padding-bottom:12px;
-  border-bottom:1px solid rgba(255,255,255,0.1);
-}
-
-/* INPUTS DE SEÇÃO */
-.section-input {
-  padding: 12px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.05);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.1);
-  font-size: 14px;
-}
-.section-input::placeholder { color: rgba(255,255,255,0.3); }
-
-.add-btn {
-  padding: 12px 20px;
-  background: #2ecc71;
-  border: none;
-  color: white;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.add-btn:hover { background: #27ae60; }
-
-/* ========================= */
-/* TOGGLE */
-/* ========================= */
-
-.toggle-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:14px 0;
-  border-bottom:1px solid rgba(255,255,255,0.07);
-}
-
+.toggle-row{ display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.07); }
 .toggle-row:last-child{ border-bottom:none; }
-
-.toggle-label{
-  font-size:16px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.toggle-label small{
-  color:rgba(255,255,255,0.5);
-  font-size:12px;
-  display:block;
-  margin-top:2px;
-}
-
-.toggle{
-  position:relative;
-  width:52px;
-  height:28px;
-  flex-shrink:0;
-}
-
+.toggle-label{ font-size:16px; display:flex; align-items:center; gap:10px; }
+.toggle-label small{ color:rgba(255,255,255,0.5); font-size:12px; display:block; margin-top:2px; }
+.toggle{ position:relative; width:52px; height:28px; flex-shrink:0; }
 .toggle input{ opacity:0; width:0; height:0; }
-
-.toggle-slider{
-  position:absolute;
-  cursor:pointer;
-  top:0; left:0; right:0; bottom:0;
-  background:#555;
-  border-radius:28px;
-  transition:0.3s;
-}
-
-.toggle-slider:before{
-  content:'';
-  position:absolute;
-  width:20px;
-  height:20px;
-  left:4px;
-  bottom:4px;
-  background:white;
-  border-radius:50%;
-  transition:0.3s;
-}
-
+.toggle-slider{ position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#555; border-radius:28px; transition:0.3s; }
+.toggle-slider:before{ content:''; position:absolute; width:20px; height:20px; left:4px; bottom:4px; background:white; border-radius:50%; transition:0.3s; }
 .toggle input:checked + .toggle-slider{ background:#2ecc71; }
 .toggle input:checked + .toggle-slider:before{ transform:translateX(24px); }
-
 .toggle input.danger:checked + .toggle-slider{ background:#9e0505; }
 
-/* ========================= */
-/* PRODUTOS */
-/* ========================= */
-
-.produto-item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px 0;
-  border-bottom:1px solid rgba(255,255,255,0.07);
-}
-
+.produto-item{ display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.07); }
 .produto-item:last-child{ border-bottom:none; }
+.produto-nome{ font-size:15px; flex:1; padding-right:15px; }
+.produto-nome small{ color:rgba(255,255,255,0.5); font-size:12px; display:block; }
 
-.produto-nome{
-  font-size:15px;
-  flex:1;
-  padding-right:15px;
-}
-
-.produto-nome small{
-  color:rgba(255,255,255,0.5);
-  font-size:12px;
-  display:block;
-}
-
-/* ========================= */
-/* PEDIDOS */
-/* ========================= */
-
-.pedido-card{
-  background:rgba(255,255,255,0.05);
-  border-radius:12px;
-  padding:15px;
-  margin-bottom:12px;
-}
-
+.pedido-card{ background:rgba(255,255,255,0.05); border-radius:12px; padding:15px; margin-bottom:12px; }
 .pedido-card:last-child{ margin-bottom:0; }
-
-.pedido-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:8px;
-}
-
+.pedido-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .pedido-numero{ font-weight:bold; font-size:16px; }
+.pedido-total{ font-weight:bold; color:#ff6b6b; font-size:16px; }
+.pedido-info{ color:rgba(255,255,255,0.7); font-size:13px; line-height:1.6; }
 
-.pedido-total{
-  font-weight:bold;
-  color:#ff6b6b;
-  font-size:16px;
-}
-
-.pedido-info{
-  color:rgba(255,255,255,0.7);
-  font-size:13px;
-  line-height:1.6;
-}
-
-.status-badge{
-  display:inline-block;
-  padding:3px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:bold;
-  margin-top:6px;
-}
-
+.status-badge{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:bold; margin-top:6px; }
 .status-Recebido{ background:#3498db22; color:#3498db; border:1px solid #3498db; }
 .status-Preparando{ background:#f1c40f22; color:#f1c40f; border:1px solid #f1c40f; }
 .status-Saiu{ background:#e67e2222; color:#e67e22; border:1px solid #e67e22; }
 .status-Entregue{ background:#2ecc7122; color:#2ecc71; border:1px solid #2ecc71; }
 
-/* ========================= */
-/* SAVE BTN */
-/* ========================= */
-
-.save-btn{
-  width:100%;
-  padding:16px;
-  border:none;
-  border-radius:12px;
-  background:#9e0505;
-  color:white;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.2s;
-  margin-top:10px;
-}
-
+.save-btn{ width:100%; padding:16px; border:none; border-radius:12px; background:#9e0505; color:white; font-size:16px; font-weight:bold; cursor:pointer; transition:0.2s; margin-top:10px; }
 .save-btn:hover{ background:#c20707; }
 .save-btn:disabled{ background:#555; cursor:not-allowed; }
 
-.save-feedback{
-  text-align:center;
-  margin-top:10px;
-  font-size:14px;
-  color:#2ecc71;
-  display:none;
+.loading{ text-align:center; padding:40px; color:rgba(255,255,255,0.5); }
+
+/* ========================= */
+/* VIP */
+/* ========================= */
+
+.vip-config-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:20px;
 }
+@media(max-width:600px){ .vip-config-grid{ grid-template-columns:1fr; } }
 
-/* ========================= */
-/* LOADING */
-/* ========================= */
-
-.loading{
-  text-align:center;
-  padding:40px;
+.vip-config-item{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.vip-config-item label{
+  font-size:12px;
   color:rgba(255,255,255,0.5);
 }
+.vip-config-item input{
+  padding:10px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.05);
+  color:white;
+  border:1px solid rgba(255,255,255,0.1);
+  font-size:16px;
+  font-weight:bold;
+  width:100%;
+  text-align:center;
+}
+
+.vip-badge{
+  display:inline-block;
+  background:linear-gradient(135deg,#f6b900,#ff7800);
+  color:white;
+  font-size:11px;
+  font-weight:bold;
+  padding:3px 10px;
+  border-radius:999px;
+  margin-left:8px;
+  letter-spacing:.05em;
+}
+
+.vip-cliente-card{
+  background:rgba(246,185,0,0.08);
+  border:1px solid rgba(246,185,0,0.2);
+  border-radius:12px;
+  padding:14px 16px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.vip-cliente-info{ font-size:14px; line-height:1.7; }
+.vip-cliente-info strong{ font-size:15px; }
+
+.vip-expira{
+  font-size:12px;
+  color:rgba(255,255,255,0.45);
+}
+
+/* Promoções */
+.promo-row{
+  padding:16px 0;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.promo-row:last-child{ border-bottom:none; }
+.promo-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:4px;
+}
+.promo-title{ font-size:15px; font-weight:bold; }
+.promo-desc{ font-size:13px; color:rgba(255,255,255,0.5); }
 </style>
 </head>
 <body>
@@ -397,9 +195,11 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     </div>
   </div>
 
+  <!-- ========================= -->
+  <!-- CONTROLES -->
+  <!-- ========================= -->
   <div class="section">
     <h2>⚙️ Controles</h2>
-
     <div class="toggle-row">
       <div class="toggle-label">
         🔓 Restaurante aberto
@@ -410,7 +210,6 @@ body{ background:#1a0000; color:white; min-height:100vh; }
         <span class="toggle-slider"></span>
       </label>
     </div>
-
     <div class="toggle-row">
       <div class="toggle-label">
         🛵 Sistema de Motoboy
@@ -423,16 +222,126 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     </div>
   </div>
 
+  <!-- ========================= -->
+  <!-- PROMOÇÕES -->
+  <!-- ========================= -->
+  <div class="section">
+    <h2>🎁 Promoções Ativas</h2>
+
+    <div class="promo-row">
+      <div class="promo-header">
+        <div>
+          <div class="promo-title">🍣 Temaki Frito grátis</div>
+          <div class="promo-desc">Pedidos acima de R$75 (sem contar a taxa de entrega) ganham 1 Temaki Frito</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="promo-temaki" onchange="saveConfig()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="promo-row">
+      <div class="promo-header">
+        <div>
+          <div class="promo-title">🚚 Entrega grátis</div>
+          <div class="promo-desc">Taxa de entrega zerada para todos os pedidos</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="promo-frete" onchange="saveConfig()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="promo-row">
+      <div class="promo-header">
+        <div>
+          <div class="promo-title">🦑 Lula à Dorê grátis</div>
+          <div class="promo-desc">Uma porção de Lula à Dorê adicionada automaticamente ao pedido</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="promo-lula" onchange="saveConfig()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================= -->
+  <!-- VIP -->
+  <!-- ========================= -->
+  <div class="section">
+    <h2>⭐ Programa VIP</h2>
+
+    <div style="margin-bottom:20px;">
+      <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:14px;">Parâmetros de elegibilidade</p>
+      <div class="vip-config-grid">
+        <div class="vip-config-item">
+          <label>Pedidos para ativar</label>
+          <input type="number" id="vip-pedidos" min="1" max="50" value="5" onchange="saveConfig()">
+        </div>
+        <div class="vip-config-item">
+          <label>Janela de tempo (dias)</label>
+          <input type="number" id="vip-janela" min="1" max="365" value="30" onchange="saveConfig()">
+        </div>
+        <div class="vip-config-item">
+          <label>Duração do VIP (dias)</label>
+          <input type="number" id="vip-duracao" min="1" max="365" value="60" onchange="saveConfig()">
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:14px;">Benefícios exclusivos para VIPs</p>
+
+    <div class="promo-row">
+      <div class="promo-header">
+        <div>
+          <div class="promo-title">🚚 Entrega grátis para VIPs</div>
+          <div class="promo-desc">Clientes VIP nunca pagam taxa de entrega</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="vip-frete-gratis" onchange="saveConfig()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="promo-row">
+      <div class="promo-header">
+        <div>
+          <div class="promo-title">🍣 Temaki Frito grátis para VIPs</div>
+          <div class="promo-desc">VIPs ganham Temaki Frito em todo pedido acima de R$50</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="vip-temaki" onchange="saveConfig()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.07);padding-top:20px;">
+      <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:14px;">Clientes VIP ativos</p>
+      <div id="vip-lista"><div class="loading">Carregando...</div></div>
+    </div>
+  </div>
+
+  <!-- ========================= -->
+  <!-- MOTOBOYS -->
+  <!-- ========================= -->
   <div class="section">
     <h2>🛵 Equipe de Motoboys</h2>
-    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-      <input type="text" id="moto-name" class="section-input" placeholder="Nome do Motoboy" style="flex: 1; min-width: 150px;">
-      <input type="text" id="moto-phone" class="section-input" placeholder="WhatsApp (Ex: 5521999999999)" style="flex: 1; min-width: 200px;">
+    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+      <input type="text" id="moto-name" class="section-input" placeholder="Nome do Motoboy" style="flex:1;min-width:150px;">
+      <input type="text" id="moto-phone" class="section-input" placeholder="WhatsApp (Ex: 5521999999999)" style="flex:1;min-width:200px;">
       <button class="add-btn" onclick="addMotoboy()">+ Cadastrar</button>
     </div>
     <div id="motoboys-lista"></div>
   </div>
 
+  <!-- ========================= -->
+  <!-- PRODUTOS -->
+  <!-- ========================= -->
   <div class="section">
     <h2>📦 Produtos</h2>
     <div id="produtos-lista"><div class="loading">Carregando...</div></div>
@@ -467,7 +376,6 @@ const produtos = [
   { name:'Harumaki de queijo (3 unidades)', category:'Harumaki' },
   { name:'Harumaki de Frango com Cream Cheese (3 unidades)', category:'Harumaki' },
   { name:'Salada Sunomono', category:'Saladas' },
-  // Yakisobas
   { name:'Yakisoba de Frango (M)', category:'Yakisoba' },
   { name:'Yakisoba de Frango (G)', category:'Yakisoba' },
   { name:'Yakisoba de Calabresa (M)', category:'Yakisoba' },
@@ -500,16 +408,14 @@ async function doLogin(){
   const btn = document.querySelector('.login-btn');
   btn.disabled = true;
   btn.innerText = 'Entrando...';
-
   try {
     const res = await fetch('/api/admin?action=login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
       body: JSON.stringify({ password }),
     });
     const data = await res.json();
     if(!res.ok) throw new Error(data.error);
-
     adminToken = data.token;
     localStorage.setItem('admin_token', adminToken);
     showPanel();
@@ -539,11 +445,9 @@ async function showPanel(){
 async function loadData(){
   try {
     const res = await fetch('/api/admin', {
-      headers: { 'Authorization': `Bearer ${adminToken}` },
+      headers:{ 'Authorization': `Bearer ${adminToken}` },
     });
-
     if(res.status === 401){ doLogout(); return; }
-
     const data = await res.json();
     currentConfig = data.config;
 
@@ -553,15 +457,33 @@ async function loadData(){
     document.getElementById('stat-total').innerText = `R$${data.totalDia.toFixed(2)}`;
     document.getElementById('stat-status').innerText = data.config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
 
-    // Toggles
+    // Toggles principais
     document.getElementById('toggle-restaurante').checked = data.config.restaurante_aberto ?? true;
     document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
+
+    // Promoções
+    const promos = data.config.promocoes || {};
+    document.getElementById('promo-temaki').checked = promos.temaki_gratis ?? false;
+    document.getElementById('promo-frete').checked  = promos.frete_gratis  ?? false;
+    document.getElementById('promo-lula').checked   = promos.lula_gratis   ?? false;
+
+    // VIP config
+    const vipCfg = data.config.vip_config || {};
+    document.getElementById('vip-pedidos').value  = vipCfg.pedidos_para_vip  ?? 5;
+    document.getElementById('vip-janela').value   = vipCfg.janela_dias        ?? 30;
+    document.getElementById('vip-duracao').value  = vipCfg.duracao_vip_dias   ?? 60;
+
+    // VIP benefícios
+    const vipBen = data.config.vip_beneficios || {};
+    document.getElementById('vip-frete-gratis').checked = vipBen.frete_gratis ?? false;
+    document.getElementById('vip-temaki').checked       = vipBen.temaki_gratis ?? false;
 
     // Renderizações
     renderMotoboys(data.config.motoboys || []);
     renderProdutos(data.config.produtos_esgotados || []);
     renderCombos(data.config.combos_esgotados || []);
     renderPedidos(data.pedidosHoje || []);
+    await loadVipClientes();
 
   } catch(e) {
     console.error('Erro ao carregar dados:', e);
@@ -569,71 +491,91 @@ async function loadData(){
 }
 
 // ========================
+// VIP — LISTA DE CLIENTES
+// ========================
+async function loadVipClientes(){
+  const container = document.getElementById('vip-lista');
+  try {
+    const res = await fetch('/api/admin?action=vip_clientes', {
+      headers:{ 'Authorization': `Bearer ${adminToken}` },
+    });
+    const data = await res.json();
+    const clientes = data.clientes || [];
+
+    if(clientes.length === 0){
+      container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:14px;text-align:center;padding:10px;">Nenhum cliente VIP ainda.</p>';
+      return;
+    }
+
+    container.innerHTML = '';
+    clientes.forEach(c => {
+      const expira = c.vipExpires ? new Date(c.vipExpires).toLocaleDateString('pt-BR') : '—';
+      const pedidos = c.pedidosRecentes || 0;
+      container.innerHTML += `
+        <div class="vip-cliente-card">
+          <div class="vip-cliente-info">
+            <strong>📞 ${c.phone}</strong>
+            <span class="vip-badge">⭐ VIP</span><br>
+            <span>${pedidos} pedidos recentes</span>
+          </div>
+          <div class="vip-expira">Expira em ${expira}</div>
+        </div>
+      `;
+    });
+  } catch(e) {
+    container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:14px;">Erro ao carregar VIPs.</p>';
+  }
+}
+
+// ========================
 // RENDER MOTOBOYS
 // ========================
-function renderMotoboys(motoboys) {
+function renderMotoboys(motoboys){
   const container = document.getElementById('motoboys-lista');
-  if(!motoboys || motoboys.length === 0) {
-    container.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:14px; text-align:center; padding:10px;">Nenhum motoboy cadastrado.</p>';
+  if(!motoboys || motoboys.length === 0){
+    container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:14px;text-align:center;padding:10px;">Nenhum motoboy cadastrado.</p>';
     return;
   }
   container.innerHTML = '';
-  motoboys.forEach((m, index) => {
+  motoboys.forEach((m,index) => {
     container.innerHTML += `
       <div class="produto-item">
-        <div class="produto-nome">
-          🏍️ <b>${m.name}</b>
-          <small>📞 ${m.phone}</small>
-        </div>
-        <div style="display: flex; align-items: center; gap: 20px;">
+        <div class="produto-nome">🏍️ <b>${m.name}</b><small>📞 ${m.phone}</small></div>
+        <div style="display:flex;align-items:center;gap:20px;">
           <label class="toggle">
-            <input type="checkbox" ${m.active ? 'checked' : ''} onchange="toggleMotoboyStatus(${index}, this.checked)">
+            <input type="checkbox" ${m.active?'checked':''} onchange="toggleMotoboyStatus(${index},this.checked)">
             <span class="toggle-slider"></span>
           </label>
-          <button onclick="removeMotoboy(${index})" style="background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 16px;">🗑️</button>
+          <button onclick="removeMotoboy(${index})" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:16px;">🗑️</button>
         </div>
       </div>`;
   });
 }
 
-function addMotoboy() {
-  const nameInput = document.getElementById('moto-name');
+function addMotoboy(){
+  const nameInput  = document.getElementById('moto-name');
   const phoneInput = document.getElementById('moto-phone');
-  const name = nameInput.value.trim();
-  const phone = phoneInput.value.trim().replace(/\D/g, '');
-
-  if(!name || !phone) {
-    alert('Por favor, insira o Nome e o WhatsApp (somente números) do motoboy.');
-    return;
-  }
-
+  const name  = nameInput.value.trim();
+  const phone = phoneInput.value.trim().replace(/\D/g,'');
+  if(!name || !phone){ alert('Insira nome e WhatsApp do motoboy.'); return; }
   if(!currentConfig.motoboys) currentConfig.motoboys = [];
-  currentConfig.motoboys.push({ name, phone, active: true });
-
-  nameInput.value = '';
-  phoneInput.value = '';
-  
+  currentConfig.motoboys.push({ name, phone, active:true });
+  nameInput.value = ''; phoneInput.value = '';
   renderMotoboys(currentConfig.motoboys);
   saveConfig();
 }
 
-function toggleMotoboyStatus(index, isChecked) {
-  if(currentConfig.motoboys && currentConfig.motoboys[index]) {
-    currentConfig.motoboys[index].active = isChecked;
-    saveConfig();
-  }
+function toggleMotoboyStatus(index,isChecked){
+  if(currentConfig.motoboys?.[index]) currentConfig.motoboys[index].active = isChecked;
+  saveConfig();
 }
 
-function removeMotoboy(index) {
-  if(confirm(`Deseja remover este motoboy da lista?`)) {
-    currentConfig.motoboys.splice(index, 1);
-    renderMotoboys(currentConfig.motoboys);
-    saveConfig();
-  }
+function removeMotoboy(index){
+  if(confirm('Remover este motoboy?')){ currentConfig.motoboys.splice(index,1); renderMotoboys(currentConfig.motoboys); saveConfig(); }
 }
 
 // ========================
-// RENDER PRODUTOS
+// RENDER PRODUTOS / COMBOS
 // ========================
 function renderProdutos(esgotados){
   const container = document.getElementById('produtos-lista');
@@ -642,22 +584,16 @@ function renderProdutos(esgotados){
     const isEsgotado = esgotados.includes(p.name);
     container.innerHTML += `
       <div class="produto-item">
-        <div class="produto-nome">
-          ${p.name}
-          <small>${p.category}</small>
-        </div>
+        <div class="produto-nome">${p.name}<small>${p.category}</small></div>
         <label class="toggle">
-          <input type="checkbox" class="danger" ${isEsgotado ? 'checked' : ''}
-            onchange="toggleProduto('${p.name.replace(/'/g, "\\'")}', this.checked)">
+          <input type="checkbox" class="danger" ${isEsgotado?'checked':''}
+            onchange="toggleProduto('${p.name.replace(/'/g,"\\'")}',this.checked)">
           <span class="toggle-slider"></span>
         </label>
       </div>`;
   });
 }
 
-// ========================
-// RENDER COMBOS
-// ========================
 function renderCombos(esgotados){
   const container = document.getElementById('combos-lista');
   container.innerHTML = '';
@@ -667,37 +603,33 @@ function renderCombos(esgotados){
       <div class="produto-item">
         <div class="produto-nome">${c.name}</div>
         <label class="toggle">
-          <input type="checkbox" class="danger" ${isEsgotado ? 'checked' : ''}
-            onchange="toggleCombo('${c.name}', this.checked)">
+          <input type="checkbox" class="danger" ${isEsgotado?'checked':''}
+            onchange="toggleCombo('${c.name}',this.checked)">
           <span class="toggle-slider"></span>
         </label>
       </div>`;
   });
 }
 
-// ========================
-// RENDER PEDIDOS
-// ========================
 function renderPedidos(pedidos){
   const container = document.getElementById('pedidos-lista');
-  if(pedidos.length === 0){
-    container.innerHTML = '<p style="color:rgba(255,255,255,0.4);text-align:center;padding:20px;">Nenhum pedido hoje ainda.</p>';
-    return;
-  }
+  if(pedidos.length === 0){ container.innerHTML='<p style="color:rgba(255,255,255,0.4);text-align:center;padding:20px;">Nenhum pedido hoje ainda.</p>'; return; }
   container.innerHTML = '';
   pedidos.forEach(p => {
-    const statusClass = p.status?.replace(' ', '') || 'Recebido';
+    const statusClass = p.status?.replace(' ','') || 'Recebido';
+    const vipTag = p.isVip ? '<span class="vip-badge" style="margin-left:6px;">⭐ VIP</span>' : '';
     container.innerHTML += `
       <div class="pedido-card">
         <div class="pedido-header">
-          <span class="pedido-numero">Pedido #${p.orderId || '—'}</span>
+          <span class="pedido-numero">Pedido #${p.orderId||'—'}${vipTag}</span>
           <span class="pedido-total">R$${p.total?.toFixed(2)}</span>
         </div>
         <div class="pedido-info">
           👤 ${p.customer} — 📞 ${p.phone}<br>
-          📍 ${p.address}, ${p.number} ${p.complement}<br>
+          📍 ${p.address}, ${p.number} ${p.complement||''}<br>
           💳 ${p.payment}<br>
-          🍣 ${p.items?.map(i => i.name).join(', ')}
+          🍣 ${p.items?.map(i=>i.name).join(', ')}
+          ${p.promos_aplicadas?.length ? `<br>🎁 ${p.promos_aplicadas.join(', ')}` : ''}
         </div>
         <span class="status-badge status-${statusClass}">${p.status}</span>
       </div>`;
@@ -705,27 +637,19 @@ function renderPedidos(pedidos){
 }
 
 // ========================
-// TOGGLE PRODUTO/COMBO
+// TOGGLES
 // ========================
-function toggleProduto(name, isEsgotado){
+function toggleProduto(name,isEsgotado){
   if(!currentConfig.produtos_esgotados) currentConfig.produtos_esgotados = [];
-  if(isEsgotado){
-    if(!currentConfig.produtos_esgotados.includes(name))
-      currentConfig.produtos_esgotados.push(name);
-  } else {
-    currentConfig.produtos_esgotados = currentConfig.produtos_esgotados.filter(n => n !== name);
-  }
+  if(isEsgotado){ if(!currentConfig.produtos_esgotados.includes(name)) currentConfig.produtos_esgotados.push(name); }
+  else { currentConfig.produtos_esgotados = currentConfig.produtos_esgotados.filter(n=>n!==name); }
   saveConfig();
 }
 
-function toggleCombo(name, isEsgotado){
+function toggleCombo(name,isEsgotado){
   if(!currentConfig.combos_esgotados) currentConfig.combos_esgotados = [];
-  if(isEsgotado){
-    if(!currentConfig.combos_esgotados.includes(name))
-      currentConfig.combos_esgotados.push(name);
-  } else {
-    currentConfig.combos_esgotados = currentConfig.combos_esgotados.filter(n => n !== name);
-  }
+  if(isEsgotado){ if(!currentConfig.combos_esgotados.includes(name)) currentConfig.combos_esgotados.push(name); }
+  else { currentConfig.combos_esgotados = currentConfig.combos_esgotados.filter(n=>n!==name); }
   saveConfig();
 }
 
@@ -734,43 +658,44 @@ function toggleCombo(name, isEsgotado){
 // ========================
 async function saveConfig(){
   const config = {
-    motoboy_on: document.getElementById('toggle-motoboy').checked,
+    motoboy_on:         document.getElementById('toggle-motoboy').checked,
     restaurante_aberto: document.getElementById('toggle-restaurante').checked,
     produtos_esgotados: currentConfig.produtos_esgotados || [],
-    combos_esgotados: currentConfig.combos_esgotados || [],
-    motoboys: currentConfig.motoboys || [] // ENVIA A LISTA DE MOTOBOYS ATUALIZADA
+    combos_esgotados:   currentConfig.combos_esgotados   || [],
+    motoboys:           currentConfig.motoboys            || [],
+    promocoes: {
+      temaki_gratis: document.getElementById('promo-temaki').checked,
+      frete_gratis:  document.getElementById('promo-frete').checked,
+      lula_gratis:   document.getElementById('promo-lula').checked,
+    },
+    vip_config: {
+      pedidos_para_vip: parseInt(document.getElementById('vip-pedidos').value) || 5,
+      janela_dias:       parseInt(document.getElementById('vip-janela').value)  || 30,
+      duracao_vip_dias:  parseInt(document.getElementById('vip-duracao').value) || 60,
+    },
+    vip_beneficios: {
+      frete_gratis:  document.getElementById('vip-frete-gratis').checked,
+      temaki_gratis: document.getElementById('vip-temaki').checked,
+    },
   };
 
   try {
     const res = await fetch('/api/admin?action=update', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${adminToken}` },
       body: JSON.stringify(config),
     });
     if(!res.ok) throw new Error('Erro ao salvar');
     currentConfig = { ...currentConfig, ...config };
-
     document.getElementById('stat-status').innerText = config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
-
   } catch(e) {
     alert('Erro ao salvar. Tente novamente.');
   }
 }
 
-// ========================
-// AUTO-RELOAD PEDIDOS A CADA 30s
-// ========================
 setInterval(loadData, 30000);
 
-// ========================
-// INIT
-// ========================
-if(adminToken){
-  showPanel();
-} 
+if(adminToken){ showPanel(); }
 </script>
 </body>
 </html>
