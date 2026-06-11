@@ -2649,7 +2649,11 @@ async function finishOrder(){
       <div class="modal-total">R$${total.toFixed(2).replace('.', ',')}</div>
     `;
 
+    // Abre o modal na tela
     document.getElementById('order-modal').style.display = 'flex';
+
+    // ✨ LINHA ADICIONADA: Checa se tem Yakisoba e exibe/esconde a pimenta
+    verificarVisibilidadeBrinde();
 
     requestAnimationFrame(() => {
       const box = document.querySelector('.modal-box');
