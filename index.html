@@ -2853,7 +2853,27 @@ comboList.addEventListener('wheel', (e) => {
 
 let addons = {
   hashi: 0,
+  pimenta: 0, // <-- Atualizado aqui
 };
+
+function verificarVisibilidadeBrinde() {
+  // Verifica se o cliente tem algum Yakisoba no carrinho
+  const temYakisoba = cart.some(item => item.name.toLowerCase().includes('yakisoba'));
+  const container = document.getElementById('addon-pimenta-container');
+  
+  if (container) {
+    if (temYakisoba) {
+      container.style.display = 'flex'; // Mostra a pimenta
+    } else {
+      container.style.display = 'none';  // Esconde se não tiver Yakisoba
+      
+      // Reseta o contador para 0 se o Yakisoba sumir do carrinho
+      addons.pimenta = 0;
+      const el = document.getElementById('qty-pimenta');
+      if (el) el.innerText = 0;
+    }
+  }
+}
 
 function calculateTotal(){
   const payment = document.getElementById('payment-method')?.value;
@@ -2963,13 +2983,16 @@ window.addEventListener('popstate', (e) => {
   <div class="loading-text">Enviando pedido...</div>
 </div>
 
+
 <!-- ORDER MODAL -->
 <div id="order-modal" class="modal-overlay">
   <div class="modal-box">
     <h2>Confirmar Pedido 🍣</h2>
     <div id="modal-content"></div>
+    
     <div class="addons-box">
       <h3>Adicionais</h3>
+      
       <div class="addon-item">
         <span>🥢 Adaptador de hashi (Grátis)</span>
         <div class="qty-control">
@@ -2978,7 +3001,17 @@ window.addEventListener('popstate', (e) => {
           <button onclick="changeAddon('hashi', 1)">+</button>
         </div>
       </div>
+
+      <div class="addon-item" id="addon-pimenta-container" style="display: none;">
+        <span>🌶️ Pimenta de Sichuan caseira (Grátis)</span>
+        <div class="qty-control">
+          <button onclick="changeAddon('pimenta', -1)">−</button>
+          <span id="qty-pimenta">0</span>
+          <button onclick="changeAddon('pimenta', 1)">+</button>
+        </div>
+      </div>
     </div>
+    
     <div class="modal-buttons">
       <button class="modal-cancel" onclick="closeOrderModal()">Cancelar</button>
       <button class="modal-confirm" onclick="confirmOrder()">Confirmar</button>

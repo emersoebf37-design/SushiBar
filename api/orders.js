@@ -203,6 +203,11 @@ export default async function handler(req, res) {
         validatedItems.push({ name: itemName, quantity, unitPrice, subtotal });
       }
 
+      // Verifica se há algum Yakisoba de fato no pedido validado
+      const temYakisobaNoPedido = validatedItems.some(item => 
+        item.name.toLowerCase().includes("yakisoba")
+      );
+
       // Transação do ID sequencial
       const counterRef = db.collection("meta").doc("orderCounter");
       let nextId = 1;
@@ -221,9 +226,14 @@ export default async function handler(req, res) {
       // Adicionais e Taxas
       const addons = order.addons || {};
       const hashi = Math.max(0, parseInt(addons.hashi || 0));
+      const pimenta = Math.max(0, parseInt(addons.pimenta || 0));
 
       if (hashi > 20) {
         return res.status(400).json({ error: "Quantidade de adicionais inválida." });
+      }
+
+      if (pimenta > 0 && !temYakisobaNoPedido) {
+        return res.status(400).json({ error: "A pimenta de Sichuan é exclusiva para pedidos com Yakisoba." });
       }
 
       const validPayments = ["Pix", "Cartão", "Dinheiro"];
@@ -249,7 +259,7 @@ export default async function handler(req, res) {
         number:      order.number,
         complement:  order.complement,
         payment:     order.payment,
-        addons:      { hashi },
+        addons:      { hashi, pimenta },
         items:       validatedItems,
         taxaEntrega,
         distanciaKm,
