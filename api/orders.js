@@ -52,45 +52,59 @@ function getPrivateKey() {
 // PRODUTOS (ATUALIZADO COM OS NOVOS TAMANHOS)
 // ========================
 const PRODUCTS = {
-"Hot Roll Philadelphia Salmão (8 unidades)": 16,
-  "Temaki Frito": 23.99,
-  "Temaki": 19.99,
-  "Hossomaki Philadelphia Salmão (8 unidades)": 14,
-  "Shimeji na Manteiga": 14.90,
+  // ── Hots ──
+  "Hot Roll Philadelphia Salmão (8 unidades)": 16,
   "Hot Roll Skin (8 unidades)": 7.99,
-  "Hossomaki Skin (8 unidades)": 6.65,
   "Hot Roll Kani (8 unidades)": 10.65,
+  "Temaki Frito": 23.99,
+  "Temaki": 19.99, // ← NOVO
+  "Bolinho de Salmão (2 unidades)": 11.90,
+
+  // ── Hossomaki ──
+  "Hossomaki Philadelphia Salmão (8 unidades)": 14,
+  "Hossomaki Skin (8 unidades)": 6.65,
   "Hossomaki Kani (8 unidades)": 7.99,
-  "Lula à Dorê (6 unidades)": 25.90,
+
+  // ── Sashimi / Joe ──
+  "Sashimi de Salmão (4 unidades)": 11.90,   // ← NOVO
+  "Joe de Salmão com Cream Cheese (4 unidades)": 11.90, // ← NOVO
+
+  // ── Harumaki ──
   "Harumaki de Legumes (3 unidades)": 12.99,
   "Harumaki de Salmão (3 unidades)": 19,
   "Harumaki de queijo (3 unidades)": 12.99,
   "Harumaki de Frango com Cream Cheese (3 unidades)": 12.99,
+  "Harumaki de Doce de leite (3 unidades)": 12.99, // ← NOVO
+
+  // ── Porções ──
+  "Lula à Dorê (6 unidades)": 25.90,
+  "Shimeji na Manteiga": 14.90,
+
+  // ── Saladas ──
   "Salada Sunomono": 5,
+
+  // ── Yakisoba ──
+  "Yakisoba de Frango (M)": 18.90,
+  "Yakisoba de Frango (G)": 25.90,
+  "Yakisoba de Calabresa (M)": 18.90,
+  "Yakisoba de Calabresa (G)": 25.90,
+  "Yakisoba de Legumes (M)": 16.90,
+  "Yakisoba de Legumes (G)": 18.90,   // era 19.90 no products.js, mas no código estava 18.90 — confirma qual é o certo
+  "Yakisoba de Carne (M)": 21.90,
+  "Yakisoba de Carne (G)": 27.90,
+  "Yakisoba Misto (M)": 24.90,
+  "Yakisoba Misto (G)": 29.90,
+
+  // ── Combos ──
+  "Mega Combo Hot Roll": 39.90,
+  "Combo Apaixonados": 59.90,          // ← NOVO
   "Combo Crocantissimo": 49.90,
   "Combo Individual": 39.90,
   "Combo de Frios": 29.90,
   "Combo Premium": 74.90,
   "Combo Primavera": 37.90,
-  "Mega Combo Hot Roll": 39.90,
-
-
-  "Yakisoba de Frango (M)": 18.90,
-  "Yakisoba de Frango (G)": 25.90,
-  
-  "Yakisoba de Calabresa (M)": 18.90,
-  "Yakisoba de Calabresa (G)": 25.90,
-
-  "Yakisoba de Legumes (M)": 16.90,
-  "Yakisoba de Legumes (G)": 19.90,
-  
-  "Yakisoba de Carne (M)": 21.90,
-  "Yakisoba de Carne (G)": 27.90,
-
-  "Yakisoba Misto (M)": 24.90,
-  "Yakisoba Misto (G)": 29.90,
+  "Combo Salmão Lovers": 49.90,        // ← NOVO (⚠️ confirma o preço, o products.js copiou do Primavera)
 };
-
 // ========================
 // API HANDLER
 // ========================
