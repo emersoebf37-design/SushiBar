@@ -291,19 +291,21 @@ export default async function handler(req, res) {
       // ====================================================
       try {
         const {
-          enviarMensagem,
-          mensagemNovoPedido,
-          mensagemPix,
-          mensagemMotoboy,
-        } = require("../whatsapp");
+                enviarMensagem,
+                mensagemNovoPedido,
+                mensagemPix,
+                mensagemCodigoPix,
+                mensagemMotoboy,
+              } = require("../whatsapp");
 
-        // 1. Mensagem de confirmação para o Cliente
-        await enviarMensagem(newOrder.phone, mensagemNovoPedido(newOrder));
+              // 1. Mensagem de confirmação para o Cliente
+              await enviarMensagem(newOrder.phone, mensagemNovoPedido(newOrder));
 
-        // 2. Se for PIX, envia dados de pagamento para o Cliente
-        if (newOrder.payment === "Pix") {
-          await enviarMensagem(newOrder.phone, mensagemPix(newOrder));
-        }
+              // 2. Se for PIX, envia mensagem explicativa + chave isolada
+              if (newOrder.payment === "Pix") {
+                await enviarMensagem(newOrder.phone, mensagemPix(newOrder));
+                await enviarMensagem(newOrder.phone, mensagemCodigoPix(newOrder));
+              }
 
         // 3. Verificação e Envio para o Motoboy
         let motoboyOn = false;

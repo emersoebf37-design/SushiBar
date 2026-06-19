@@ -35,7 +35,7 @@ async function conectarWhatsApp(){
   });
 }
 
-/* ENVIAR MENSAGEM (CORRIGIDO COM VALIDAÇÃO DE JID) */
+/* ENVIAR MENSAGEM */
 async function enviarMensagem(telefone, mensagem){
   if(!sock){
     console.log('❌ Erro: WhatsApp não está conectado.');
@@ -44,21 +44,18 @@ async function enviarMensagem(telefone, mensagem){
 
   try {
     let numero = telefone.replace(/\D/g, '');
-    
-    // Garante o código do país (Brasil = 55)
+
     if(!numero.startsWith('55')){
       numero = `55${numero}`;
     }
 
-    // Procura o JID real no servidor do WhatsApp (resolve o problema do 9º dígito no Brasil)
     const [result] = await sock.onWhatsApp(numero);
-    
+
     if (!result || !result.exists) {
       console.log(`❌ O número ${telefone} não possui WhatsApp válido.`);
       return;
     }
 
-    // Envia para o JID correto retornado pelo servidor
     await sock.sendMessage(result.jid, { text: mensagem });
     console.log(`✅ WhatsApp enviado com sucesso para: ${result.jid}`);
 
@@ -67,7 +64,7 @@ async function enviarMensagem(telefone, mensagem){
   }
 }
 
-/* FUNÇÕES DE MENSAGENS */
+/* MENSAGEM DE NOVO PEDIDO */
 function mensagemNovoPedido(order){
   return `🍣 *Kaizora — Confirmação de Pedido*
 
@@ -79,7 +76,7 @@ ${order.items.map(i => `• ${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`
 🧾 *Adicionais:*
 🥢 Adaptador de Hashi: ${order.addons?.hashi || 0}
 
-💰 *Total:* R$${order.total.toFixed(2)}
+💰 *Total:* R$${order.total.toFixed(2).replace('.', ',')}
 💳 *Pagamento:* ${order.payment}
 
 📍 *Entrega em:*
@@ -91,74 +88,28 @@ ${order.complement || ''}
 Acompanhe seu pedido por aqui. Obrigado! 🙏`;
 }
 
-function gerarPixCopiaECola(valor) {
-  const chave = "e5da076d-f585-4274-83bd-acb0e26904fb";
-  const nome = "KAIZORA SUSHI"; 
-  const city = "RIO DE JANEIRO";
-  const txid = "0000"; 
-
-  const valStr = valor.toFixed(2);
-
-  const formatarBloco = (tag, conteudo) => {
-    const tamanho = String(conteudo.length).padStart(2, '0');
-    return `${tag}${tamanho}${conteudo}`;
-  };
-
-  const b00 = "000201";
-  const s00 = formatarBloco("00", "br.gov.bcb.pix");
-  const s01 = formatarBloco("01", chave);
-  const b26 = formatarBloco("26", s00 + s01);
-
-  const b52 = "52040000";
-  const b53 = "5303986";
-  const b54 = formatarBloco("54", valStr);
-  const b58 = "5802BR";
-  const b59 = formatarBloco("59", nome);
-  const b60 = formatarBloco("60", city);
-  
-  const s05 = formatarBloco("05", txid);
-  const b62 = formatarBloco("62", s05);
-  
-  const b63Obrigatorio = "6304";
-  const payloadCompleto = b00 + b26 + b52 + b53 + b54 + b58 + b59 + b60 + b62 + b63Obrigatorio;
-
-  let crc = 0xFFFF;
-  for (let c = 0; c < payloadCompleto.length; c++) {
-    crc ^= payloadCompleto.charCodeAt(c) << 8;
-    for (let i = 0; i < 8; i++) {
-      if (crc & 0x8000) {
-        crc = (crc << 1) ^ 0x1021;
-      } else {
-        crc = crc << 1;
-      }
-    }
-  }
-  
-  const crcResultado = (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
-  return payloadCompleto + crcResultado;
-}
-
+/* MENSAGEM PIX */
 function mensagemPix(order) {
   return `💸 *Kaizora — Pagamento via Pix*
 
 Olá, *${order.customer}*! Para confirmar seu pedido, realize o pagamento.
 
-💰 *Valor:* R$ ${order.total.toFixed(2)}
+💰 *Valor:* R$ ${order.total.toFixed(2).replace('.', ',')}
 
-👇 *Copie o código que vamos enviar na PRÓXIMA mensagem abaixo:*
-(Basta pressionar e segurar a mensagem de baixo para copiar o código direto!)
+🔑 *Chave Pix (CNPJ):*
+67.185.069/0001-08
 
 Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos seu pedido. 🙏
 
 ⚠️ O pedido só será preparado após a confirmação do pagamento.`;
 }
 
-// ⚠️ NOVA FUNÇÃO: Gera o código isolado e envelopa na formatação de código do WhatsApp
+/* CÓDIGO PIX ISOLADO */
 function mensagemCodigoPix(order) {
-  const codigoPuro = gerarPixCopiaECola(order.total);
-  return `${codigoPuro}`;
+  return `67.185.069/0001-08`;
 }
 
+/* MENSAGEM DE STATUS */
 function mensagemStatus(order, status, senha) {
   if (status === 'Saiu para entrega') {
     return `🍣 *Seu pedido mudou de status!*\n\n` +
@@ -169,6 +120,7 @@ function mensagemStatus(order, status, senha) {
          `Status atual: *${status}*`;
 }
 
+/* MENSAGEM MOTOBOY */
 function mensagemMotoboy(order, senha, mapsLink) {
   return `🛵 *NOTIFICAÇÃO DE ENTREGA (MOTOBOY)*\n\n` +
          `*Pedido:* #${order.orderId || '?'}\n` +
@@ -185,6 +137,6 @@ module.exports = {
   mensagemNovoPedido,
   mensagemStatus,
   mensagemPix,
-  mensagemCodigoPix, // 👈 Exportado com sucesso aqui!
+  mensagemCodigoPix,
   mensagemMotoboy
 };
