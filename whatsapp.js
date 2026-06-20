@@ -15,6 +15,38 @@ async function conectarWhatsApp(){
 
   sock.ev.on('creds.update', saveCreds);
 
+  const notifier = require('node-notifier');
+
+  sock.ev.on('messages.upsert', async ({ messages, type }) => {
+    if (type !== 'notify') return;
+    
+    for (const msg of messages) {
+
+      if (msg.key.fromMe) continue;
+      if (msg.key.remoteJid.endsWith('@g.us')) continue;
+      if (msg.key.remoteJid === 'status@broadcast') continue;
+      if (!msg.message) continue;
+
+      const de = msg.key.remoteJid.replace('@s.whatsapp.net', '');
+      const texto =
+        msg.message.conversation ||
+        msg.message.extendedTextMessage?.text ||
+        '(mídia ou sticker)';
+
+      console.log(`\n📩 MENSAGEM RECEBIDA DE: ${de}`);
+      console.log(`💬 "${texto}"\n`);
+
+      // Beep nativo do Windows (assíncrono para não travar)
+      const { exec } = require('child_process');
+      exec('powershell -WindowStyle Hidden -c "[console]::beep(1000, 200); Start-Sleep -Milliseconds 100; [console]::beep(1000, 200); Start-Sleep -Milliseconds 100; [console]::beep(1000, 200)"');
+
+      // Notificação visual
+      const { exec: execNotif } = require('child_process');
+      execNotif(`powershell -c "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('De: ${de}\\n${texto.replace(/'/g, '')}', 'Kaizora — WhatsApp')"`);
+
+    }
+  });
+
   sock.ev.on('connection.update', async(update) => {
     const { connection, lastDisconnect, qr } = update;
 

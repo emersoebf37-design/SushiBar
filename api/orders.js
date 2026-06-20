@@ -84,26 +84,26 @@ const PRODUCTS = {
   "Salada Sunomono": 5,
 
   // ── Yakisoba ──
-  "Yakisoba de Frango (M)": 18.90,
-  "Yakisoba de Frango (G)": 25.90,
+  "Yakisoba de Frango (M)": 24.90,
+  "Yakisoba de Frango (G)": 30,
   "Yakisoba de Calabresa (M)": 18.90,
-  "Yakisoba de Calabresa (G)": 25.90,
+  "Yakisoba de Calabresa (G)": 27,
   "Yakisoba de Legumes (M)": 16.90,
-  "Yakisoba de Legumes (G)": 18.90,   // era 19.90 no products.js, mas no código estava 18.90 — confirma qual é o certo
-  "Yakisoba de Carne (M)": 21.90,
-  "Yakisoba de Carne (G)": 27.90,
+  "Yakisoba de Legumes (G)": 25,  
+  "Yakisoba de Carne (M)": 27.90,
+  "Yakisoba de Carne (G)": 35,
   "Yakisoba Misto (M)": 24.90,
-  "Yakisoba Misto (G)": 29.90,
+  "Yakisoba Misto (G)": 35,
 
   // ── Combos ──
   "Mega Combo Hot Roll": 39.90,
-  "Combo Apaixonados": 59.90,          // ← NOVO
+  "Combo Apaixonados": 59.90,          
   "Combo Crocantissimo": 49.90,
   "Combo Individual": 39.90,
   "Combo de Frios": 29.90,
   "Combo Premium": 74.90,
   "Combo Primavera": 37.90,
-  "Combo Salmão Lovers": 49.90,        // ← NOVO (⚠️ confirma o preço, o products.js copiou do Primavera)
+  "Combo Salmão Lovers": 49.90,       
 };
 // ========================
 // API HANDLER
