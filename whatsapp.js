@@ -98,6 +98,17 @@ async function enviarMensagem(telefone, mensagem){
 
 /* MENSAGEM DE NOVO PEDIDO */
 function mensagemNovoPedido(order){
+  const addons = order.addons || {};
+  
+  const adicionaisLinhas = [];
+  if(addons.hashi > 0) adicionaisLinhas.push(`🥢 Hashi: ${addons.hashi} (Grátis)`);
+  if(addons.geleia > 0) adicionaisLinhas.push(`🌶️ Geleia de Pimenta: ${addons.geleia} (+R$${(addons.geleia * 1.00).toFixed(2).replace('.', ',')})`);
+  if(addons.pimenta > 0) adicionaisLinhas.push(`🌶️ Pimenta de Sichuan: ${addons.pimenta} (Grátis)`);
+
+  const adicionaisTexto = adicionaisLinhas.length > 0
+    ? adicionaisLinhas.join('\n')
+    : 'Nenhum';
+
   return `🍣 *Kaizora — Confirmação de Pedido*
 
 Olá, *${order.customer}*! Seu pedido foi recebido com sucesso.
@@ -106,7 +117,7 @@ Olá, *${order.customer}*! Seu pedido foi recebido com sucesso.
 ${order.items.map(i => `• ${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`).join('\n')}
 
 🧾 *Adicionais:*
-🥢 Adaptador de Hashi: ${order.addons?.hashi || 0}
+${adicionaisTexto}
 
 💰 *Total:* R$${order.total.toFixed(2).replace('.', ',')}
 💳 *Pagamento:* ${order.payment}
@@ -118,22 +129,6 @@ ${order.complement || ''}
 ⏳ *Status:* ${order.status}
 
 Acompanhe seu pedido por aqui. Obrigado! 🙏`;
-}
-
-/* MENSAGEM PIX */
-function mensagemPix(order) {
-  return `💸 *Kaizora — Pagamento via Pix*
-
-Olá, *${order.customer}*! Para confirmar seu pedido, realize o pagamento.
-
-💰 *Valor:* R$ ${order.total.toFixed(2).replace('.', ',')}
-
-🔑 *Chave Pix (CNPJ):*
-67.185.069/0001-08
-
-Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos seu pedido. 🙏
-
-⚠️ O pedido só será preparado após a confirmação do pagamento.`;
 }
 
 /* CÓDIGO PIX ISOLADO */
