@@ -260,6 +260,7 @@ export default async function handler(req, res) {
       if (taxaEntrega < 0 || taxaEntrega > 50) {
         return res.status(400).json({ error: "Taxa de entrega inválida." });
       }
+      total += geleia * 1.00;
       total += taxaEntrega;
 
       if (order.payment === "Cartão") total *= 1.10;
