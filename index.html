@@ -2629,6 +2629,7 @@ async function finishOrder(){
     }, 0);
 
     let total = baseTotal + (cart.length > 0 ? (entregaAtual.taxa || 0) : 0);
+    total += (addons.geleia || 0) * 1.00;
     if(payment === 'Cartão') total *= 1.10;
 
     pendingOrder = {
@@ -2910,7 +2911,8 @@ function calculateTotal(){
 
 function updateModalTotal(){
   const total = calculateTotal();
-  const el = document.querySelector('.modal-total');
+  const orderModal = document.getElementById('order-modal');
+  const el = orderModal ? orderModal.querySelector('.modal-total') : null;
   if(el) el.innerText = `R$${total.toFixed(2).replace('.', ',')}`;
 }
 
