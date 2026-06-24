@@ -2692,6 +2692,7 @@ async function confirmOrder(){
     return sum + (price * (item.quantity || 1));
   }, 0);
   total += cart.length > 0 ? (entregaAtual.taxa || 0) : 0;
+  total += (addons.geleia || 0) * 1.00;
   if(payment === 'Cartão') total *= 1.10;
   pendingOrder.total = Number(total.toFixed(2));
 
@@ -2898,6 +2899,9 @@ function calculateTotal(){
   }, 0);
 
   total += cart.length > 0 ? (entregaAtual.taxa || 0) : 0;
+
+  // Soma adicionais pagos
+  total += (addons.geleia || 0) * 1.00;
 
   if(payment === 'Cartão') total *= 1.10;
 
