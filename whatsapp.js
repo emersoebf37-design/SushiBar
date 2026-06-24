@@ -131,6 +131,22 @@ ${order.complement || ''}
 Acompanhe seu pedido por aqui. Obrigado! 🙏`;
 }
 
+/* MENSAGEM PIX */
+function mensagemPix(order) {
+  return `💸 *Kaizora — Pagamento via Pix*
+
+Olá, *${order.customer}*! Para confirmar seu pedido, realize o pagamento.
+
+💰 *Valor:* R$ ${order.total.toFixed(2).replace('.', ',')}
+
+🔑 *Chave Pix (CNPJ):*
+67.185.069/0001-08
+
+Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos seu pedido. 🙏
+
+⚠️ O pedido só será preparado após a confirmação do pagamento.`;
+}
+
 /* CÓDIGO PIX ISOLADO */
 function mensagemCodigoPix(order) {
   return `67.185.069/0001-08`;
