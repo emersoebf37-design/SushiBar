@@ -2864,7 +2864,8 @@ comboList.addEventListener('wheel', (e) => {
 
 let addons = {
   hashi: 0,
-  pimenta: 0, // <-- Atualizado aqui
+  pimenta: 0,
+  geleia: 0 // <-- Atualizado aqui
 };
 
 function verificarVisibilidadeBrinde() {
@@ -3010,6 +3011,15 @@ window.addEventListener('popstate', (e) => {
           <button onclick="changeAddon('hashi', -1)">−</button>
           <span id="qty-hashi">0</span>
           <button onclick="changeAddon('hashi', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="addon-item">
+        <span>🌶️ Geleia de Pimenta (+R$1,00)</span>
+        <div class="qty-control">
+          <button onclick="changeAddon('geleia', -1)">−</button>
+          <span id="qty-geleia">0</span>
+          <button onclick="changeAddon('geleia', 1)">+</button>
         </div>
       </div>
 

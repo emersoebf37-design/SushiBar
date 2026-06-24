@@ -240,9 +240,10 @@ export default async function handler(req, res) {
       // Adicionais e Taxas
       const addons = order.addons || {};
       const hashi = Math.max(0, parseInt(addons.hashi || 0));
+      const geleia = Math.max(0, parseInt(addons.geleia || 0));
       const pimenta = Math.max(0, parseInt(addons.pimenta || 0));
 
-      if (hashi > 20) {
+      if (hashi > 20 || geleia > 20) {
         return res.status(400).json({ error: "Quantidade de adicionais inválida." });
       }
 
@@ -273,7 +274,7 @@ export default async function handler(req, res) {
         number:      order.number,
         complement:  order.complement,
         payment:     order.payment,
-        addons:      { hashi, pimenta },
+        addons:      { hashi, pimenta, geleia },
         items:       validatedItems,
         taxaEntrega,
         distanciaKm,
