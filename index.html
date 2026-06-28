@@ -2803,7 +2803,7 @@ function openComboModal(combo){
   document.getElementById('combo-modal-name').innerText = combo.name;
   document.getElementById('combo-modal-desc').innerText = combo.description;
   document.getElementById('combo-modal-price').innerHTML = `
-    <div style="color:#c40000;text-decoration:line-through;font-size:18px;margin-bottom:6px;">R$${(combo.price * 1.05).toFixed(2).replace('.', ',')}</div>
+    <div style="color:#c40000;text-decoration:line-through;font-size:18px;margin-bottom:6px;">R$${Math.ceil(combo.price * 1.10).toFixed(2).replace('.', ',')}</div>
     <div style="font-size:38px;font-weight:bold;color:black;">R$${combo.price.toFixed(2).replace('.', ',')}</div>
     <div style="color:#008a2e;font-size:15px;font-weight:bold;margin-top:8px;">10% OFF no Pix e Dinheiro</div>
   `;
