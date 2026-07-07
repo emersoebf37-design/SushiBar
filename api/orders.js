@@ -67,7 +67,7 @@ const PRODUCTS = {
 
   // ── Sashimi / Joe ──
   "Sashimi de Salmão (4 unidades)": 11.90,   // ← NOVO
-  "Joe de Salmão com Cream Cheese (4 unidades)": 11.90, // ← NOVO
+ 
 
   // ── Harumaki ──
   "Harumaki de Legumes (3 unidades)": 12.99,
@@ -84,6 +84,7 @@ const PRODUCTS = {
   "Salada Sunomono": 5,
 
   // ── Yakisoba ──
+   "Frango Xadrez": 24.90, // ← NOVO
   "Yakisoba de Frango (M)": 24.90,
   "Yakisoba de Frango (G)": 30,
   "Yakisoba de Calabresa (M)": 18.90,
