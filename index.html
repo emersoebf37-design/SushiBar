@@ -1820,14 +1820,14 @@ const products = [
 //{ name:'Shimeji na Manteiga', price:14.90, category:'Porções', description:'Porção de cogumelo shimeji refogado na manteiga, temperado com shoyu e cebolinha.', image:'Imagens/Shimeji.jpg', esgotado: false },
 { name:'Temaki Frito', price:23.99, category:'Hots', description:'Temaki empanado com farinha Panko, recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Temaki-Frito.jpg', esgotado: false },
 { name:'Temaki', price:19.99, category:'Hossomaki', description:'Temaki recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Temaki.jpg', esgotado: false },
-{ name:'Sashimi de Salmão (4 unidades)', price:11.90, category:'Sashimi', description:'Fatias frescas de salmão cortadas na espessura ideal, servidas com shoyu.', image:'Imagens/Sashimi de Salmão.jpg', esgotado: false },
-{ name:'Joe de Salmão com Cream Cheese (4 unidades)', price:11.90, category:'Sashimi', description:'Fatias de salmão fresco enroladas com cream cheese, servidas em formato de botão.', image:'Imagens/Joe de Salmão.jpg', esgotado: false },
+//{ name:'Sashimi de Salmão (4 unidades)', price:11.90, category:'Yakisoba', description:'Fatias frescas de salmão cortadas na espessura ideal, servidas com shoyu.', image:'Imagens/Sashimi de Salmão.jpg', esgotado: false },
+{ name:'Frango Xadrez', price:24.90, category:'Refeições', description:'Arroz soltinho, cubos suculentos de frango, pimentões crocantes e coloridos envolvidos em um molho shoyu e finalizado com gergelim para aquele toque especial de textura. Adicional de amendoim sem sal.', image:'Imagens/Frango Xadrez.jpeg', esgotado: false },
 { name:'Bolinho de Salmão (4 unidades)', price:11.90, category:'Hots', description:'Bolinhos de salmão fresco e cream cheese crocantes.', image:'Imagens/Bolinho de Salmão.jpeg', esgotado: false },
 {
     name: 'Yakisoba de Frango',
-    category: 'Yakisoba',
+    category: 'Refeições',
     description: 'Macarrão oriental selado na chapa com frango suculento, legumes e shoyu.',
-    image: 'Imagens/Yakisoba Frango.avif', // Lembre de colocar a imagem na pasta
+    image: 'Imagens/Yakisoba Frango.avif',
     esgotado: false,
     isVariable: true,
     sizes: [
@@ -1837,7 +1837,7 @@ const products = [
   },
   {
     name: 'Yakisoba de Calabresa',
-    category: 'Yakisoba',
+    category: 'Refeições',
     description: 'Macarrão oriental selado na chapa com linguiça calabresa macia, legumes e shoyu.',
     image: 'Imagens/Yakisoba Calabresa.JPG',
     esgotado: false,
@@ -1849,7 +1849,7 @@ const products = [
   },
   {
     name: 'Yakisoba de Carne',
-    category: 'Yakisoba',
+    category: 'Refeições',
     description: 'Macarrão oriental selado na chapa com carne bovina macia, legumes e shoyu.',
     image: 'Imagens/Yakisoba Carne.jpg',
     esgotado: false,
@@ -1862,7 +1862,7 @@ const products = [
 
     {
     name: 'Yakisoba de Legumes',
-    category: 'Yakisoba',
+    category: 'Refeições',
     description: 'Macarrão oriental selado na chapa com cenoura, repolho roxo, cebola, brocolis e shoyu.',
     image: 'Imagens/Yakisoba Legumes.jpeg',
     esgotado: false,
@@ -1875,7 +1875,7 @@ const products = [
 
     {
     name: 'Yakisoba Misto',
-    category: 'Yakisoba',
+    category: 'Refeições',
     description: 'Macarrão oriental selado na chapa com carne bovina, frango, linguiça calabresa, legumes e shoyu.',
     image: 'Imagens/Yakisoba Misto.jpg',
     esgotado: false,
@@ -1895,14 +1895,13 @@ const combos = [
 { name: 'Combo de Frios', description: 'Uma seleção de peças frias saborosas.', descricaoModal: '18 Hossomaki Skin, 18 Hossomaki Kani e Salada Sunomono.', price: 29.90, image: 'Imagens/Combo de Frios.png', esgotado: false },
 { name: 'Combo Premium', description: 'Combo completo pensado para compartilhar.', descricaoModal: '24 Hot Philadelphia Salmão, 12 Hot Skin e 6 Lula à Dorê.', price: 74.90, image: 'Imagens/Combo Premium.png', esgotado: false },
 { name: 'Combo Primavera', description: 'Uma seleção crocante de peças saborosas.', descricaoModal: '4 Harumaki de Legumes, 4 Harumaki de Queijo e 4 Harumaki de Frango.', price: 37.90, image: 'Imagens/Combo Primavera.jpg', esgotado: false },
-{ name: 'Combo Salmão Lovers', description: 'Uma seleção para os amantes de salmão.', descricaoModal: '6 Sashimi de Salmão, 8 Bolinhos de Salmão e 6 Joe de Salmão com Cream Cheese.', price: 49.90, image: 'Imagens/Combo Salmão Lovers.png', esgotado: false }
 ];
 
 const categories = [
 { image:'Imagens/todos.png', name:'Todos' },
 { image:'Imagens/Rolls.png', name:'Hossomaki' },
 { image:'Imagens/Hots.png', name:'Hots' },
-{ image:'Imagens/Yakisoba.png', name:'Yakisoba' },
+{ image:'Imagens/Yakisoba.png', name:'Refeições' },
 { image:'Imagens/Harumaki.png', name:'Harumaki' },
 { image:'Imagens/Porções.png', name:'Porções' },
 { image:'Imagens/Saladas.png', name:'Saladas' },
