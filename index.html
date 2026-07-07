@@ -2876,14 +2876,27 @@ function verificarVisibilidadeBrinde() {
   
   if (container) {
     if (temYakisoba) {
-      container.style.display = 'flex'; // Mostra a pimenta
+      container.style.display = 'flex';
     } else {
-      container.style.display = 'none';  // Esconde se não tiver Yakisoba
-      
-      // Reseta o contador para 0 se o Yakisoba sumir do carrinho
+      container.style.display = 'none';
       addons.pimenta = 0;
       const el = document.getElementById('qty-pimenta');
       if (el) el.innerText = 0;
+    }
+  }
+
+  // ✨ NOVO: Verifica se o cliente tem Frango Xadrez no carrinho
+  const temFrangoXadrez = cart.some(item => item.name.toLowerCase().includes('frango xadrez'));
+  const containerAmendoim = document.getElementById('addon-amendoim-container');
+
+  if (containerAmendoim) {
+    if (temFrangoXadrez) {
+      containerAmendoim.style.display = 'flex';
+    } else {
+      containerAmendoim.style.display = 'none';
+      addons.amendoim = 0;
+      const elAmendoim = document.getElementById('qty-amendoim');
+      if (elAmendoim) elAmendoim.innerText = 0;
     }
   }
 }
@@ -3037,6 +3050,16 @@ window.addEventListener('popstate', (e) => {
         </div>
       </div>
     </div>
+
+    <div class="addon-item" id="addon-amendoim-container" style="display: none;">
+      <span>🥜 Amendoim (Perfeito para Frango Xadrez) (+R$1,00)</span>
+      <div class="qty-control">
+        <button onclick="changeAddon('amendoim', -1)">−</button>
+        <span id="qty-amendoim">0</span>
+        <button onclick="changeAddon('amendoim', 1)">+</button>
+      </div>
+    </div>
+
     
     <div class="modal-buttons">
       <button class="modal-cancel" onclick="closeOrderModal()">Cancelar</button>
