@@ -58,7 +58,7 @@ const PRODUCTS = {
   "Hot Roll Kani (8 unidades)": 10.50,
   "Temaki Frito": 24,
   "Temaki": 20, // ← NOVO
-  "Bolinho de Salmão (2 unidades)": 12,
+  "Bolinho de Salmão (4 unidades)": 12,
 
   // ── Hossomaki ──
   "Hossomaki Philadelphia Salmão (8 unidades)": 14,
