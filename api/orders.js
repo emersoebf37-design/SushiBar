@@ -54,57 +54,57 @@ function getPrivateKey() {
 const PRODUCTS = {
   // ── Hots ──
   "Hot Roll Philadelphia Salmão (8 unidades)": 16,
-  "Hot Roll Skin (8 unidades)": 7.99,
-  "Hot Roll Kani (8 unidades)": 10.65,
-  "Temaki Frito": 23.99,
-  "Temaki": 19.99, // ← NOVO
-  "Bolinho de Salmão (2 unidades)": 11.90,
+  "Hot Roll Skin (8 unidades)": 8,
+  "Hot Roll Kani (8 unidades)": 10.50,
+  "Temaki Frito": 24,
+  "Temaki": 20, // ← NOVO
+  "Bolinho de Salmão (2 unidades)": 12,
 
   // ── Hossomaki ──
   "Hossomaki Philadelphia Salmão (8 unidades)": 14,
-  "Hossomaki Skin (8 unidades)": 6.65,
-  "Hossomaki Kani (8 unidades)": 7.99,
+  "Hossomaki Skin (8 unidades)": 6.50,
+  "Hossomaki Kani (8 unidades)": 8,
 
   // ── Sashimi / Joe ──
-  "Sashimi de Salmão (4 unidades)": 11.90,   // ← NOVO
+  "Sashimi de Salmão (4 unidades)": 12,   // ← NOVO
  
 
   // ── Harumaki ──
-  "Harumaki de Legumes (3 unidades)": 12.99,
+  "Harumaki de Legumes (3 unidades)": 13,
   "Harumaki de Salmão (3 unidades)": 19,
-  "Harumaki de queijo (3 unidades)": 12.99,
-  "Harumaki de Frango com Cream Cheese (3 unidades)": 12.99,
-  "Harumaki de Doce de leite (3 unidades)": 12.99, // ← NOVO
+  "Harumaki de queijo (3 unidades)": 13,
+  "Harumaki de Frango com Cream Cheese (3 unidades)": 13,
+  "Harumaki de Doce de leite (3 unidades)": 13, // ← NOVO
 
   // ── Porções ──
-  "Lula à Dorê (6 unidades)": 25.90,
-  "Shimeji na Manteiga": 14.90,
+  "Lula à Dorê (6 unidades)": 26,
+  "Shimeji na Manteiga": 15,
 
   // ── Saladas ──
   "Salada Sunomono": 5,
 
   // ── Yakisoba ──
-   "Frango Xadrez": 24.90, // ← NOVO
-  "Yakisoba de Frango (M)": 24.90,
+   "Frango Xadrez": 25, // ← NOVO
+  "Yakisoba de Frango (M)": 25,
   "Yakisoba de Frango (G)": 30,
-  "Yakisoba de Calabresa (M)": 18.90,
+  "Yakisoba de Calabresa (M)": 19,
   "Yakisoba de Calabresa (G)": 27,
-  "Yakisoba de Legumes (M)": 16.90,
+  "Yakisoba de Legumes (M)": 17,
   "Yakisoba de Legumes (G)": 25,  
-  "Yakisoba de Carne (M)": 27.90,
+  "Yakisoba de Carne (M)": 28,
   "Yakisoba de Carne (G)": 35,
-  "Yakisoba Misto (M)": 24.90,
+  "Yakisoba Misto (M)": 25,
   "Yakisoba Misto (G)": 35,
 
   // ── Combos ──
-  "Mega Combo Hot Roll": 39.90,
-  "Combo Apaixonados": 59.90,          
-  "Combo Crocantissimo": 49.90,
-  "Combo Individual": 39.90,
-  "Combo de Frios": 29.90,
-  "Combo Premium": 74.90,
-  "Combo Primavera": 37.90,
-  "Combo Salmão Lovers": 49.90,       
+  "Mega Combo Hot Roll": 40,
+  "Combo Apaixonados": 60,
+  "Combo Crocantissimo": 50,
+  "Combo Individual": 40,
+  "Combo de Frios": 30,
+  "Combo Premium": 75,
+  "Combo Primavera": 38,
+  "Combo Salmão Lovers": 50,       
 };
 // ========================
 // API HANDLER
