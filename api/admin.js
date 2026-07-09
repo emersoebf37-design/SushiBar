@@ -61,56 +61,55 @@ export default async function handler(req, res) {
   // ========================
   // GET /api/admin
   // ========================
-  if (req.method === "GET") {
-    try {
-      const configRef = db.collection("config").doc("settings");
-      const configSnap = await configRef.get();
-      const config = configSnap.exists ? configSnap.data() : {
-        motoboy_on: false,
-        restaurante_aberto: true,
-        produtos_esgotados: [],
-        combos_esgotados: [],
-        motoboys: [], // 👈 Adicionado fallback aqui
-      };
+    if (req.method === "GET") {
+      try {
+        const configRef = db.collection("config").doc("settings");
+        const configSnap = await configRef.get();
+        const config = configSnap.exists ? configSnap.data() : {
+          motoboy_on: false,
+          restaurante_aberto: true,
+          produtos_esgotados: [],
+          combos_esgotados: [],
+          motoboys: [],
+        };
 
-      const hoje = new Date();
-      hoje.setHours(0, 0, 0, 0);
-      const hojeTimestamp = hoje.getTime();
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        const hojeTimestamp = hoje.getTime();
 
-      const ordersSnap = await db
-        .collection("orders")
-        .orderBy("createdAt", "desc")
-        .get();
+        // ✅ Filtra no Firestore, não traz o histórico inteiro
+        const ordersSnap = await db
+          .collection("orders")
+          .where("createdAt", ">=", hojeTimestamp)
+          .orderBy("createdAt", "desc")
+          .get();
 
-      const pedidosHoje = [];
-      let totalDia = 0;
+        const pedidosHoje = [];
+        let totalDia = 0;
 
-      ordersSnap.forEach(doc => {
-        const order = doc.data();
-        if (order.createdAt >= hojeTimestamp) {
+        ordersSnap.forEach(doc => {
+          const order = doc.data();
           pedidosHoje.push({ id: doc.id, ...order });
           totalDia += order.total || 0;
-        }
-      });
+        });
 
-      const ticketMedio = pedidosHoje.length > 0
-        ? totalDia / pedidosHoje.length
-        : 0;
+        const ticketMedio = pedidosHoje.length > 0
+          ? totalDia / pedidosHoje.length
+          : 0;
 
-      return res.status(200).json({
-        config,
-        pedidosHoje,
-        totalDia,
-        ticketMedio,
-        totalPedidos: pedidosHoje.length,
-      });
+        return res.status(200).json({
+          config,
+          pedidosHoje,
+          totalDia,
+          ticketMedio,
+          totalPedidos: pedidosHoje.length,
+        });
 
-    } catch (error) {
-      console.error("Erro no admin GET:", error);
-      return res.status(500).json({ error: "Erro ao buscar dados." });
+      } catch (error) {
+        console.error("Erro no admin GET:", error);
+        return res.status(500).json({ error: "Erro ao buscar dados." });
+      }
     }
-  }
-
   // ========================
   // POST /api/admin?action=update
   // ========================

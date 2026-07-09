@@ -374,6 +374,14 @@ body{ background:#1a0000; color:white; min-height:100vh; }
 <div class="admin-panel" id="admin-panel">
 
   <div class="admin-header">
+  <h1>🍣 Kaizora Admin</h1>
+  <div style="display:flex; gap:10px;">
+    <button class="logout-btn" id="refresh-btn" onclick="loadData()">🔄 Atualizar</button>
+    <button class="logout-btn" onclick="doLogout()">Sair</button>
+  </div>
+</div>
+
+  <div class="admin-header">
     <h1>🍣 Kaizora Admin</h1>
     <button class="logout-btn" onclick="doLogout()">Sair</button>
   </div>
@@ -451,6 +459,42 @@ body{ background:#1a0000; color:white; min-height:100vh; }
 </div>
 
 <script>
+
+  async function loadData(){
+  const btn = document.getElementById('refresh-btn');
+  if(btn){ btn.disabled = true; btn.innerText = '⏳ Carregando...'; }
+
+  try {
+    const res = await fetch('/api/admin', {
+      headers: { 'Authorization': `Bearer ${adminToken}` },
+    });
+
+    if(res.status === 401){ doLogout(); return; }
+
+    const data = await res.json();
+    currentConfig = data.config;
+
+    document.getElementById('stat-pedidos').innerText = data.totalPedidos;
+    document.getElementById('stat-ticket').innerText = `R$${data.ticketMedio.toFixed(2)}`;
+    document.getElementById('stat-total').innerText = `R$${data.totalDia.toFixed(2)}`;
+    document.getElementById('stat-status').innerText = data.config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
+
+    document.getElementById('toggle-restaurante').checked = data.config.restaurante_aberto ?? true;
+    document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
+
+    renderMotoboys(data.config.motoboys || []);
+    renderProdutos(data.config.produtos_esgotados || []);
+    renderCombos(data.config.combos_esgotados || []);
+    renderPedidos(data.pedidosHoje || []);
+
+  } catch(e) {
+    console.error('Erro ao carregar dados:', e);
+    alert('Erro ao atualizar. Tente novamente.');
+  } finally {
+    if(btn){ btn.disabled = false; btn.innerText = '🔄 Atualizar'; }
+  }
+}
+
 const produtos = [
   { name:'Hot Roll Philadelphia Salmão (8 unidades)', category:'Hots' },
   { name:'Temaki Frito', category:'Hots' },
@@ -770,7 +814,7 @@ async function saveConfig(){
 // ========================
 // AUTO-RELOAD PEDIDOS A CADA 30s
 // ========================
-setInterval(loadData, 30000);
+
 
 // ========================
 // INIT
