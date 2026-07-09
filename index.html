@@ -2867,7 +2867,8 @@ let addons = {
   hashi: 0,
   pimenta: 0,
   geleia: 0,
-  amendoim: 0
+  amendoim: 0,
+  talheres: 0
 };
 
 function verificarVisibilidadeBrinde() {
@@ -3057,6 +3058,15 @@ window.addEventListener('popstate', (e) => {
           <button onclick="changeAddon('amendoim', -1)">−</button>
           <span id="qty-amendoim">0</span>
           <button onclick="changeAddon('amendoim', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="addon-item" id="addon-talheres-container" style="display: none;">
+        <span>🍴 Talheres (Grátis)</span>
+        <div class="qty-control">
+          <button onclick="changeAddon('talheres', -1)">−</button>
+          <span id="qty-talheres">0</span>
+          <button onclick="changeAddon('talheres', 1)">+</button>
         </div>
       </div>
 
