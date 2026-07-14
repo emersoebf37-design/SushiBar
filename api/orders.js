@@ -106,6 +106,39 @@ const PRODUCTS = {
   "Combo Primavera": 38,
   "Combo Salmão Lovers": 50,       
 };
+
+// ========================
+// PRODUTOS CUSTOMIZADOS (cadastrados pelo admin)
+// Cache em memória para não estourar o limite de leitura do Firestore
+// ========================
+let customProductsCache = null;
+let customProductsCacheAt = 0;
+const CUSTOM_PRODUCTS_CACHE_MS = 60 * 1000; // 60s
+
+async function getFullProductList(db) {
+  const now = Date.now();
+  if (customProductsCache && (now - customProductsCacheAt < CUSTOM_PRODUCTS_CACHE_MS)) {
+    return { ...PRODUCTS, ...customProductsCache };
+  }
+
+  try {
+    const snap = await db.collection("custom_products").get();
+    const custom = {};
+    snap.forEach(doc => {
+      const data = doc.data();
+      if (data && data.name && Number.isFinite(data.price)) {
+        custom[data.name] = data.price;
+      }
+    });
+    customProductsCache = custom;
+    customProductsCacheAt = now;
+    return { ...PRODUCTS, ...custom };
+  } catch (e) {
+    console.warn("Erro ao buscar produtos customizados, usando apenas os fixos:", e.message);
+    return { ...PRODUCTS };
+  }
+}
+
 // ========================
 // API HANDLER
 // ========================
@@ -196,6 +229,7 @@ export default async function handler(req, res) {
       }
 
       // Recalcula Total
+      const ALL_PRODUCTS = await getFullProductList(db);
       let total = 0;
       const validatedItems = [];
 
@@ -207,11 +241,11 @@ export default async function handler(req, res) {
           return res.status(400).json({ error: "Quantidade inválida." });
         }
 
-        if (!(itemName in PRODUCTS)) {
+        if (!(itemName in ALL_PRODUCTS)) {
           return res.status(400).json({ error: `Produto inválido: ${itemName}` });
         }
 
-        const unitPrice = PRODUCTS[itemName];
+        const unitPrice = ALL_PRODUCTS[itemName];
         const subtotal  = unitPrice * quantity;
         total += subtotal;
 

@@ -1803,14 +1803,14 @@ body{
 /* PRODUCTS */
 /* ========================= */
 
-const products = [
+const productsBase = [
 { name:'Hot Roll Philadelphia Salmão (8 unidades)', price:16, category:'Hots', description:'Sushi empanado com farinha Panko, recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Hot Roll Philadelphia.jpg', esgotado: false },
 { name:'Hossomaki Philadelphia Salmão (8 unidades)', price:14, category:'Hossomaki', description:'Sushi recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Roll Salmão.png', esgotado: false },
 { name:'Hot Roll Skin (8 unidades)', price:8, category:'Hots', description:'Sushi empanado com farinha Panko, recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Hot Roll Skin.jpg', esgotado: false },
 { name:'Hossomaki Skin (8 unidades)', price:6.50, category:'Hossomaki', description:'Sushi recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Roll Skin.jpg', esgotado: false },
 { name:'Hot Roll Kani (8 unidades)', price:10.50, category:'Hots', description:'Sushi empanado com farinha Panko, recheado com kani, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Hot Roll Kani.jpg', esgotado: false },
 { name:'Hossomaki Kani (8 unidades)', price:8, category:'Hossomaki', description:'Sushi recheado com kani, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Roll Kani.jpg', esgotado: false },
-//{ name:'Lula à Dorê (6 unidades)', price:26, category:'Porções', description:'Anéis de lula empanados e fritos até dourarem, crocantes por fora e macios por dentro.', image:'Imagens/Lula a Dore.jpg', esgotado: false },
+{ name:'Lula à Dorê (6 unidades)', price:26, category:'Porções', description:'Anéis de lula empanados e fritos até dourarem, crocantes por fora e macios por dentro.', image:'Imagens/Lula a Dore.jpg', esgotado: false },
 { name:'Harumaki de Legumes (3 unidades)', price:13, category:'Harumaki', description:'Rolinho primavera crocante recheado com cream cheese e legumes frescos e temperados.', image:'Imagens/Harumaki Legume.jpg', esgotado: false },
 { name:'Harumaki de Salmão (3 unidades)', price:19, category:'Harumaki', description:'Rolinho primavera recheado com salmão fresco e cream cheese, envolto em massa crocante.', image:'Imagens/Harumaki Salmão.jpeg', esgotado: false },
 { name:'Harumaki de queijo (3 unidades)', price:13, category:'Harumaki', description:'Rolinho primavera recheado com queijo e oregano, envolto em massa crocante.', image:'Imagens/Harumaki Queijo.jpg', esgotado: false },
@@ -1887,15 +1887,58 @@ const products = [
   }
 ];
 
-const combos = [
+const combosBase = [
 { name: 'Mega Combo Hot Roll', description: 'Hot Roll até não dar mais.', descricaoModal: '32 Hot Roll Philadelphia.', price: 40, image: 'Imagens/Mega Combo Hot Roll.jpg', esgotado: false },
 { name: 'Combo Apaixonados', description: 'Um combo especial para momentos a dois.', descricaoModal: '  2 Yakisoba de calabresa M, 2 Temaki Frito, 2 Harumaki de Doce de Leite.', price: 60, image: 'Imagens/Combo Apaixonados.jpeg', esgotado: false },
 { name: 'Combo Crocantissimo', description: 'Uma explosão de crocância', descricaoModal: '1 Temaki Frito, 8 Hot Skin, 8 Hot Kani, 8 Hot Philadelphia Salmão.', price: 50, image: 'Imagens/Combo Crocantissimo.png', esgotado: false },
-{ name: 'Combo Individual', description: 'Uma seleção para as noites de muita fome.', descricaoModal: '1 Temaki Frito, 8 Hot Philadelphia, 2 Harumaki de Doce de Leite.', price: 40, image: 'Imagens/Combo Individual.png', esgotado: false },
+{ name: 'Combo Individual', description: 'Uma seleção para as noites de muita fome.', descricaoModal: '1 Temaki Frito, 8 Hot Philadelphia, 2 Harumaki de Legumes.', price: 40, image: 'Imagens/Combo Individual.png', esgotado: false },
 { name: 'Combo de Frios', description: 'Uma seleção de peças frias saborosas.', descricaoModal: '18 Hossomaki Skin, 18 Hossomaki Kani e Salada Sunomono.', price: 30, image: 'Imagens/Combo de Frios.png', esgotado: false },
 { name: 'Combo Premium', description: 'Combo completo pensado para compartilhar.', descricaoModal: '24 Hot Philadelphia Salmão, 12 Hot Skin e 6 Lula à Dorê.', price: 75, image: 'Imagens/Combo Premium.png', esgotado: false },
 { name: 'Combo Primavera', description: 'Uma seleção crocante de peças saborosas.', descricaoModal: '4 Harumaki de Legumes, 4 Harumaki de Queijo e 4 Harumaki de Frango.', price: 38, image: 'Imagens/Combo Primavera.jpg', esgotado: false },
 ];
+
+let products = [...productsBase];
+let combos = [...combosBase];
+
+// ========================
+// PRODUTOS CUSTOMIZADOS (cadastrados pelo admin em admin.html)
+// ========================
+async function fetchCustomProducts(){
+  try {
+    const res = await fetchComTimeout('/api/products');
+    const data = await res.json();
+    const customItems = data.items || [];
+
+    const customProdutos = customItems
+      .filter(i => i.type === 'produto' || i.type === 'adicional')
+      .map(i => ({
+        name: i.name,
+        price: i.price,
+        category: i.category,
+        description: i.description,
+        image: i.image,
+        esgotado: false,
+      }));
+
+    const customCombos = customItems
+      .filter(i => i.type === 'combo')
+      .map(i => ({
+        name: i.name,
+        price: i.price,
+        description: i.description,
+        descricaoModal: i.descricaoModal || i.description,
+        image: i.image,
+        esgotado: false,
+      }));
+
+    products = [...productsBase, ...customProdutos];
+    combos = [...combosBase, ...customCombos];
+  } catch(e) {
+    console.warn('Não foi possível carregar itens customizados do cardápio:', e);
+    products = [...productsBase];
+    combos = [...combosBase];
+  }
+}
 
 const categories = [
 { image:'Imagens/todos.png', name:'Todos' },
@@ -2018,7 +2061,11 @@ function checkRestauranteAberto(){
   }
 }
 
-fetchConfig(true);
+async function initCardapio(){
+  await fetchCustomProducts();
+  await fetchConfig(true);
+}
+initCardapio();
 
 document.addEventListener('visibilitychange', () => {
   if(document.visibilityState === 'visible') fetchConfig();

@@ -357,6 +357,120 @@ body{ background:#1a0000; color:white; min-height:100vh; }
   padding:40px;
   color:rgba(255,255,255,0.5);
 }
+
+/* ========================= */
+/* MODAL - NOVO ITEM */
+/* ========================= */
+
+.modal-overlay{
+  display:none;
+  position:fixed;
+  top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  z-index:9999;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  box-sizing:border-box;
+}
+
+.modal-box{
+  background:#2a0101;
+  border-radius:18px;
+  padding:25px;
+  width:100%;
+  max-width:420px;
+  max-height:90vh;
+  overflow-y:auto;
+}
+
+.modal-box h3{
+  margin-bottom:18px;
+  font-size:19px;
+}
+
+.modal-field{
+  margin-bottom:14px;
+}
+
+.modal-field label{
+  display:block;
+  font-size:13px;
+  color:rgba(255,255,255,0.6);
+  margin-bottom:6px;
+}
+
+.modal-field .section-input,
+.modal-field select,
+.modal-field textarea{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.05);
+  color:white;
+  border:1px solid rgba(255,255,255,0.1);
+  font-size:14px;
+  font-family:Arial,sans-serif;
+}
+
+.modal-field textarea{
+  resize:vertical;
+  min-height:70px;
+}
+
+.modal-field small{
+  display:block;
+  color:rgba(255,255,255,0.4);
+  font-size:11px;
+  margin-top:5px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+
+.modal-actions button{
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.modal-cancel-btn{
+  background:rgba(255,255,255,0.1);
+  color:white;
+}
+
+.modal-save-btn{
+  background:#2ecc71;
+  color:white;
+}
+
+.modal-save-btn:disabled{ background:#555; cursor:not-allowed; }
+
+.modal-error{
+  color:#ff6b6b;
+  font-size:13px;
+  margin-top:10px;
+  display:none;
+}
+
+.custom-item-thumb{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:bold;
+  margin-left:8px;
+}
+.tipo-produto{ background:#3498db33; color:#3498db; }
+.tipo-adicional{ background:#f1c40f33; color:#f1c40f; }
+.tipo-combo{ background:#9b59b633; color:#9b59b6; }
 </style>
 </head>
 <body>
@@ -442,6 +556,13 @@ body{ background:#1a0000; color:white; min-height:100vh; }
   </div>
 
   <div class="section">
+    <h2>🆕 Cardápio</h2>
+    <p style="color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:15px;">Cadastre novos pratos, adicionais ou combos. Eles aparecem automaticamente no site e passam a ser aceitos nos pedidos.</p>
+    <button class="add-btn" onclick="abrirModalNovoItem()">+ Adicionar Novo Item</button>
+    <div id="custom-items-lista" style="margin-top:18px;"></div>
+  </div>
+
+  <div class="section">
     <h2>📦 Produtos</h2>
     <div id="produtos-lista"><div class="loading">Carregando...</div></div>
   </div>
@@ -456,6 +577,72 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     <div id="pedidos-lista"><div class="loading">Carregando...</div></div>
   </div>
 
+</div>
+
+<!-- MODAL: NOVO ITEM -->
+<div class="modal-overlay" id="novo-item-overlay">
+  <div class="modal-box">
+    <h3>🆕 Adicionar Novo Item</h3>
+
+    <div class="modal-field">
+      <label>Tipo</label>
+      <select id="novo-item-tipo" onchange="onTipoNovoItemChange()">
+        <option value="produto">Prato</option>
+        <option value="adicional">Adicional</option>
+        <option value="combo">Combo</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label>Nome</label>
+      <input type="text" id="novo-item-nome" class="section-input" placeholder="Ex: Hot Roll Especial (8 unidades)" maxlength="80">
+    </div>
+
+    <div class="modal-field">
+      <label>Categoria</label>
+      <input type="text" id="novo-item-categoria" class="section-input" list="categorias-existentes" placeholder="Ex: Hots, Harumaki, Adicionais...">
+      <datalist id="categorias-existentes">
+        <option value="Hots">
+        <option value="Hossomaki">
+        <option value="Harumaki">
+        <option value="Porções">
+        <option value="Saladas">
+        <option value="Refeições">
+        <option value="Sashimi">
+        <option value="Adicionais">
+      </datalist>
+      <small>Se usar uma categoria já existente (ex: Hots), o item aparece no filtro dessa categoria. Categorias novas aparecem só em "Todos".</small>
+    </div>
+
+    <div class="modal-field">
+      <label>Preço (R$)</label>
+      <input type="number" id="novo-item-preco" class="section-input" placeholder="Ex: 25.00" step="0.01" min="0.01">
+    </div>
+
+    <div class="modal-field">
+      <label>Descrição</label>
+      <textarea id="novo-item-descricao" maxlength="400" placeholder="Descrição que aparece no card do produto"></textarea>
+    </div>
+
+    <div class="modal-field" id="campo-descricao-modal" style="display:none;">
+      <label>Descrição do Combo (lista de itens)</label>
+      <textarea id="novo-item-descricao-modal" maxlength="400" placeholder="Ex: 2 Temaki Frito, 8 Hot Skin..."></textarea>
+      <small>Aparece no modal de detalhes do combo, no site.</small>
+    </div>
+
+    <div class="modal-field">
+      <label>Nome do arquivo da imagem</label>
+      <input type="text" id="novo-item-imagem" class="section-input" placeholder="Ex: hot-roll-especial.jpg">
+      <small>Só o nome do arquivo. A imagem precisa estar na pasta "Imagens/" do site.</small>
+    </div>
+
+    <div class="modal-error" id="novo-item-erro"></div>
+
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="fecharModalNovoItem()">Cancelar</button>
+      <button class="modal-save-btn" id="novo-item-save-btn" onclick="salvarNovoItem()">Adicionar</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -482,6 +669,8 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     document.getElementById('toggle-restaurante').checked = data.config.restaurante_aberto ?? true;
     document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
 
+    await loadCustomItems();
+    renderCustomItemsList();
     renderMotoboys(data.config.motoboys || []);
     renderProdutos(data.config.produtos_esgotados || []);
     renderCombos(data.config.combos_esgotados || []);
@@ -495,7 +684,7 @@ body{ background:#1a0000; color:white; min-height:100vh; }
   }
 }
 
-const produtos = [
+const produtosBase = [
   { name:'Hot Roll Philadelphia Salmão (8 unidades)', category:'Hots' },
   { name:'Temaki Frito', category:'Hots' },
   { name:'Bolinho de Salmão (4 unidades)', category:'Hots' },
@@ -529,7 +718,7 @@ const produtos = [
   { name:'Frango Xadrez', category:'Refeições' },
 ];
 
-const combos = [
+const combosBase = [
   { name:'Mega Combo Hot Roll' },
   { name:'Combo Apaixonados' },
   { name:'Combo Crocantissimo' },
@@ -540,8 +729,158 @@ const combos = [
   { name:'Combo Salmão Lovers' },
 ];
 
+let produtos = [...produtosBase];
+let combos = [...combosBase];
+let customItems = [];
+
 let adminToken = localStorage.getItem('admin_token') || null;
 let currentConfig = {};
+
+// ========================
+// CARDÁPIO CUSTOMIZADO (itens criados pelo admin)
+// ========================
+async function loadCustomItems(){
+  try {
+    const res = await fetch('/api/products');
+    const data = await res.json();
+    customItems = data.items || [];
+  } catch(e) {
+    console.error('Erro ao carregar itens customizados:', e);
+    customItems = [];
+  }
+  mergeCustomItems();
+}
+
+function mergeCustomItems(){
+  const produtosCustom = customItems
+    .filter(i => i.type === 'produto' || i.type === 'adicional')
+    .map(i => ({ name: i.name, category: i.category, custom: true, id: i.id, tipo: i.type }));
+
+  const combosCustom = customItems
+    .filter(i => i.type === 'combo')
+    .map(i => ({ name: i.name, custom: true, id: i.id }));
+
+  produtos = [...produtosBase, ...produtosCustom];
+  combos = [...combosBase, ...combosCustom];
+}
+
+function renderCustomItemsList(){
+  const container = document.getElementById('custom-items-lista');
+  if(!container) return;
+
+  if(!customItems || customItems.length === 0){
+    container.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Nenhum item customizado cadastrado ainda.</p>';
+    return;
+  }
+
+  const tipoLabel = { produto: 'Prato', adicional: 'Adicional', combo: 'Combo' };
+  const tipoClass = { produto: 'tipo-produto', adicional: 'tipo-adicional', combo: 'tipo-combo' };
+
+  container.innerHTML = '';
+  customItems.forEach(item => {
+    container.innerHTML += `
+      <div class="produto-item">
+        <div class="produto-nome">
+          ${item.name}
+          <span class="custom-item-thumb ${tipoClass[item.type] || ''}">${tipoLabel[item.type] || item.type}</span>
+          <small>${item.category} · R$${Number(item.price).toFixed(2)}</small>
+        </div>
+        <button onclick="removeCustomItem('${item.id}')" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;">🗑️</button>
+      </div>`;
+  });
+}
+
+async function removeCustomItem(id){
+  if(!confirm('Remover este item do cardápio? Ele deixará de aparecer no site.')) return;
+  try {
+    const res = await fetch(`/api/products?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${adminToken}` },
+    });
+    if(!res.ok) throw new Error('Erro ao remover');
+    await loadCustomItems();
+    renderCustomItemsList();
+    renderProdutos(currentConfig.produtos_esgotados || []);
+    renderCombos(currentConfig.combos_esgotados || []);
+  } catch(e) {
+    alert('Erro ao remover item. Tente novamente.');
+  }
+}
+
+// ========================
+// MODAL: NOVO ITEM
+// ========================
+function abrirModalNovoItem(){
+  document.getElementById('novo-item-tipo').value = 'produto';
+  document.getElementById('novo-item-nome').value = '';
+  document.getElementById('novo-item-categoria').value = '';
+  document.getElementById('novo-item-preco').value = '';
+  document.getElementById('novo-item-descricao').value = '';
+  document.getElementById('novo-item-descricao-modal').value = '';
+  document.getElementById('novo-item-imagem').value = '';
+  document.getElementById('novo-item-erro').style.display = 'none';
+  onTipoNovoItemChange();
+  document.getElementById('novo-item-overlay').style.display = 'flex';
+}
+
+function fecharModalNovoItem(){
+  document.getElementById('novo-item-overlay').style.display = 'none';
+}
+
+function onTipoNovoItemChange(){
+  const tipo = document.getElementById('novo-item-tipo').value;
+  document.getElementById('campo-descricao-modal').style.display = (tipo === 'combo') ? 'block' : 'none';
+}
+
+async function salvarNovoItem(){
+  const btn = document.getElementById('novo-item-save-btn');
+  const erroBox = document.getElementById('novo-item-erro');
+  erroBox.style.display = 'none';
+
+  const payload = {
+    type: document.getElementById('novo-item-tipo').value,
+    name: document.getElementById('novo-item-nome').value.trim(),
+    category: document.getElementById('novo-item-categoria').value.trim(),
+    price: parseFloat(document.getElementById('novo-item-preco').value),
+    description: document.getElementById('novo-item-descricao').value.trim(),
+    descricaoModal: document.getElementById('novo-item-descricao-modal').value.trim(),
+    image: document.getElementById('novo-item-imagem').value.trim(),
+  };
+
+  if(!payload.name || !payload.category || !payload.description || !payload.image || !(payload.price > 0)){
+    erroBox.innerText = 'Preencha todos os campos obrigatórios corretamente.';
+    erroBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = 'Salvando...';
+
+  try {
+    const res = await fetch('/api/products?action=create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Erro ao salvar');
+
+    await loadCustomItems();
+    renderCustomItemsList();
+    renderProdutos(currentConfig.produtos_esgotados || []);
+    renderCombos(currentConfig.combos_esgotados || []);
+    fecharModalNovoItem();
+  } catch(e) {
+    erroBox.innerText = e.message || 'Erro ao salvar. Tente novamente.';
+    erroBox.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'Adicionar';
+  }
+}
 
 // ========================
 // LOGIN
@@ -609,6 +948,8 @@ async function loadData(){
     document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
 
     // Renderizações
+    await loadCustomItems();
+    renderCustomItemsList();
     renderMotoboys(data.config.motoboys || []);
     renderProdutos(data.config.produtos_esgotados || []);
     renderCombos(data.config.combos_esgotados || []);
