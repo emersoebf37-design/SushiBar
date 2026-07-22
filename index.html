@@ -3031,6 +3031,12 @@ function temHotRollOuHossomakiElegivel(){
     return combo && combo.hotHossoMin8 === true;
   });
 }
+function temTemakiElegivel(){
+  return cart.some(item => {
+    const n = item.name || '';
+    return n.includes('Temaki');
+  });
+}
 
 function verificarVisibilidadeBrinde() {
   // Verifica se o cliente tem algum Yakisoba no carrinho
