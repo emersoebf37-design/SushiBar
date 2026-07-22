@@ -1273,57 +1273,136 @@ body{
   font-size:20px;
 }
 
-.addon-item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px 0;
-  border-bottom:1px solid #e9e9e9;
+.addons-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(112px, 1fr));
+  gap:10px;
 }
 
-.addon-item:last-child{
-  border-bottom:none;
+.addon-card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  background:white;
+  border:1px solid #e9e9e9;
+  border-radius:14px;
+  overflow:hidden;
+}
+
+.addon-card.addon-recommended{
+  border:2px solid #9e0505;
+}
+
+.addon-badge{
+  position:absolute;
+  top:6px;
+  left:6px;
+  z-index:2;
+  max-width:calc(100% - 12px);
+  background:#9e0505;
+  color:white;
+  font-size:9.5px;
+  font-weight:bold;
+  padding:3px 7px;
+  border-radius:999px;
+  line-height:1.25;
+}
+
+.addon-photo{
+  position:relative;
+  width:100%;
+  height:78px;
+  background:#f6f0e8;
+  overflow:hidden;
+}
+
+.addon-photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.addon-photo-fallback{
+  display:none;
+  width:100%;
+  height:100%;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+}
+
+.addon-info{
+  padding:8px 10px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1;
+}
+
+.addon-name{
+  font-size:12.5px;
+  font-weight:600;
+  line-height:1.25;
+  margin:0;
+  min-height:31px;
+}
+
+.addon-price{
+  font-size:11px;
+  color:#777;
 }
 
 .qty-control{
+  margin-top:auto;
   display:flex;
   align-items:center;
-  gap:10px;
-  background:white;
-  padding:6px 10px;
+  justify-content:space-between;
+  gap:6px;
+  background:#f6f6f6;
+  padding:4px 6px;
   border-radius:999px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.05);
 }
 
 .qty-control button{
-  width:28px;
-  height:28px;
+  width:24px;
+  height:24px;
   border:none;
   border-radius:50%;
   background:#9e0505;
   color:white;
-  font-size:18px;
+  font-size:16px;
+  line-height:1;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
   transition:0.2s;
+  flex-shrink:0;
 }
 
 .qty-control button:hover{
   background:#c20707;
-  transform:scale(1.1);
 }
 
 .qty-control button:active{
-  transform:scale(0.95);
+  transform:scale(0.9);
 }
 
 .qty-control span{
-  min-width:20px;
+  min-width:16px;
   text-align:center;
   font-weight:bold;
-  font-size:16px;
+  font-size:13px;
+}
+
+@media(max-width:420px){
+  .addons-grid{
+    grid-template-columns:repeat(2, 1fr);
+  }
+  .addon-photo{
+    height:66px;
+  }
 }
 
 #desktop-finish-btn{
@@ -1890,12 +1969,12 @@ const productsBase = [
 //
 
 const combosBase = [
-{ name: 'Mega Combo Hot Roll', description: 'Hot Roll até não dar mais.', descricaoModal: '32 Hot Roll Philadelphia.', price: 40, image: 'Imagens/Mega Combo Hot Roll.jpg', esgotado: false },
+{ name: 'Mega Combo Hot Roll', description: 'Hot Roll até não dar mais.', descricaoModal: '32 Hot Roll Philadelphia.', price: 40, image: 'Imagens/Mega Combo Hot Roll.jpg', esgotado: false, hotHossoMin8: true },
 { name: 'Combo Apaixonados', description: 'Um combo especial para momentos a dois.', descricaoModal: '  2 Yakisoba de calabresa M, 2 Temaki Frito, 2 Harumaki de Doce de Leite.', price: 60, image: 'Imagens/Combo Apaixonados.jpeg', esgotado: false },
-{ name: 'Combo Crocantissimo', description: 'Uma explosão de crocância', descricaoModal: '1 Temaki Frito, 8 Hot Skin, 8 Hot Kani, 8 Hot Philadelphia Salmão.', price: 50, image: 'Imagens/Combo Crocantissimo.png', esgotado: false },
-{ name: 'Combo Individual', description: 'Uma seleção para as noites de muita fome.', descricaoModal: '1 Temaki Frito, 8 Hot Philadelphia, 2 Harumaki de Doce de Leite.', price: 40, image: 'Imagens/Combo Individual.png', esgotado: false },
-{ name: 'Combo de Frios', description: 'Uma seleção de peças frias saborosas.', descricaoModal: '18 Hossomaki Skin, 18 Hossomaki Kani e Salada Sunomono.', price: 30, image: 'Imagens/Combo de Frios.png', esgotado: false },
-{ name: 'Combo Premium', description: 'Combo completo pensado para compartilhar.', descricaoModal: '24 Hot Philadelphia Salmão, 12 Hot Skin e 6 Lula à Dorê.', price: 75, image: 'Imagens/Combo Premium.png', esgotado: false },
+{ name: 'Combo Crocantissimo', description: 'Uma explosão de crocância', descricaoModal: '1 Temaki Frito, 8 Hot Skin, 8 Hot Kani, 8 Hot Philadelphia Salmão.', price: 50, image: 'Imagens/Combo Crocantissimo.png', esgotado: false, hotHossoMin8: true },
+{ name: 'Combo Individual', description: 'Uma seleção para as noites de muita fome.', descricaoModal: '1 Temaki Frito, 8 Hot Philadelphia, 2 Harumaki de Doce de Leite.', price: 40, image: 'Imagens/Combo Individual.png', esgotado: false, hotHossoMin8: true },
+{ name: 'Combo de Frios', description: 'Uma seleção de peças frias saborosas.', descricaoModal: '18 Hossomaki Skin, 18 Hossomaki Kani e Salada Sunomono.', price: 30, image: 'Imagens/Combo de Frios.png', esgotado: false, hotHossoMin8: true },
+{ name: 'Combo Premium', description: 'Combo completo pensado para compartilhar.', descricaoModal: '24 Hot Philadelphia Salmão, 12 Hot Skin e 6 Lula à Dorê.', price: 75, image: 'Imagens/Combo Premium.png', esgotado: false, hotHossoMin8: true },
 { name: 'Combo Primavera', description: 'Uma seleção crocante de peças saborosas.', descricaoModal: '4 Harumaki de Legumes, 4 Harumaki de Queijo e 4 Harumaki de Frango.', price: 38, image: 'Imagens/Combo Primavera.jpg', esgotado: false },
 ];
 
@@ -1931,6 +2010,7 @@ async function fetchCustomProducts(){
         descricaoModal: i.descricaoModal || i.description,
         image: i.image,
         esgotado: false,
+        hotHossoMin8: i.hotHossoMin8 === true,
       }));
 
     products = [...productsBase, ...customProdutos];
@@ -2678,7 +2758,7 @@ async function finishOrder(){
     }, 0);
 
     let total = baseTotal + (cart.length > 0 ? (entregaAtual.taxa || 0) : 0);
-    total += (addons.geleia || 0) * 1.00;
+    total += addonsExtraCost(addons);
     if(payment === 'Cartão') total *= 1.10;
 
     pendingOrder = {
@@ -2742,7 +2822,7 @@ async function confirmOrder(){
     return sum + (price * (item.quantity || 1));
   }, 0);
   total += cart.length > 0 ? (entregaAtual.taxa || 0) : 0;
-  total += (addons.geleia || 0) * 1.00;
+  total += addonsExtraCost(addons);
   if(payment === 'Cartão') total *= 1.10;
   pendingOrder.total = Number(total.toFixed(2));
 
@@ -2918,8 +2998,40 @@ let addons = {
   pimenta: 0,
   geleia: 0,
   amendoim: 0,
-  talheres: 0
+  talheres: 0,
+  creamCheeseExtra: 0,
+  creamCheeseCrocante: 0,
+  creamCheeseCouve: 0,
+  creamCheeseGeleiaPimenta: 0
 };
+
+// Preço unitário de cada adicional pago (adicionais grátis não entram aqui)
+const ADDON_PRICES = {
+  geleia: 1.00,
+  creamCheeseExtra: 1.00,
+  creamCheeseCrocante: 1.50,
+  creamCheeseCouve: 1.50,
+  creamCheeseGeleiaPimenta: 1.50
+};
+
+function addonsExtraCost(a){
+  return Object.entries(ADDON_PRICES).reduce((sum, [key, price]) => sum + ((a[key] || 0) * price), 0);
+}
+
+// Verifica se o carrinho tem Hot Roll, Hossomaki (avulsos) ou algum combo
+// com pelo menos 8 peças de Hot Roll/Hossomaki (flag hotHossoMin8)
+function temHotRollOuHossomakiElegivel(){
+  const temItemAvulso = cart.some(item => {
+    const n = item.name || '';
+    return n.includes('Hot Roll') || n.includes('Hossomaki');
+  });
+  if (temItemAvulso) return true;
+
+  return cart.some(item => {
+    const combo = combos.find(c => c.name === item.name);
+    return combo && combo.hotHossoMin8 === true;
+  });
+}
 
 function verificarVisibilidadeBrinde() {
   // Verifica se o cliente tem algum Yakisoba no carrinho
@@ -2951,6 +3063,28 @@ function verificarVisibilidadeBrinde() {
       if (elAmendoim) elAmendoim.innerText = 0;
     }
   }
+  // ✨ NOVO: Adicionais de cream cheese extra — exclusivos p/ Hot Roll, Hossomaki
+  // avulsos ou combos com 8+ dessas peças (flag hotHossoMin8)
+  const creamCheeseAddons = [
+    { key: 'creamCheeseExtra', id: 'addon-creamcheese-extra-container' },
+    { key: 'creamCheeseCrocante', id: 'addon-creamcheese-crocante-container' },
+    { key: 'creamCheeseCouve', id: 'addon-creamcheese-couve-container' },
+    { key: 'creamCheeseGeleiaPimenta', id: 'addon-creamcheese-geleiapimenta-container' },
+  ];
+  const elegivelCreamCheese = temHotRollOuHossomakiElegivel();
+
+  creamCheeseAddons.forEach(({ key, id }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (elegivelCreamCheese) {
+      el.style.display = 'flex';
+    } else {
+      el.style.display = 'none';
+      addons[key] = 0;
+      const qtyEl = document.getElementById(`qty-${key}`);
+      if (qtyEl) qtyEl.innerText = 0;
+    }
+  });
 }
 
 function calculateTotal(){
@@ -2966,7 +3100,7 @@ function calculateTotal(){
   total += cart.length > 0 ? (entregaAtual.taxa || 0) : 0;
 
   // Soma adicionais pagos
-  total += (addons.geleia || 0) * 1.00;
+  total += addonsExtraCost(addons);
 
   if(payment === 'Cartão') total *= 1.10;
 
@@ -3074,52 +3208,169 @@ window.addEventListener('popstate', (e) => {
     
     <div class="addons-box">
       <h3>Adicionais</h3>
-      
-      <div class="addon-item">
-        <span>🥢 Adaptador de hashi (Grátis)</span>
-        <div class="qty-control">
-          <button onclick="changeAddon('hashi', -1)">−</button>
-          <span id="qty-hashi">0</span>
-          <button onclick="changeAddon('hashi', 1)">+</button>
-        </div>
-      </div>
 
-      <div class="addon-item">
-        <span>🌶️ Geleia de Pimenta (+R$1,00)</span>
-        <div class="qty-control">
-          <button onclick="changeAddon('geleia', -1)">−</button>
-          <span id="qty-geleia">0</span>
-          <button onclick="changeAddon('geleia', 1)">+</button>
-        </div>
-      </div>
+      <div class="addons-grid">
 
-      <div class="addon-item" id="addon-pimenta-container" style="display: none;">
-        <span>🌶️ Pimenta de Sichuan caseira (Perfeita para Yakisoba) (Grátis)</span>
-        <div class="qty-control">
-          <button onclick="changeAddon('pimenta', -1)">−</button>
-          <span id="qty-pimenta">0</span>
-          <button onclick="changeAddon('pimenta', 1)">+</button>
+        <div class="addon-card">
+          <div class="addon-photo">
+            <img src="Imagens/hashi.jpg" alt="Adaptador de hashi" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🥢</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Adaptador de hashi</p>
+            <span class="addon-price">Grátis</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('hashi', -1)" aria-label="Diminuir hashi">−</button>
+              <span id="qty-hashi">0</span>
+              <button onclick="changeAddon('hashi', 1)" aria-label="Aumentar hashi">+</button>
+            </div>
+          </div>
         </div>
-      </div>
-    
-      <div class="addon-item" id="addon-amendoim-container" style="display: none;">
-        <span>🥜 Amendoim (Perfeito para Frango Xadrez) (Grátis)</span>
-        <div class="qty-control">
-          <button onclick="changeAddon('amendoim', -1)">−</button>
-          <span id="qty-amendoim">0</span>
-          <button onclick="changeAddon('amendoim', 1)">+</button>
-        </div>
-      </div>
 
-      <div class="addon-item" id="addon-talheres-container">
-        <span>🍴 Talheres (Grátis)</span>
-        <div class="qty-control">
-          <button onclick="changeAddon('talheres', -1)">−</button>
-          <span id="qty-talheres">0</span>
-          <button onclick="changeAddon('talheres', 1)">+</button>
+        <div class="addon-card">
+          <div class="addon-photo">
+            <img src="Imagens/geleia-pimenta.jpg" alt="Geleia de pimenta" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🌶️</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Geleia de pimenta</p>
+            <span class="addon-price">+R$1,00</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('geleia', -1)" aria-label="Diminuir geleia">−</button>
+              <span id="qty-geleia">0</span>
+              <button onclick="changeAddon('geleia', 1)" aria-label="Aumentar geleia">+</button>
+            </div>
+          </div>
         </div>
-      </div>
 
+        <div class="addon-card addon-recommended" id="addon-pimenta-container" style="display: none;">
+          <span class="addon-badge">Ideal p/ yakisoba</span>
+          <div class="addon-photo">
+            <img src="Imagens/pimenta-sichuan.jpg" alt="Pimenta de sichuan caseira" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🌶️</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Pimenta de sichuan caseira</p>
+            <span class="addon-price">Grátis</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('pimenta', -1)" aria-label="Diminuir pimenta">−</button>
+              <span id="qty-pimenta">0</span>
+              <button onclick="changeAddon('pimenta', 1)" aria-label="Aumentar pimenta">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="addon-card addon-recommended" id="addon-amendoim-container" style="display: none;">
+          <span class="addon-badge">Ideal p/ frango xadrez</span>
+          <div class="addon-photo">
+            <img src="Imagens/amendoim.jpg" alt="Amendoim" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🥜</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Amendoim</p>
+            <span class="addon-price">Grátis</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('amendoim', -1)" aria-label="Diminuir amendoim">−</button>
+              <span id="qty-amendoim">0</span>
+              <button onclick="changeAddon('amendoim', 1)" aria-label="Aumentar amendoim">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="addon-card" id="addon-talheres-container">
+          <div class="addon-photo">
+            <img src="Imagens/talheres.jpg" alt="Talheres" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🍴</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Talheres</p>
+            <span class="addon-price">Grátis</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('talheres', -1)" aria-label="Diminuir talheres">−</button>
+              <span id="qty-talheres">0</span>
+              <button onclick="changeAddon('talheres', 1)" aria-label="Aumentar talheres">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="addon-card addon-recommended" id="addon-creamcheese-extra-container" style="display: none;">
+          <span class="addon-badge">Hot Roll / Hossomaki</span>
+          <div class="addon-photo">
+            <img src="Imagens/cream-cheese-extra.jpg" alt="Cream cheese extra" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🧀</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Cream cheese extra (8 unidades)</p>
+            <span class="addon-price">+R$1,00</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('creamCheeseExtra', -1)" aria-label="Diminuir cream cheese extra">−</button>
+              <span id="qty-creamCheeseExtra">0</span>
+              <button onclick="changeAddon('creamCheeseExtra', 1)" aria-label="Aumentar cream cheese extra">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="addon-card addon-recommended" id="addon-creamcheese-crocante-container" style="display: none;">
+          <span class="addon-badge">Hot Roll / Hossomaki</span>
+          <div class="addon-photo">
+            <img src="Imagens/cream-cheese-crocante.jpg" alt="Cream cheese extra com crocante" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🧀</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Cream cheese extra com crocante (8 unidades)</p>
+            <span class="addon-price">+R$1,50</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('creamCheeseCrocante', -1)" aria-label="Diminuir cream cheese com crocante">−</button>
+              <span id="qty-creamCheeseCrocante">0</span>
+              <button onclick="changeAddon('creamCheeseCrocante', 1)" aria-label="Aumentar cream cheese com crocante">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="addon-card addon-recommended" id="addon-creamcheese-couve-container" style="display: none;">
+          <span class="addon-badge">Hot Roll / Hossomaki</span>
+          <div class="addon-photo">
+            <img src="Imagens/cream-cheese-couve.jpg" alt="Cream cheese extra com couve frita" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🧀</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Cream cheese extra com couve frita (8 unidades)</p>
+            <span class="addon-price">+R$1,50</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('creamCheeseCouve', -1)" aria-label="Diminuir cream cheese com couve frita">−</button>
+              <span id="qty-creamCheeseCouve">0</span>
+              <button onclick="changeAddon('creamCheeseCouve', 1)" aria-label="Aumentar cream cheese com couve frita">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="addon-card addon-recommended" id="addon-creamcheese-geleiapimenta-container" style="display: none;">
+          <span class="addon-badge">Hot Roll / Hossomaki</span>
+          <div class="addon-photo">
+            <img src="Imagens/cream-cheese-geleia-pimenta.jpg" alt="Cream cheese extra com geleia de pimenta" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🧀</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Cream cheese extra com geleia de pimenta (8 unidades)</p>
+            <span class="addon-price">+R$1,50</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('creamCheeseGeleiaPimenta', -1)" aria-label="Diminuir cream cheese com geleia de pimenta">−</button>
+              <span id="qty-creamCheeseGeleiaPimenta">0</span>
+              <button onclick="changeAddon('creamCheeseGeleiaPimenta', 1)" aria-label="Aumentar cream cheese com geleia de pimenta">+</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
     
     <div class="modal-buttons">

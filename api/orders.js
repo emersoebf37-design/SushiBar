@@ -49,6 +49,26 @@ function getPrivateKey() {
 }
 
 // ========================
+// COMBOS ELEGÍVEIS PARA CREAM CHEESE EXTRA
+// (8+ peças de Hot Roll/Hossomaki). Combos customizados cadastrados
+// pelo admin entram nessa lista dinamicamente via campo hotHossoMin8.
+// ========================
+const QUALIFYING_COMBOS_FIXOS = new Set([
+  "Mega Combo Hot Roll",
+  "Combo Crocantissimo",
+  "Combo Individual",
+  "Combo de Frios",
+  "Combo Premium",
+]);
+
+const CREAM_CHEESE_ADDON_PRICES = {
+  creamCheeseExtra: 1.00,
+  creamCheeseCrocante: 1.50,
+  creamCheeseCouve: 1.50,
+  creamCheeseGeleiaPimenta: 1.50,
+};
+
+// ========================
 // PRODUTOS (ATUALIZADO COM OS NOVOS TAMANHOS)
 // ========================
 const PRODUCTS = {
@@ -112,30 +132,45 @@ const PRODUCTS = {
 // Cache em memória para não estourar o limite de leitura do Firestore
 // ========================
 let customProductsCache = null;
+let customQualifyingCombosCache = new Set();
 let customProductsCacheAt = 0;
 const CUSTOM_PRODUCTS_CACHE_MS = 60 * 1000; // 60s
 
 async function getFullProductList(db) {
   const now = Date.now();
   if (customProductsCache && (now - customProductsCacheAt < CUSTOM_PRODUCTS_CACHE_MS)) {
-    return { ...PRODUCTS, ...customProductsCache };
+    return {
+      products: { ...PRODUCTS, ...customProductsCache },
+      qualifyingCombos: new Set([...QUALIFYING_COMBOS_FIXOS, ...customQualifyingCombosCache]),
+    };
   }
 
   try {
     const snap = await db.collection("custom_products").get();
     const custom = {};
+    const qualifying = new Set();
     snap.forEach(doc => {
       const data = doc.data();
       if (data && data.name && Number.isFinite(data.price)) {
         custom[data.name] = data.price;
+        if (data.type === "combo" && data.hotHossoMin8 === true) {
+          qualifying.add(data.name);
+        }
       }
     });
     customProductsCache = custom;
+    customQualifyingCombosCache = qualifying;
     customProductsCacheAt = now;
-    return { ...PRODUCTS, ...custom };
+    return {
+      products: { ...PRODUCTS, ...custom },
+      qualifyingCombos: new Set([...QUALIFYING_COMBOS_FIXOS, ...qualifying]),
+    };
   } catch (e) {
     console.warn("Erro ao buscar produtos customizados, usando apenas os fixos:", e.message);
-    return { ...PRODUCTS };
+    return {
+      products: { ...PRODUCTS },
+      qualifyingCombos: new Set(QUALIFYING_COMBOS_FIXOS),
+    };
   }
 }
 
@@ -229,7 +264,7 @@ export default async function handler(req, res) {
       }
 
       // Recalcula Total
-      const ALL_PRODUCTS = await getFullProductList(db);
+      const { products: ALL_PRODUCTS, qualifyingCombos } = await getFullProductList(db);
       let total = 0;
       const validatedItems = [];
 
@@ -257,6 +292,13 @@ export default async function handler(req, res) {
         item.name.toLowerCase().includes("yakisoba")
       );
 
+      // Verifica se há Hot Roll/Hossomaki avulso ou combo elegível (8+ peças) no pedido
+      const temHotRollOuHossomakiNoPedido = validatedItems.some(item =>
+        item.name.includes("Hot Roll") ||
+        item.name.includes("Hossomaki") ||
+        qualifyingCombos.has(item.name)
+      );
+
       // Transação do ID sequencial
       const counterRef = db.collection("meta").doc("orderCounter");
       let nextId = 1;
@@ -279,13 +321,26 @@ export default async function handler(req, res) {
       const pimenta = Math.max(0, parseInt(addons.pimenta || 0));
       const amendoim = Math.max(0, parseInt(addons.amendoim || 0));
       const talheres = Math.max(0, parseInt(addons.talheres || 0));
+      const creamCheeseExtra = Math.max(0, parseInt(addons.creamCheeseExtra || 0));
+      const creamCheeseCrocante = Math.max(0, parseInt(addons.creamCheeseCrocante || 0));
+      const creamCheeseCouve = Math.max(0, parseInt(addons.creamCheeseCouve || 0));
+      const creamCheeseGeleiaPimenta = Math.max(0, parseInt(addons.creamCheeseGeleiaPimenta || 0));
 
-      if (hashi > 20 || geleia > 20 || amendoim > 20 || talheres > 20) {
+      if (
+        hashi > 20 || geleia > 20 || amendoim > 20 || talheres > 20 ||
+        creamCheeseExtra > 20 || creamCheeseCrocante > 20 ||
+        creamCheeseCouve > 20 || creamCheeseGeleiaPimenta > 20
+      ) {
         return res.status(400).json({ error: "Quantidade de adicionais inválida." });
       }
 
       if (pimenta > 0 && !temYakisobaNoPedido) {
         return res.status(400).json({ error: "A pimenta de Sichuan é exclusiva para pedidos com Yakisoba." });
+      }
+
+      const totalCreamCheeseExtras = creamCheeseExtra + creamCheeseCrocante + creamCheeseCouve + creamCheeseGeleiaPimenta;
+      if (totalCreamCheeseExtras > 0 && !temHotRollOuHossomakiNoPedido) {
+        return res.status(400).json({ error: "Os adicionais de cream cheese extra são exclusivos para pedidos com Hot Roll, Hossomaki ou combos com 8 ou mais dessas peças." });
       }
 
       const validPayments = ["Pix", "Cartão", "Dinheiro"];
@@ -298,6 +353,10 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Taxa de entrega inválida." });
       }
       total += geleia * 1.00;
+      total += creamCheeseExtra * CREAM_CHEESE_ADDON_PRICES.creamCheeseExtra;
+      total += creamCheeseCrocante * CREAM_CHEESE_ADDON_PRICES.creamCheeseCrocante;
+      total += creamCheeseCouve * CREAM_CHEESE_ADDON_PRICES.creamCheeseCouve;
+      total += creamCheeseGeleiaPimenta * CREAM_CHEESE_ADDON_PRICES.creamCheeseGeleiaPimenta;
       total += taxaEntrega;
 
       if (order.payment === "Cartão") total *= 1.10;
@@ -312,7 +371,10 @@ export default async function handler(req, res) {
         number:      order.number,
         complement:  order.complement,
         payment:     order.payment,
-        addons:      { hashi, pimenta, geleia, amendoim, talheres },
+        addons:      {
+          hashi, pimenta, geleia, amendoim, talheres,
+          creamCheeseExtra, creamCheeseCrocante, creamCheeseCouve, creamCheeseGeleiaPimenta,
+        },
         items:       validatedItems,
         taxaEntrega,
         distanciaKm,

@@ -84,6 +84,7 @@ export default async function handler(req, res) {
       const descricaoModal = clean(body.descricaoModal);
       const imageFile = clean(body.image).replace(/^\/+/, ""); // remove barras iniciais
       const price = Number(body.price);
+      const hotHossoMin8 = body.hotHossoMin8 === true || body.hotHossoMin8 === "true";
 
       if (!VALID_TYPES.includes(type)) {
         return res.status(400).json({ error: "Tipo inválido. Use produto, adicional ou combo." });
@@ -120,6 +121,9 @@ export default async function handler(req, res) {
 
       if (type === "combo" && descricaoModal) {
         newItem.descricaoModal = descricaoModal;
+      }
+      if (type === "combo") {
+        newItem.hotHossoMin8 = hotHossoMin8;
       }
 
       const ref = await db.collection("custom_products").add(newItem);

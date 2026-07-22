@@ -632,6 +632,14 @@ body{ background:#1a0000; color:white; min-height:100vh; }
       <small>Aparece no modal de detalhes do combo, no site.</small>
     </div>
 
+    <div class="modal-field" id="campo-hot-hosso-min8" style="display:none;">
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+        <input type="checkbox" id="novo-item-hot-hosso-min8" style="width:auto;">
+        Tem 8 ou mais peças de Hot Roll/Hossomaki
+      </label>
+      <small>Libera os adicionais de cream cheese extra (Grátis/pago) para quem pedir esse combo.</small>
+    </div>
+
     <div class="modal-field">
       <label>Nome do arquivo da imagem</label>
       <input type="text" id="novo-item-imagem" class="section-input" placeholder="Ex: hot-roll-especial.jpg">
@@ -780,11 +788,15 @@ function renderCustomItemsList(){
 
   container.innerHTML = '';
   customItems.forEach(item => {
+    const badgeHotHosso = item.type === 'combo' && item.hotHossoMin8
+      ? '<span class="custom-item-thumb" style="background:#9e050533; color:#e57373;">🧀 8+ Hot Roll/Hossomaki</span>'
+      : '';
     container.innerHTML += `
       <div class="produto-item">
         <div class="produto-nome">
           ${item.name}
           <span class="custom-item-thumb ${tipoClass[item.type] || ''}">${tipoLabel[item.type] || item.type}</span>
+          ${badgeHotHosso}
           <small>${item.category} · R$${Number(item.price).toFixed(2)}</small>
         </div>
         <button onclick="removeCustomItem('${item.id}')" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;">🗑️</button>
@@ -820,6 +832,7 @@ function abrirModalNovoItem(){
   document.getElementById('novo-item-descricao').value = '';
   document.getElementById('novo-item-descricao-modal').value = '';
   document.getElementById('novo-item-imagem').value = '';
+  document.getElementById('novo-item-hot-hosso-min8').checked = false;
   document.getElementById('novo-item-erro').style.display = 'none';
   onTipoNovoItemChange();
   document.getElementById('novo-item-overlay').style.display = 'flex';
@@ -832,6 +845,7 @@ function fecharModalNovoItem(){
 function onTipoNovoItemChange(){
   const tipo = document.getElementById('novo-item-tipo').value;
   document.getElementById('campo-descricao-modal').style.display = (tipo === 'combo') ? 'block' : 'none';
+  document.getElementById('campo-hot-hosso-min8').style.display = (tipo === 'combo') ? 'block' : 'none';
 }
 
 async function salvarNovoItem(){
@@ -847,6 +861,7 @@ async function salvarNovoItem(){
     description: document.getElementById('novo-item-descricao').value.trim(),
     descricaoModal: document.getElementById('novo-item-descricao-modal').value.trim(),
     image: document.getElementById('novo-item-imagem').value.trim(),
+    hotHossoMin8: document.getElementById('novo-item-hot-hosso-min8').checked,
   };
 
   if(!payload.name || !payload.category || !payload.description || !payload.image || !(payload.price > 0)){
