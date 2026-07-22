@@ -66,6 +66,7 @@ const CREAM_CHEESE_ADDON_PRICES = {
   creamCheeseCrocante: 1.50,
   creamCheeseCouve: 1.50,
   creamCheeseGeleiaPimenta: 1.50,
+  creamCheeseTemakiExtra: 2.00,
 };
 
 // ========================
@@ -325,11 +326,12 @@ export default async function handler(req, res) {
       const creamCheeseCrocante = Math.max(0, parseInt(addons.creamCheeseCrocante || 0));
       const creamCheeseCouve = Math.max(0, parseInt(addons.creamCheeseCouve || 0));
       const creamCheeseGeleiaPimenta = Math.max(0, parseInt(addons.creamCheeseGeleiaPimenta || 0));
+      const creamCheeseTemakiExtra = Math.max(0, parseInt(addons.creamCheeseTemakiExtra || 0));
 
       if (
         hashi > 20 || geleia > 20 || amendoim > 20 || talheres > 20 ||
         creamCheeseExtra > 20 || creamCheeseCrocante > 20 ||
-        creamCheeseCouve > 20 || creamCheeseGeleiaPimenta > 20
+        creamCheeseCouve > 20 || creamCheeseGeleiaPimenta > 20 || creamCheeseTemakiExtra > 20
       ) {
         return res.status(400).json({ error: "Quantidade de adicionais inválida." });
       }
@@ -373,7 +375,7 @@ export default async function handler(req, res) {
         payment:     order.payment,
         addons:      {
           hashi, pimenta, geleia, amendoim, talheres,
-          creamCheeseExtra, creamCheeseCrocante, creamCheeseCouve, creamCheeseGeleiaPimenta,
+          creamCheeseExtra, creamCheeseCrocante, creamCheeseCouve, creamCheeseGeleiaPimenta, creamCheeseTemakiExtra,
         },
         items:       validatedItems,
         taxaEntrega,

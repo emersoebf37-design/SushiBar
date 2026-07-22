@@ -3084,6 +3084,24 @@ function verificarVisibilidadeBrinde() {
       if (qtyEl) qtyEl.innerText = 0;
     }
   });
+
+  const TemakiAddons = [
+    { key: 'creamCheeseTemakiExtra', id: 'cream-cheese-temaki-container' },
+  ];
+  const elegivelTemaki = temTemakiElegivel();
+
+  TemakiAddons.forEach(({ key, id }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (elegivelTemaki) {
+      el.style.display = 'flex';
+    } else {
+      el.style.display = 'none';
+      addons[key] = 0;
+      const qtyEl = document.getElementById(`qty-${key}`);
+      if (qtyEl) qtyEl.innerText = 0;
+    }
+  });
 }
 
 function calculateTotal(){
@@ -3347,6 +3365,24 @@ window.addEventListener('popstate', (e) => {
               <button onclick="changeAddon('creamCheeseCouve', -1)" aria-label="Diminuir cream cheese com couve frita">−</button>
               <span id="qty-creamCheeseCouve">0</span>
               <button onclick="changeAddon('creamCheeseCouve', 1)" aria-label="Aumentar cream cheese com couve frita">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="addon-card addon-recommended" id="cream-cheese-temaki-container" style="display: none;">
+          <span class="addon-badge">Hot Roll / Hossomaki</span>
+          <div class="addon-photo">
+            <img src="Imagens/cream-cheese-extra temaki.jpg" alt="Cream cheese extra temaki" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🧀</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Cream cheese extra (8 unidades)</p>
+            <span class="addon-price">+R$2,00</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('creamCheeseExtra', -1)" aria-label="Diminuir cream cheese extra">−</button>
+              <span id="qty-creamCheeseExtra">0</span>
+              <button onclick="changeAddon('creamCheeseExtra', 1)" aria-label="Aumentar cream cheese extra">+</button>
             </div>
           </div>
         </div>
