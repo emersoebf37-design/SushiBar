@@ -107,7 +107,9 @@ body{
 
 .main{
   flex:1;
+  min-width:0;
   overflow-y:auto;
+  overflow-x:hidden;
   height:100vh;
   padding:30px;
   background:#ffffff;
@@ -308,7 +310,7 @@ body{
 
 .products{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(3, minmax(0,1fr));
   gap:25px;
   padding-right:0;
 }
@@ -532,7 +534,7 @@ body{
 
 .acc-field-row{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   gap:12px;
 }
 
@@ -844,6 +846,9 @@ body{
   color:black;
   width:100%;
   max-width:450px;
+  max-height:85vh;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
   border-radius:25px;
   padding:30px;
   animation:modalShow 0.2s ease;
@@ -1078,7 +1083,7 @@ body{
 
   .menu-container{
     display:grid;
-    grid-template-columns:1fr 380px;
+    grid-template-columns:minmax(0,1fr) 380px;
     gap:30px;
     align-items:start;
     background:transparent;
@@ -1100,7 +1105,7 @@ body{
   }
 
   .products{
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(2, minmax(0,1fr));
     gap:30px;
   }
 
@@ -1398,7 +1403,7 @@ body{
 
 @media(max-width:420px){
   .addons-grid{
-    grid-template-columns:repeat(2, 1fr);
+    grid-template-columns:repeat(2, minmax(0,1fr));
   }
   .addon-photo{
     height:66px;
@@ -1416,12 +1421,6 @@ body{
 }
 
 @media(max-width:900px){
-  .modal-box{
-    max-height: 85vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
   .modal-overlay{
     align-items: center;
     padding: 15px;
