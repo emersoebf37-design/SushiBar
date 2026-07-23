@@ -1969,9 +1969,9 @@ const productsBase = [
 
 const combosBase = [
 { name: 'Mega Combo Hot Roll', description: 'Hot Roll até não dar mais.', descricaoModal: '32 Hot Roll Philadelphia.', price: 40, image: 'Imagens/Mega Combo Hot Roll.jpg', esgotado: false, hotHossoMin8: true },
-{ name: 'Combo Apaixonados', description: 'Um combo especial para momentos a dois.', descricaoModal: '  2 Yakisoba de calabresa M, 2 Temaki Frito, 2 Harumaki de Doce de Leite.', price: 60, image: 'Imagens/Combo Apaixonados.jpeg', esgotado: false },
-{ name: 'Combo Crocantissimo', description: 'Uma explosão de crocância', descricaoModal: '1 Temaki Frito, 8 Hot Skin, 8 Hot Kani, 8 Hot Philadelphia Salmão.', price: 50, image: 'Imagens/Combo Crocantissimo.png', esgotado: false, hotHossoMin8: true },
-{ name: 'Combo Individual', description: 'Uma seleção para as noites de muita fome.', descricaoModal: '1 Temaki Frito, 8 Hot Philadelphia, 2 Harumaki de Doce de Leite.', price: 40, image: 'Imagens/Combo Individual.png', esgotado: false, hotHossoMin8: true },
+{ name: 'Combo Apaixonados', description: 'Um combo especial para momentos a dois.', descricaoModal: '  2 Yakisoba de calabresa M, 2 Temaki Frito, 2 Harumaki de Doce de Leite.', price: 60, image: 'Imagens/Combo Apaixonados.jpeg', esgotado: false, temakiFrito: true },
+{ name: 'Combo Crocantissimo', description: 'Uma explosão de crocância', descricaoModal: '1 Temaki Frito, 8 Hot Skin, 8 Hot Kani, 8 Hot Philadelphia Salmão.', price: 50, image: 'Imagens/Combo Crocantissimo.png', esgotado: false, hotHossoMin8: true, temakiFrito: true },
+{ name: 'Combo Individual', description: 'Uma seleção para as noites de muita fome.', descricaoModal: '1 Temaki Frito, 8 Hot Philadelphia, 2 Harumaki de Doce de Leite.', price: 40, image: 'Imagens/Combo Individual.png', esgotado: false, hotHossoMin8: true, temakiFrito: true },
 { name: 'Combo de Frios', description: 'Uma seleção de peças frias saborosas.', descricaoModal: '18 Hossomaki Skin, 18 Hossomaki Kani e Salada Sunomono.', price: 30, image: 'Imagens/Combo de Frios.png', esgotado: false, hotHossoMin8: true },
 { name: 'Combo Premium', description: 'Combo completo pensado para compartilhar.', descricaoModal: '24 Hot Philadelphia Salmão, 12 Hot Skin e 6 Lula à Dorê.', price: 75, image: 'Imagens/Combo Premium.png', esgotado: false, hotHossoMin8: true },
 { name: 'Combo Primavera', description: 'Uma seleção crocante de peças saborosas.', descricaoModal: '4 Harumaki de Legumes, 4 Harumaki de Queijo e 4 Harumaki de Frango.', price: 38, image: 'Imagens/Combo Primavera.jpg', esgotado: false },
@@ -1990,7 +1990,7 @@ async function fetchCustomProducts(){
     const customItems = data.items || [];
 
     const customProdutos = customItems
-      .filter(i => i.type === 'produto' || i.type === 'adicional')
+      .filter(i => i.type === 'produto')
       .map(i => ({
         name: i.name,
         price: i.price,
@@ -2010,15 +2010,71 @@ async function fetchCustomProducts(){
         image: i.image,
         esgotado: false,
         hotHossoMin8: i.hotHossoMin8 === true,
+        temakiFrito: i.temakiFrito === true,
+      }));
+
+    // ✨ Adicionais cadastrados pelo admin (type: 'adicional') não são
+    // pratos do cardápio — eles viram cards dentro do modal de adicionais.
+    const customAdicionais = customItems
+      .filter(i => i.type === 'adicional')
+      .map(i => ({
+        id: i.id,
+        name: i.name,
+        price: i.price,
+        image: i.image,
       }));
 
     products = [...productsBase, ...customProdutos];
     combos = [...combosBase, ...customCombos];
+    renderCustomAddonsUI(customAdicionais);
   } catch(e) {
     console.warn('Não foi possível carregar itens customizados do cardápio:', e);
     products = [...productsBase];
     combos = [...combosBase];
   }
+}
+
+// Cria dinamicamente os cards dos adicionais customizados dentro do
+// modal de finalização, na mesma grade dos adicionais fixos (hashi, geleia etc).
+function renderCustomAddonsUI(items){
+  const grid = document.querySelector('#order-modal .addons-grid');
+  if(!grid) return;
+
+  // Remove cards de uma renderização anterior (evita duplicar em re-fetch)
+  grid.querySelectorAll('.addon-card[data-custom-addon="true"]').forEach(el => el.remove());
+
+  items.forEach(item => {
+    if(!item.id || !item.name) return;
+    const key = 'custom_' + item.id;
+
+    // Garante uma entrada no estado de adicionais e no mapa de preços
+    if(!(key in addons)) addons[key] = 0;
+    ADDON_PRICES[key] = Number(item.price) || 0;
+
+    const precoTexto = '+R$' + (Number(item.price) || 0).toFixed(2).replace('.', ',');
+    const nomeSeguro = String(item.name).replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+    const card = document.createElement('div');
+    card.className = 'addon-card';
+    card.dataset.customAddon = 'true';
+    card.innerHTML = `
+      <div class="addon-photo">
+        <img src="${item.image || ''}" alt="${nomeSeguro}" loading="lazy"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="addon-photo-fallback">🍥</div>
+      </div>
+      <div class="addon-info">
+        <p class="addon-name">${nomeSeguro}</p>
+        <span class="addon-price">${precoTexto}</span>
+        <div class="qty-control">
+          <button onclick="changeAddon('${key}', -1)" aria-label="Diminuir ${nomeSeguro}">−</button>
+          <span id="qty-${key}">0</span>
+          <button onclick="changeAddon('${key}', 1)" aria-label="Aumentar ${nomeSeguro}">+</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
 }
 
 const categories = [
@@ -3001,7 +3057,8 @@ let addons = {
   creamCheeseExtra: 0,
   creamCheeseCrocante: 0,
   creamCheeseCouve: 0,
-  creamCheeseGeleiaPimenta: 0
+  creamCheeseGeleiaPimenta: 0,
+  creamCheeseTemaki: 0
 };
 
 // Preço unitário de cada adicional pago (adicionais grátis não entram aqui)
@@ -3010,7 +3067,8 @@ const ADDON_PRICES = {
   creamCheeseExtra: 1.00,
   creamCheeseCrocante: 1.50,
   creamCheeseCouve: 1.50,
-  creamCheeseGeleiaPimenta: 1.50
+  creamCheeseGeleiaPimenta: 1.50,
+  creamCheeseTemaki: 1.50
 };
 
 function addonsExtraCost(a){
@@ -3031,10 +3089,16 @@ function temHotRollOuHossomakiElegivel(){
     return combo && combo.hotHossoMin8 === true;
   });
 }
-function temTemakiElegivel(){
+
+// Verifica se o carrinho tem Temaki Frito avulso ou algum combo
+// que contenha Temaki Frito (flag temakiFrito)
+function temTemakiFritoElegivel(){
+  const temItemAvulso = cart.some(item => (item.name || '').includes('Temaki Frito'));
+  if (temItemAvulso) return true;
+
   return cart.some(item => {
-    const n = item.name || '';
-    return n.includes('Temaki');
+    const combo = combos.find(c => c.name === item.name);
+    return combo && combo.temakiFrito === true;
   });
 }
 
@@ -3091,23 +3155,20 @@ function verificarVisibilidadeBrinde() {
     }
   });
 
-  const TemakiAddons = [
-    { key: 'creamCheeseTemakiExtra', id: 'cream-cheese-temaki-container' },
-  ];
-  const elegivelTemaki = temTemakiElegivel();
-
-  TemakiAddons.forEach(({ key, id }) => {
-    const el = document.getElementById(id);
-    if (!el) return;
+  // ✨ NOVO: Cream cheese extra no temaki — exclusivo p/ Temaki Frito avulso
+  // ou combos que contenham Temaki Frito (flag temakiFrito)
+  const elegivelTemaki = temTemakiFritoElegivel();
+  const temakiEl = document.getElementById('addon-creamcheese-temaki-container');
+  if (temakiEl) {
     if (elegivelTemaki) {
-      el.style.display = 'flex';
+      temakiEl.style.display = 'flex';
     } else {
-      el.style.display = 'none';
-      addons[key] = 0;
-      const qtyEl = document.getElementById(`qty-${key}`);
+      temakiEl.style.display = 'none';
+      addons.creamCheeseTemaki = 0;
+      const qtyEl = document.getElementById('qty-creamCheeseTemaki');
       if (qtyEl) qtyEl.innerText = 0;
     }
-  });
+  }
 }
 
 function calculateTotal(){
@@ -3251,7 +3312,7 @@ window.addEventListener('popstate', (e) => {
           </div>
         </div>
 
-       <!-- <div class="addon-card">
+        <div class="addon-card">
           <div class="addon-photo">
             <img src="Imagens/geleia-pimenta.jpg" alt="Geleia de pimenta" loading="lazy"
                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
@@ -3266,7 +3327,7 @@ window.addEventListener('popstate', (e) => {
               <button onclick="changeAddon('geleia', 1)" aria-label="Aumentar geleia">+</button>
             </div>
           </div>
-        </div>-->
+        </div>
 
         <div class="addon-card addon-recommended" id="addon-pimenta-container" style="display: none;">
           <span class="addon-badge">Ideal p/ yakisoba</span>
@@ -3375,25 +3436,7 @@ window.addEventListener('popstate', (e) => {
           </div>
         </div>
 
-       <!-- <div class="addon-card addon-recommended" id="cream-cheese-temaki-container" style="display: none;">
-          <span class="addon-badge">Hot Roll / Hossomaki</span>
-          <div class="addon-photo">
-            <img src="Imagens/cream-cheese-extra temaki.jpg" alt="Cream cheese extra temaki" loading="lazy"
-                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-            <div class="addon-photo-fallback">🧀</div>
-          </div>
-          <div class="addon-info">
-            <p class="addon-name">Cream cheese extra</p>
-            <span class="addon-price">+R$2,00</span>
-            <div class="qty-control">
-              <button onclick="changeAddon('creamCheeseTemakiExtra', -1)" aria-label="Diminuir cream cheese extra">−</button>
-              <span id="qty-creamCheeseTemakiExtra">0</span>
-              <button onclick="changeAddon('creamCheeseTemakiExtra', 1)" aria-label="Aumentar cream cheese extra">+</button>
-            </div>
-          </div>
-        </div>-->
-
-       <!--<div class="addon-card addon-recommended" id="addon-creamcheese-geleiapimenta-container" style="display: none;">
+        <div class="addon-card addon-recommended" id="addon-creamcheese-geleiapimenta-container" style="display: none;">
           <span class="addon-badge">Hot Roll / Hossomaki</span>
           <div class="addon-photo">
             <img src="Imagens/cream-cheese-geleia-pimenta.jpg" alt="Cream cheese extra com geleia de pimenta" loading="lazy"
@@ -3409,7 +3452,25 @@ window.addEventListener('popstate', (e) => {
               <button onclick="changeAddon('creamCheeseGeleiaPimenta', 1)" aria-label="Aumentar cream cheese com geleia de pimenta">+</button>
             </div>
           </div>
-        </div>-->
+        </div>
+
+        <div class="addon-card addon-recommended" id="addon-creamcheese-temaki-container" style="display: none;">
+          <span class="addon-badge">Temaki Frito</span>
+          <div class="addon-photo">
+            <img src="Imagens/cream-cheese-temaki.jpg" alt="Cream cheese extra no temaki" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="addon-photo-fallback">🧀</div>
+          </div>
+          <div class="addon-info">
+            <p class="addon-name">Cream cheese extra no temaki</p>
+            <span class="addon-price">+R$1,50</span>
+            <div class="qty-control">
+              <button onclick="changeAddon('creamCheeseTemaki', -1)" aria-label="Diminuir cream cheese no temaki">−</button>
+              <span id="qty-creamCheeseTemaki">0</span>
+              <button onclick="changeAddon('creamCheeseTemaki', 1)" aria-label="Aumentar cream cheese no temaki">+</button>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>

@@ -598,7 +598,7 @@ body{ background:#1a0000; color:white; min-height:100vh; }
       <input type="text" id="novo-item-nome" class="section-input" placeholder="Ex: Hot Roll Especial (8 unidades)" maxlength="80">
     </div>
 
-    <div class="modal-field">
+    <div class="modal-field" id="campo-categoria">
       <label>Categoria</label>
       <input type="text" id="novo-item-categoria" class="section-input" list="categorias-existentes" placeholder="Ex: Hots, Harumaki, Adicionais...">
       <datalist id="categorias-existentes">
@@ -614,6 +614,10 @@ body{ background:#1a0000; color:white; min-height:100vh; }
         </option>
       </datalist>
       <small>Se usar uma categoria já existente (ex: Hots), o item aparece no filtro dessa categoria. Categorias novas aparecem só em "Todos".</small>
+    </div>
+
+    <div class="modal-field" id="campo-adicional-info" style="display:none;">
+      <small>💡 Esse adicional vai aparecer como um card (com foto, preço e contador) dentro do modal de finalização do pedido, junto com hashi, geleia etc. — não aparece como prato no cardápio.</small>
     </div>
 
     <div class="modal-field">
@@ -638,6 +642,14 @@ body{ background:#1a0000; color:white; min-height:100vh; }
         Tem 8 ou mais peças de Hot Roll/Hossomaki
       </label>
       <small>Libera os adicionais de cream cheese extra (Grátis/pago) para quem pedir esse combo.</small>
+    </div>
+
+    <div class="modal-field" id="campo-temaki-frito" style="display:none;">
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+        <input type="checkbox" id="novo-item-temaki-frito" style="width:auto;">
+        Contém Temaki Frito
+      </label>
+      <small>Libera o adicional "Cream cheese extra no temaki" para quem pedir esse combo.</small>
     </div>
 
     <div class="modal-field">
@@ -763,7 +775,7 @@ async function loadCustomItems(){
 
 function mergeCustomItems(){
   const produtosCustom = customItems
-    .filter(i => i.type === 'produto' || i.type === 'adicional')
+    .filter(i => i.type === 'produto')
     .map(i => ({ name: i.name, category: i.category, custom: true, id: i.id, tipo: i.type }));
 
   const combosCustom = customItems
@@ -791,12 +803,16 @@ function renderCustomItemsList(){
     const badgeHotHosso = item.type === 'combo' && item.hotHossoMin8
       ? '<span class="custom-item-thumb" style="background:#9e050533; color:#e57373;">🧀 8+ Hot Roll/Hossomaki</span>'
       : '';
+    const badgeTemaki = item.type === 'combo' && item.temakiFrito
+      ? '<span class="custom-item-thumb" style="background:#9e050533; color:#e57373;">🧀 Temaki Frito</span>'
+      : '';
     container.innerHTML += `
       <div class="produto-item">
         <div class="produto-nome">
           ${item.name}
           <span class="custom-item-thumb ${tipoClass[item.type] || ''}">${tipoLabel[item.type] || item.type}</span>
           ${badgeHotHosso}
+          ${badgeTemaki}
           <small>${item.category} · R$${Number(item.price).toFixed(2)}</small>
         </div>
         <button onclick="removeCustomItem('${item.id}')" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;">🗑️</button>
@@ -833,6 +849,7 @@ function abrirModalNovoItem(){
   document.getElementById('novo-item-descricao-modal').value = '';
   document.getElementById('novo-item-imagem').value = '';
   document.getElementById('novo-item-hot-hosso-min8').checked = false;
+  document.getElementById('novo-item-temaki-frito').checked = false;
   document.getElementById('novo-item-erro').style.display = 'none';
   onTipoNovoItemChange();
   document.getElementById('novo-item-overlay').style.display = 'flex';
@@ -846,6 +863,9 @@ function onTipoNovoItemChange(){
   const tipo = document.getElementById('novo-item-tipo').value;
   document.getElementById('campo-descricao-modal').style.display = (tipo === 'combo') ? 'block' : 'none';
   document.getElementById('campo-hot-hosso-min8').style.display = (tipo === 'combo') ? 'block' : 'none';
+  document.getElementById('campo-temaki-frito').style.display = (tipo === 'combo') ? 'block' : 'none';
+  document.getElementById('campo-categoria').style.display = (tipo === 'adicional') ? 'none' : 'block';
+  document.getElementById('campo-adicional-info').style.display = (tipo === 'adicional') ? 'block' : 'none';
 }
 
 async function salvarNovoItem(){
@@ -862,6 +882,7 @@ async function salvarNovoItem(){
     descricaoModal: document.getElementById('novo-item-descricao-modal').value.trim(),
     image: document.getElementById('novo-item-imagem').value.trim(),
     hotHossoMin8: document.getElementById('novo-item-hot-hosso-min8').checked,
+    temakiFrito: document.getElementById('novo-item-temaki-frito').checked,
   };
 
   if(!payload.name || !payload.category || !payload.description || !payload.image || !(payload.price > 0)){
