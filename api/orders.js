@@ -282,24 +282,6 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Telefone inválido." });
       }
 
-      // ========================
-      // DESCONTO DE PRIMEIRO PEDIDO (10%)
-      // Cliente é considerado "novo" se não existir NENHUM pedido
-      // anterior salvo com esse telefone.
-      // ========================
-      let isNovoCliente = false;
-      try {
-        const pedidosAnteriores = await db
-          .collection("orders")
-          .where("phone", "==", order.phone)
-          .limit(1)
-          .get();
-        isNovoCliente = pedidosAnteriores.empty;
-      } catch (e) {
-        console.warn("Erro ao verificar histórico de pedidos do telefone:", e.message);
-        isNovoCliente = false; // em caso de falha, não concede o desconto por segurança
-      }
-
       if (order.customer.length > 60) {
         return res.status(400).json({ error: "Nome muito grande." });
       }
@@ -448,7 +430,6 @@ export default async function handler(req, res) {
       total += creamCheeseTemaki * CREAM_CHEESE_TEMAKI_PRICE;
       total += taxaEntrega;
 
-      if (isNovoCliente) total *= 0.90;
       if (order.payment === "Cartão") total *= 1.10;
       total = Number(total.toFixed(2));
 
@@ -471,7 +452,6 @@ export default async function handler(req, res) {
         taxaEntrega,
         distanciaKm,
         total,
-        descontoPrimeiroPedido: isNovoCliente,
         orderId:     nextId,
         createdAt:   Date.now(),
         status:      "Recebido",
@@ -528,7 +508,7 @@ export default async function handler(req, res) {
         console.error("Erro na rotina de disparos do WhatsApp:", waErr.message);
       }
 
-      return res.status(200).json({ success: true, orderId: nextId, descontoPrimeiroPedido: isNovoCliente });
+      return res.status(200).json({ success: true, orderId: nextId });
 
     } catch (error) {
       console.error("Erro ao criar pedido:", error);

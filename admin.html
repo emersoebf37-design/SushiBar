@@ -1117,9 +1117,6 @@ function renderPedidos(pedidos){
   container.innerHTML = '';
   pedidos.forEach(p => {
     const statusClass = p.status?.replace(' ', '') || 'Recebido';
-    const badgeDesconto = p.descontoPrimeiroPedido
-      ? '<span class="status-badge" style="background:#00c85333;color:#00e676;margin-left:6px;">🎉 1º pedido -10%</span>'
-      : '';
     container.innerHTML += `
       <div class="pedido-card">
         <div class="pedido-header">
@@ -1132,7 +1129,7 @@ function renderPedidos(pedidos){
           💳 ${p.payment}<br>
           🍣 ${p.items?.map(i => i.name).join(', ')}
         </div>
-        <span class="status-badge status-${statusClass}">${p.status}</span>${badgeDesconto}
+        <span class="status-badge status-${statusClass}">${p.status}</span>
       </div>`;
   });
 }

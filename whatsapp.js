@@ -99,55 +99,15 @@ async function enviarMensagem(telefone, mensagem){
 /* MENSAGEM DE NOVO PEDIDO */
 function mensagemNovoPedido(order){
   const addons = order.addons || {};
-
-  // Nomes e preços dos adicionais fixos (mesma tabela usada no cupom da impressora).
-  // Chave não listada aqui cai no fallback genérico "➕ <chave>".
-  const ADDON_INFO = {
-    hashi:                    { label: '🥢 Hashi',                            price: 0 },
-    pimenta:                  { label: '🌶️ Pimenta de Sichuan',               price: 0 },
-    geleia:                   { label: '🌶️ Geleia de Pimenta',                price: 1.00 },
-    amendoim:                 { label: '🥜 Amendoim',                         price: 0 },
-    talheres:                 { label: '🍴 Talheres',                         price: 0 },
-    creamCheeseExtra:         { label: '🧀 Cream Cheese Extra',               price: 1.00 },
-    creamCheeseCrocante:      { label: '🧀 Cream Cheese c/ Crocante',         price: 1.50 },
-    creamCheeseCouve:         { label: '🧀 Cream Cheese c/ Couve Frita',      price: 1.50 },
-    creamCheeseGeleiaPimenta: { label: '🧀 Cream Cheese c/ Geleia de Pimenta', price: 1.50 },
-    creamCheeseTemaki:        { label: '🧀 Cream Cheese no Temaki',           price: 1.50 },
-  };
-
+  
   const adicionaisLinhas = [];
-
-  // Adicionais fixos (hashi, geleia, pimenta, amendoim, talheres, cream cheese...)
-  for (const [key, qty] of Object.entries(addons)) {
-    const quantidade = Number(qty) || 0;
-    if (quantidade <= 0) continue;
-    if (key.startsWith('custom_')) continue; // esses são tratados abaixo, com nome/preço reais
-
-    const info = ADDON_INFO[key] || { label: `➕ ${key}`, price: 0 };
-    const subtotal = info.price * quantidade;
-    const precoTexto = subtotal > 0 ? `+R$${subtotal.toFixed(2).replace('.', ',')}` : 'Grátis';
-    adicionaisLinhas.push(`${info.label}: ${quantidade} (${precoTexto})`);
-  }
-
-  // Adicionais customizados (cadastrados pelo admin). Nome e preço já vêm
-  // resolvidos e validados desde a criação do pedido em orders.js.
-  if (Array.isArray(order.customAddons)) {
-    for (const ca of order.customAddons) {
-      const quantidade = Number(ca.quantity) || 0;
-      if (quantidade <= 0) continue;
-      const subtotal = Number(ca.subtotal ?? (ca.unitPrice * quantidade)) || 0;
-      const precoTexto = subtotal > 0 ? `+R$${subtotal.toFixed(2).replace('.', ',')}` : 'Grátis';
-      adicionaisLinhas.push(`➕ ${ca.name}: ${quantidade} (${precoTexto})`);
-    }
-  }
+  if(addons.hashi > 0) adicionaisLinhas.push(`🥢 Hashi: ${addons.hashi} (Grátis)`);
+  if(addons.geleia > 0) adicionaisLinhas.push(`🌶️ Geleia de Pimenta: ${addons.geleia} (+R$${(addons.geleia * 1.00).toFixed(2).replace('.', ',')})`);
+  if(addons.pimenta > 0) adicionaisLinhas.push(`🌶️ Pimenta de Sichuan: ${addons.pimenta} (Grátis)`);
 
   const adicionaisTexto = adicionaisLinhas.length > 0
     ? adicionaisLinhas.join('\n')
     : 'Nenhum';
-
-  const linhaDesconto = order.descontoPrimeiroPedido
-    ? '\n🎉 *Desconto de boas-vindas (1º pedido): -10%*\n'
-    : '';
 
   return `🍣 *Kaizora — Confirmação de Pedido*
 
@@ -158,7 +118,7 @@ ${order.items.map(i => `• ${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`
 
 🧾 *Adicionais:*
 ${adicionaisTexto}
-${linhaDesconto}
+
 💰 *Total:* R$${order.total.toFixed(2).replace('.', ',')}
 💳 *Pagamento:* ${order.payment}
 
