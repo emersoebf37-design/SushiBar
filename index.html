@@ -2760,6 +2760,23 @@ function loadUser(){
 loadUser();
 
 let pendingOrder = null;
+let pendingIsNovoCliente = false;
+
+// Verifica se o telefone já tem algum pedido anterior salvo.
+// Sem pedido anterior = cliente novo = elegível ao desconto de 10% no 1º pedido.
+async function verificarNovoCliente(phone){
+  try {
+    const phoneLimpo = String(phone || '').replace(/\D/g, '');
+    if(!phoneLimpo) return false;
+    const response = await fetch(`/api/orders?phone=${encodeURIComponent(phoneLimpo)}`);
+    if(!response.ok) return false;
+    const data = await response.json();
+    return Array.isArray(data.orders) && data.orders.length === 0;
+  } catch(e) {
+    console.warn('Não foi possível verificar histórico do cliente:', e);
+    return false;
+  }
+}
 
 /* ========================= */
 /* FINISH ORDER */
@@ -2805,6 +2822,9 @@ async function finishOrder(){
 
     const addonsCopy = { ...addons };
 
+    const isNovoCliente = await verificarNovoCliente(user.phone);
+    pendingIsNovoCliente = isNovoCliente;
+
     let baseTotal = cart.reduce((sum, item) => {
       const product = products.find(p => p.name === item.name);
       const combo = combos.find(c => c.name === item.name);
@@ -2814,6 +2834,7 @@ async function finishOrder(){
 
     let total = baseTotal + (cart.length > 0 ? (entregaAtual.taxa || 0) : 0);
     total += addonsExtraCost(addons);
+    if(isNovoCliente) total *= 0.90;
     if(payment === 'Cartão') total *= 1.10;
 
     pendingOrder = {
@@ -2838,6 +2859,7 @@ async function finishOrder(){
       <p><strong>Endereço:</strong><br>${user.address}, ${user.number}</p>
       <p>${user.complement || ''}</p>
       <p><strong>Pagamento:</strong> ${payment}</p>
+      ${isNovoCliente ? '<p style="color:#008a2e;font-weight:bold;">🎉 10% de desconto de boas-vindas aplicado no seu primeiro pedido!</p>' : ''}
       <div class="modal-total">R$${total.toFixed(2).replace('.', ',')}</div>
     `;
 
@@ -2878,6 +2900,7 @@ async function confirmOrder(){
   }, 0);
   total += cart.length > 0 ? (entregaAtual.taxa || 0) : 0;
   total += addonsExtraCost(addons);
+  if(pendingIsNovoCliente) total *= 0.90;
   if(payment === 'Cartão') total *= 1.10;
   pendingOrder.total = Number(total.toFixed(2));
 
@@ -2897,7 +2920,9 @@ async function confirmOrder(){
     renderCart();
     resetAddonUI();
     closeOrderModal();
-    alert(`Pedido #${data.orderId} realizado com sucesso! 🍣`);
+    const msgDesconto = data.descontoPrimeiroPedido ? ' Desconto de boas-vindas de 10% aplicado! 🎉' : '';
+    alert(`Pedido #${data.orderId} realizado com sucesso! 🍣${msgDesconto}`);
+    pendingIsNovoCliente = false;
   } catch(error){
     alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
   } finally {
@@ -3457,7 +3482,7 @@ window.addEventListener('popstate', (e) => {
         <div class="addon-card addon-recommended" id="addon-creamcheese-temaki-container" style="display: none;">
           <span class="addon-badge">Temaki Frito</span>
           <div class="addon-photo">
-            <img src="Imagens/cream-cheese-extra temaki.jpg" alt="Cream cheese extra no temaki" loading="lazy"
+            <img src="Imagens/cream-cheese-temaki.jpg" alt="Cream cheese extra no temaki" loading="lazy"
                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
             <div class="addon-photo-fallback">🧀</div>
           </div>
