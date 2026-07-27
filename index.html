@@ -2760,6 +2760,23 @@ function loadUser(){
 loadUser();
 
 let pendingOrder = null;
+let pendingIsNovoCliente = false;
+
+// Verifica se o telefone já tem algum pedido anterior salvo.
+// Sem pedido anterior = cliente novo = elegível ao desconto de 10% no 1º pedido.
+async function verificarNovoCliente(phone){
+  try {
+    const phoneLimpo = String(phone || '').replace(/\D/g, '');
+    if(!phoneLimpo) return false;
+    const response = await fetch(`/api/orders?phone=${encodeURIComponent(phoneLimpo)}`);
+    if(!response.ok) return false;
+    const data = await response.json();
+    return Array.isArray(data.orders) && data.orders.length === 0;
+  } catch(e) {
+    console.warn('Não foi possível verificar histórico do cliente:', e);
+    return false;
+  }
+}
 
 /* ========================= */
 /* FINISH ORDER */
@@ -2767,7 +2784,6 @@ let pendingOrder = null;
 
 async function finishOrder(){
   try {
-
     if(cart.length === 0){ alert('Carrinho vazio!'); return; }
 
     await fetchConfig();
@@ -2805,16 +2821,11 @@ async function finishOrder(){
 
     const addonsCopy = { ...addons };
 
-    let baseTotal = cart.reduce((sum, item) => {
-      const product = products.find(p => p.name === item.name);
-      const combo = combos.find(c => c.name === item.name);
-      const price = item.price || product?.price || combo?.price || 0;
-      return sum + (price * (item.quantity || 1));
-    }, 0);
+    const isNovoCliente = await verificarNovoCliente(user.phone);
+    pendingIsNovoCliente = isNovoCliente;
 
-    let total = baseTotal + (cart.length > 0 ? (entregaAtual.taxa || 0) : 0);
-    total += addonsExtraCost(addons);
-    if(payment === 'Cartão') total *= 1.10;
+    // Utiliza o cálculo centralizado garantindo a aplicação do desconto
+    let total = calculateTotal();
 
     pendingOrder = {
       customer: user.name,
@@ -2838,13 +2849,13 @@ async function finishOrder(){
       <p><strong>Endereço:</strong><br>${user.address}, ${user.number}</p>
       <p>${user.complement || ''}</p>
       <p><strong>Pagamento:</strong> ${payment}</p>
+      ${isNovoCliente ? '<p style="color:#008a2e;font-weight:bold;">🎉 10% de desconto de boas-vindas aplicado no seu primeiro pedido!</p>' : ''}
       <div class="modal-total">R$${total.toFixed(2).replace('.', ',')}</div>
     `;
 
     // Abre o modal na tela
     document.getElementById('order-modal').style.display = 'flex';
 
-    // ✨ LINHA ADICIONADA: Checa se tem Yakisoba e exibe/esconde a pimenta
     verificarVisibilidadeBrinde();
 
     requestAnimationFrame(() => {
@@ -2860,6 +2871,44 @@ async function finishOrder(){
 
 function closeOrderModal(){
   document.getElementById('order-modal').style.display = 'none';
+  pendingIsNovoCliente = false;
+}
+
+async function confirmOrder(){
+  if(!pendingOrder) return;
+
+  // Atualiza adicionais com o estado atual antes de enviar
+  pendingOrder.addons = { ...addons };
+
+  // Recalcula total com adicionais atuais utilizando a função centralizada
+  pendingOrder.total = Number(calculateTotal().toFixed(2));
+
+  document.getElementById('loading-overlay').classList.add('active');
+  document.querySelector('.modal-confirm').disabled = true;
+
+  try {
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pendingOrder),
+    });
+    const data = await response.json();
+    if(!response.ok) throw new Error(data.error || 'Erro desconhecido');
+    cart = [];
+    saveCart();
+    renderCart();
+    resetAddonUI();
+    closeOrderModal();
+    const msgDesconto = data.descontoPrimeiroPedido ? ' Desconto de boas-vindas de 10% aplicado! 🎉' : '';
+    alert(`Pedido #${data.orderId} realizado com sucesso! 🍣${msgDesconto}`);
+    pendingIsNovoCliente = false;
+  } catch(error){
+    alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
+  } finally {
+    document.getElementById('loading-overlay').classList.remove('active');
+    const btn = document.querySelector('.modal-confirm');
+    if(btn) btn.disabled = false;
+  }
 }
 
 async function confirmOrder(){
@@ -2878,6 +2927,7 @@ async function confirmOrder(){
   }, 0);
   total += cart.length > 0 ? (entregaAtual.taxa || 0) : 0;
   total += addonsExtraCost(addons);
+  if(pendingIsNovoCliente) total *= 0.90;
   if(payment === 'Cartão') total *= 1.10;
   pendingOrder.total = Number(total.toFixed(2));
 
@@ -2897,7 +2947,9 @@ async function confirmOrder(){
     renderCart();
     resetAddonUI();
     closeOrderModal();
-    alert(`Pedido #${data.orderId} realizado com sucesso! 🍣`);
+    const msgDesconto = data.descontoPrimeiroPedido ? ' Desconto de boas-vindas de 10% aplicado! 🎉' : '';
+    alert(`Pedido #${data.orderId} realizado com sucesso! 🍣${msgDesconto}`);
+    pendingIsNovoCliente = false;
   } catch(error){
     alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
   } finally {
@@ -3171,6 +3223,10 @@ function verificarVisibilidadeBrinde() {
   }
 }
 
+/* ========================= */
+/* CÁLCULO CENTRALIZADO DE TOTAL */
+/* ========================= */
+
 function calculateTotal(){
   const payment = document.getElementById('payment-method')?.value;
 
@@ -3181,11 +3237,15 @@ function calculateTotal(){
     return sum + (price * (item.quantity || 1));
   }, 0);
 
-  total += cart.length > 0 ? (entregaAtual.taxa || 0) : 0;
+  total += cart.length > 0 ? (entregaAtual.taxa ?? 0) : 0;
 
   // Soma adicionais pagos
   total += addonsExtraCost(addons);
 
+  // CORREÇÃO DO BUG: Aplica o desconto de 10% se for novo cliente
+  if(pendingIsNovoCliente) total *= 0.90;
+
+  // Aplica acréscimo se a forma de pagamento for Cartão
   if(payment === 'Cartão') total *= 1.10;
 
   return total;
@@ -3457,7 +3517,7 @@ window.addEventListener('popstate', (e) => {
         <div class="addon-card addon-recommended" id="addon-creamcheese-temaki-container" style="display: none;">
           <span class="addon-badge">Temaki Frito</span>
           <div class="addon-photo">
-            <img src="Imagens/cream-cheese-extra temaki.jpg" alt="Cream cheese extra no temaki" loading="lazy"
+            <img src="Imagens/cream-cheese-temaki.jpg" alt="Cream cheese extra no temaki" loading="lazy"
                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
             <div class="addon-photo-fallback">🧀</div>
           </div>
