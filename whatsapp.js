@@ -1,15 +1,18 @@
 const makeWASocket = require('@whiskeysockets/baileys').default;
 const { useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const qrcode = require('qrcode-terminal');
+const { fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 
 let sock = null;
 
 /* CONECTAR WHATSAPP */
 async function conectarWhatsApp(){
   const { state, saveCreds } = await useMultiFileAuthState('auth_whatsapp');
-
+    const { version } = await fetchLatestBaileysVersion();
+    
   sock = makeWASocket({
     auth: state,
+    version,
     printQRInTerminal: false
   });
 
