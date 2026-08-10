@@ -55,6 +55,8 @@ function getPrivateKey() {
 // ========================
 const QUALIFYING_COMBOS_FIXOS = new Set([
   "Mega Combo Hot Roll",
+  "Combo Osaka",
+  "Combo Shangai",
   "Combo Crocantissimo",
   "Combo Individual",
   "Combo de Frios",
