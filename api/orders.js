@@ -210,6 +210,39 @@ async function getFullProductList(db) {
 // CONFIGURAÇÃO DO POKE PERSONALIZADO (cadastrada pelo admin em admin.html)
 // Cache em memória para não estourar o limite de leitura do Firestore
 // ========================
+
+// Mesmo fallback usado em api/poke.js — garante que o Poke funcione com os
+// ingredientes padrão mesmo antes do admin salvar qualquer configuração.
+const DEFAULT_POKE_CONFIG = {
+  basePrice: 32.9,
+  saladaQtd: 2,
+  avisos: [],
+  groups: {
+    arroz: [
+      { id: "arroz-japones", name: "Arroz Japonês", description: "", price: 0, available: true },
+      { id: "arroz-brasileiro", name: "Arroz Brasileiro", description: "", price: 0, available: true },
+    ],
+    proteina: [
+      { id: "salmao-cru", name: "Salmão Cru", description: "", price: 0, available: true },
+      { id: "salmao-grelhado", name: "Salmão Grelhado", description: "", price: 0, available: true },
+      { id: "salmao-cru-cream-cheese", name: "Salmão Cru com Cream Cheese", description: "", price: 0, available: true },
+      { id: "salmao-grelhado-cream-cheese", name: "Salmão Grelhado com Cream Cheese", description: "", price: 0, available: true },
+    ],
+    salada: [
+      { id: "cenoura", name: "Cenoura", description: "", price: 0, available: true },
+      { id: "repolho", name: "Repolho", description: "", price: 0, available: true },
+      { id: "couve-crispy", name: "Couve Crispy", description: "", price: 0, available: true },
+    ],
+    crocante: [
+      { id: "tempura", name: "Tempurá", description: "", price: 0, available: true },
+      { id: "chips-batata", name: "Chips de Batata", description: "", price: 0, available: true },
+      { id: "chips-batata-doce", name: "Chips de Batata Doce", description: "", price: 0, available: true },
+      { id: "couve-frita", name: "Couve Frita", description: "", price: 0, available: true },
+      { id: "brocoli-frito", name: "Brócoli Frito", description: "", price: 0, available: true },
+    ],
+  },
+};
+
 let pokeConfigCache = null;
 let pokeConfigCacheAt = 0;
 const POKE_CONFIG_CACHE_MS = 60 * 1000; // 60s
@@ -221,13 +254,15 @@ async function getPokeConfig(db) {
   }
   try {
     const snap = await db.collection("poke_config").doc("settings").get();
-    const config = snap.exists ? snap.data() : null;
+    // Documento ainda não existe (admin nunca salvou) → usa o padrão em vez
+    // de bloquear o pedido.
+    const config = snap.exists ? snap.data() : DEFAULT_POKE_CONFIG;
     pokeConfigCache = config;
     pokeConfigCacheAt = now;
     return config;
   } catch (e) {
     console.warn("Erro ao buscar configuração do Poke:", e.message);
-    return pokeConfigCache; // usa o último valor conhecido, se houver
+    return pokeConfigCache || DEFAULT_POKE_CONFIG; // usa o último valor conhecido, ou o padrão
   }
 }
 
