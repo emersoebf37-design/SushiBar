@@ -1616,6 +1616,71 @@ body{
   to { opacity: 1; transform: scale(1); }
 }
 
+/* ========================================== */
+/* MONTE SEU POKE */
+/* ========================================== */
+
+.poke-group{
+  margin-bottom: 18px;
+}
+
+.poke-group-title{
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.poke-group-hint{
+  font-size: 11px;
+  font-weight: 500;
+  color: #999;
+  margin-left: 4px;
+}
+
+.poke-options-grid{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.poke-option-card{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 2px solid #eae5dc;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13.5px;
+  color: #333;
+  background: #fff;
+  transition: 0.15s;
+}
+
+.poke-option-card:hover{ border-color: #d8b9b9; }
+
+.poke-option-card.selected{
+  border-color: #c40000;
+  background: #fdf3f3;
+  color: #c40000;
+  font-weight: 700;
+}
+
+.poke-option-card.disabled{
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+.poke-option-main{ display:flex; flex-direction:column; gap:2px; flex:1; }
+.poke-option-desc{ font-size: 11px; font-weight: 400; color: #999; }
+.poke-option-price{ font-size: 12px; font-weight: 600; white-space: nowrap; }
+
 </style>
 </head>
 
@@ -1870,6 +1935,33 @@ body{
   </div>
 </div>
 
+<!-- ========================= -->
+<!-- MONTE SEU POKE -->
+<!-- ========================= -->
+
+<div id="poke-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:9999; align-items:center; justify-content:center; padding:15px; box-sizing:border-box;">
+  <div style="background:#fff; border-radius:18px; padding:22px; width:100%; max-width:460px; max-height:90vh; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.2); font-family:sans-serif;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <h3 style="margin:0; font-size:19px; color:#1a1a1a;">🍱 Monte seu Poke</h3>
+      <button onclick="closePokeModal()" style="background:none; border:none; font-size:18px; cursor:pointer; color:#999; margin-left:auto;">✕</button>
+    </div>
+    <p style="margin:0 0 14px; font-size:13px; color:#777;">Escolha 1 arroz, 1 proteína, <span id="poke-salada-qtd-texto">2 saladas</span> e 1 crocante.</p>
+
+    <div id="poke-avisos-box" style="display:none; background:#fff8e1; border:1px solid #ffe082; color:#8a6100; padding:10px 12px; border-radius:10px; font-size:13px; margin-bottom:16px;"></div>
+
+    <div id="poke-groups-box"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin:18px 0 14px; padding-top:14px; border-top:1px solid #eee;">
+      <span style="font-weight:600; color:#333;">Total</span>
+      <span id="poke-modal-total" style="font-weight:bold; font-size:18px; color:#c40000;">R$0,00</span>
+    </div>
+
+    <div id="poke-modal-erro" style="display:none; color:#c40000; font-size:13px; margin-bottom:12px;"></div>
+
+    <button onclick="confirmAddPoke()" style="width:100%; background:#008a2e; color:#fff; border:none; padding:14px; font-weight:bold; font-size:15px; border-radius:10px; cursor:pointer;">Adicionar ao Pedido</button>
+  </div>
+</div>
+
 </main>
 
 <!-- TOAST -->
@@ -1969,7 +2061,7 @@ const productsBase = [
 
 const combosBase = [
 { name: 'Mega Combo Hot Roll', description: 'Hot Roll até não dar mais.', descricaoModal: '32 Hot Roll Philadelphia.', price: 40, image: 'Imagens/Mega Combo Hot Roll.jpg', esgotado: false, hotHossoMin8: true },
-{ name: 'Combo Osaka', description: 'Um combo especial para momentos a dois.', descricaoModal: '2 Temakis Fritos de Salmão, 12 Hot Roll Philadelphia e 2 Coca-Cola Lata 350ml.', price: 55, image: 'Imagens/Combo Osaka.jpg', esgotado: false, temakiFrito: true, hotHossoMin8: true },
+{ name: 'Combo Osaka', description: 'Um combo especial para momentos a dois.', descricaoModal: '2 Temakis Fritos de Salmão, 12 Hot Roll Philadelphia e 2 Coca-Cola Lata 350ml.', price: 55, image: 'Imagens/Combo Osaka.jpg', esgotado: false, temakiFrito: true },
 { name: 'Combo Shangai', description: 'Um combo completo para se deliciar.', descricaoModal: '1 Yakisoba (Frango, Legumes ou calabresa), 8 Hot Roll Philadelphia e 1 Guaravita.', price: 30, image: 'Imagens/Combo Shangai.jpeg', esgotado: false, hotHossoMin8: true, temakiFrito: true },
 //{ name: 'Combo Crocantissimo', description: 'Uma explosão de crocância', descricaoModal: '1 Temaki Frito, 8 Hot Skin, 8 Hot Kani, 8 Hot Philadelphia Salmão.', price: 50, image: 'Imagens/Combo Crocantissimo.png', esgotado: false, hotHossoMin8: true, temakiFrito: true },
 //{ name: 'Combo Individual', description: 'Uma seleção para as noites de muita fome.', descricaoModal: '1 Temaki Frito, 8 Hot Philadelphia, 2 Harumaki de Doce de Leite.', price: 40, image: 'Imagens/Combo Individual.png', esgotado: false, hotHossoMin8: true, temakiFrito: true },
@@ -2078,12 +2170,40 @@ function renderCustomAddonsUI(items){
   });
 }
 
+// ========================
+// POKE PERSONALIZADO (configuração cadastrada pelo admin em admin.html)
+// ========================
+let pokeConfig = null;
+
+async function fetchPokeConfig(){
+  try {
+    const res = await fetchComTimeout('/api/poke');
+    pokeConfig = await res.json();
+  } catch(e) {
+    console.warn('Não foi possível carregar a configuração do Poke:', e);
+    pokeConfig = null;
+  }
+
+  // Garante um único card "Poke Personalizado" no cardápio (categoria Poke)
+  if(!products.some(p => p.isPoke)){
+    products.push({
+      name: 'Poke Personalizado',
+      category: 'Poke',
+      description: 'Monte do seu jeito: escolha o arroz, a proteína, as saladas e o crocante.',
+      image: 'Imagens/poke.jpg',
+      esgotado: false,
+      isPoke: true,
+    });
+  }
+}
+
 const categories = [
 { image:'Imagens/todos.png', name:'Todos' },
 { image:'Imagens/Rolls.png', name:'Hossomaki' },
 { image:'Imagens/Hots.png', name:'Hots' },
 { image:'Imagens/Yakisoba.png', name:'Refeições' },
 { image:'Imagens/Harumaki.png', name:'Harumaki' },
+{ image:'Imagens/Poke.png', name:'Poke' },
 //{ image:'Imagens/Porções.png', name:'Porções' },
 //{ image:'Imagens/Saladas.png', name:'Saladas' },
 //{ image:'Imagens/Sashimi.jpeg', name:'Sashimi' },
@@ -2202,6 +2322,7 @@ function checkRestauranteAberto(){
 
 async function initCardapio(){
   await fetchCustomProducts();
+  await fetchPokeConfig();
   await fetchConfig(true);
 }
 initCardapio();
@@ -2335,6 +2456,38 @@ function renderProducts(data){
     
     let priceHTML = '';
     let buttonAction = '';
+
+    // POKE PERSONALIZADO — abre o modal de montagem em vez de ir direto pro carrinho
+    if (product.isPoke) {
+      const basePrice = (pokeConfig && Number(pokeConfig.basePrice)) || 0;
+      const cardPrice = gercardPrice(basePrice);
+      priceHTML = `
+        <div style="color:#c40000;text-decoration:line-through;font-size:14px;margin-bottom:5px;">
+          R$${formatPrice(cardPrice)}
+        </div>
+        <div class="price">A partir de R$${formatPrice(basePrice)}</div>
+      `;
+      buttonAction = `openPokeModal()`;
+
+      container.innerHTML += `
+        <div class="product-card ${product.esgotado ? 'esgotado' : ''}">
+          <div style="position:relative;">
+            <img src="${product.image}" onerror="this.style.opacity='0';">
+            ${product.esgotado ? `<div class="esgotado-overlay"><span class="esgotado-badge">ESGOTADO</span></div>` : ''}
+          </div>
+          <div class="product-content">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            ${priceHTML}
+            <div style="color:#008a2e;font-size:14px;font-weight:bold;margin-top:5px;">10% OFF no Pix e Dinheiro</div>
+            <button class="add-cart-btn" ${product.esgotado ? 'disabled' : ''} onclick="${buttonAction}">
+              ${product.esgotado ? 'Esgotado' : 'Montar meu Poke'}
+            </button>
+          </div>
+        </div>
+      `;
+      return;
+    }
 
     // VERIFICA SE O PRODUTO TEM VARIANTES DE TAMANHO
     if (product.isVariable) {
@@ -2471,6 +2624,188 @@ function salvarTamanhoNoCarrinho() {
   fecharModalTamanhos();
 }
 
+/* ========================= */
+/* MONTE SEU POKE */
+/* ========================= */
+
+const POKE_GROUP_LABELS = { arroz: '🍚 Arroz', proteina: '🐟 Proteína', salada: '🥗 Salada', crocante: '🍤 Crocante' };
+const POKE_GROUP_ORDER = ['arroz', 'proteina', 'salada', 'crocante'];
+
+let pokeSelection = { arroz: null, proteina: null, salada: [], crocante: null };
+
+function openPokeModal(){
+  if(!pokeConfig || !pokeConfig.groups){
+    alert('O Poke Personalizado está indisponível no momento. Tente novamente em instantes.');
+    return;
+  }
+  pokeSelection = { arroz: null, proteina: null, salada: [], crocante: null };
+  renderPokeAvisosModal();
+  renderPokeModalGroups();
+  updatePokeModalTotal();
+  document.getElementById('poke-modal-erro').style.display = 'none';
+  document.getElementById('poke-modal-overlay').style.display = 'flex';
+}
+
+function closePokeModal(){
+  document.getElementById('poke-modal-overlay').style.display = 'none';
+}
+
+function renderPokeAvisosModal(){
+  const box = document.getElementById('poke-avisos-box');
+  const avisos = (pokeConfig.avisos || []).filter(Boolean);
+  if(avisos.length === 0){ box.style.display = 'none'; return; }
+  box.innerHTML = avisos.map(a => `⚠️ ${a}`).join('<br>');
+  box.style.display = 'block';
+}
+
+function pokeFindOption(groupKey, id){
+  return (pokeConfig.groups[groupKey] || []).find(o => o.id === id);
+}
+
+function renderPokeModalGroups(){
+  const container = document.getElementById('poke-groups-box');
+  container.innerHTML = '';
+
+  const saladaQtd = Number(pokeConfig.saladaQtd) || 2;
+  const qtdTexto = document.getElementById('poke-salada-qtd-texto');
+  if(qtdTexto) qtdTexto.innerText = `${saladaQtd} salada${saladaQtd > 1 ? 's' : ''}`;
+
+  POKE_GROUP_ORDER.forEach(groupKey => {
+    const options = pokeConfig.groups[groupKey] || [];
+    const isMulti = groupKey === 'salada';
+    const hint = isMulti ? `(escolha ${saladaQtd})` : '(escolha 1)';
+
+    const optionsHtml = options.map(opt => {
+      const disabled = opt.available === false;
+      const isSelected = isMulti
+        ? pokeSelection.salada.includes(opt.id)
+        : pokeSelection[groupKey] === opt.id;
+      const precoTxt = opt.price > 0 ? `+R$${formatPrice(opt.price)}` : 'Grátis';
+      const descHtml = opt.description ? `<span class="poke-option-desc">${opt.description}</span>` : '';
+      return `
+        <div class="poke-option-card ${isSelected ? 'selected' : ''} ${disabled ? 'disabled' : ''}"
+          onclick="${disabled ? '' : `pokeSelectOption('${groupKey}', '${opt.id}', ${isMulti})`}">
+          <div class="poke-option-main">
+            <span>${opt.name}${disabled ? ' (Indisponível)' : ''}</span>
+            ${descHtml}
+          </div>
+          <span class="poke-option-price">${precoTxt}</span>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML += `
+      <div class="poke-group">
+        <div class="poke-group-title">${POKE_GROUP_LABELS[groupKey]}<span class="poke-group-hint">${hint}</span></div>
+        <div class="poke-options-grid">${optionsHtml || '<p style="font-size:12px;color:#999;">Nenhuma opção disponível no momento.</p>'}</div>
+      </div>
+    `;
+  });
+}
+
+function pokeSelectOption(groupKey, id, isMulti){
+  const saladaQtd = Number(pokeConfig.saladaQtd) || 2;
+  if(isMulti){
+    const idx = pokeSelection.salada.indexOf(id);
+    if(idx >= 0){
+      pokeSelection.salada.splice(idx, 1);
+    } else {
+      if(pokeSelection.salada.length >= saladaQtd){
+        pokeSelection.salada.shift(); // libera espaço automaticamente pra próxima escolha
+      }
+      pokeSelection.salada.push(id);
+    }
+  } else {
+    pokeSelection[groupKey] = id;
+  }
+  renderPokeModalGroups();
+  updatePokeModalTotal();
+}
+
+function pokeCalcTotal(){
+  const base = Number(pokeConfig.basePrice) || 0;
+  let total = base;
+  ['arroz', 'proteina', 'crocante'].forEach(g => {
+    const opt = pokeSelection[g] && pokeFindOption(g, pokeSelection[g]);
+    if(opt) total += Number(opt.price) || 0;
+  });
+  pokeSelection.salada.forEach(id => {
+    const opt = pokeFindOption('salada', id);
+    if(opt) total += Number(opt.price) || 0;
+  });
+  return total;
+}
+
+function updatePokeModalTotal(){
+  const el = document.getElementById('poke-modal-total');
+  if(el) el.innerText = `R$${formatPrice(pokeCalcTotal())}`;
+}
+
+function pokeModalErro(msg){
+  const erroBox = document.getElementById('poke-modal-erro');
+  erroBox.innerText = msg;
+  erroBox.style.display = 'block';
+}
+
+function confirmAddPoke(){
+  document.getElementById('poke-modal-erro').style.display = 'none';
+  const saladaQtd = Number(pokeConfig.saladaQtd) || 2;
+
+  if(!pokeSelection.arroz) return pokeModalErro('Escolha uma opção de arroz.');
+  if(!pokeSelection.proteina) return pokeModalErro('Escolha uma opção de proteína.');
+  if(pokeSelection.salada.length !== saladaQtd) return pokeModalErro(`Escolha exatamente ${saladaQtd} opções de salada.`);
+  if(!pokeSelection.crocante) return pokeModalErro('Escolha uma opção de crocante.');
+
+  const arrozOpt = pokeFindOption('arroz', pokeSelection.arroz);
+  const proteinaOpt = pokeFindOption('proteina', pokeSelection.proteina);
+  const crocanteOpt = pokeFindOption('crocante', pokeSelection.crocante);
+  const saladaOpts = pokeSelection.salada.map(id => pokeFindOption('salada', id)).filter(Boolean);
+
+  if(!arrozOpt || !proteinaOpt || !crocanteOpt || saladaOpts.length !== saladaQtd){
+    return pokeModalErro('Uma das opções escolhidas não está mais disponível. Escolha novamente.');
+  }
+
+  const unitPrice = Number(pokeCalcTotal().toFixed(2));
+  const saladaIdsOrdenados = [...pokeSelection.salada].sort();
+  const signature = JSON.stringify({
+    arroz: arrozOpt.id, proteina: proteinaOpt.id, salada: saladaIdsOrdenados, crocante: crocanteOpt.id,
+  });
+
+  const existing = cart.find(i => i.isPoke && i.pokeSignature === signature);
+  if(existing){
+    existing.quantity = Math.min(20, (existing.quantity || 1) + 1);
+  } else {
+    cart.push({
+      name: 'Poke Personalizado',
+      isPoke: true,
+      quantity: 1,
+      price: unitPrice,
+      pokeSignature: signature,
+      pokeChoices: {
+        arroz: arrozOpt.id,
+        proteina: proteinaOpt.id,
+        salada: [...pokeSelection.salada],
+        crocante: crocanteOpt.id,
+      },
+      pokeSummary: {
+        arroz: arrozOpt.name,
+        proteina: proteinaOpt.name,
+        salada: saladaOpts.map(o => o.name),
+        crocante: crocanteOpt.name,
+      },
+    });
+  }
+
+  saveCart();
+  renderCart();
+  closePokeModal();
+}
+
+window.openPokeModal = openPokeModal;
+window.closePokeModal = closePokeModal;
+window.pokeSelectOption = pokeSelectOption;
+window.confirmAddPoke = confirmAddPoke;
+
 function renderCombos(){
   const container = document.getElementById('combo-list');
   container.innerHTML = '';
@@ -2559,10 +2894,18 @@ function renderCart(){
     const combo = combos.find(c => c.name === item.name);
     const itemPrice = item.price || product?.price || combo?.price || 0;
     total += itemPrice * (item.quantity || 1);
+    const pokeResumoHtml = (item.isPoke && item.pokeSummary) ? `
+      <p style="font-size:11.5px; color:#888; line-height:1.5; margin:3px 0 0;">
+        🍚 ${item.pokeSummary.arroz} · 🐟 ${item.pokeSummary.proteina}<br>
+        🥗 ${(item.pokeSummary.salada || []).join(' + ')} · 🍤 ${item.pokeSummary.crocante}
+      </p>
+    ` : '';
+
     cartItems.innerHTML += `
       <div class="cart-item">
         <div style="flex:1;">
           <strong>${item.name}</strong>
+          ${pokeResumoHtml}
           <p>R$${(itemPrice * (item.quantity || 1)).toFixed(2)}</p>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">

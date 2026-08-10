@@ -157,7 +157,18 @@ function mensagemNovoPedido(order){
 Olá, *${order.customer}*! Seu pedido foi recebido com sucesso.
 
 📋 *Itens:*
-${order.items.map(i => `• ${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`).join('\n')}
+${order.items.map(i => {
+  let linha = `• ${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`;
+  if (i.isPoke && i.pokeDetails) {
+    const pd = i.pokeDetails;
+    const salada = Array.isArray(pd.salada) ? pd.salada.map(s => s.name).join(' + ') : '';
+    linha += `\n   🍚 ${pd.arroz?.name || '-'}` +
+             `\n   🐟 ${pd.proteina?.name || '-'}` +
+             `\n   🥗 ${salada || '-'}` +
+             `\n   🍤 ${pd.crocante?.name || '-'}`;
+  }
+  return linha;
+}).join('\n')}
 
 🧾 *Adicionais:*
 ${adicionaisTexto}

@@ -259,6 +259,64 @@ body{ background:#1a0000; color:white; min-height:100vh; }
 
 .produto-item:last-child{ border-bottom:none; }
 
+/* ========================= */
+/* POKE PERSONALIZADO */
+/* ========================= */
+
+.poke-group-box{
+  margin-top:20px;
+  padding:14px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;
+}
+
+.poke-group-box h3{
+  font-size:15px;
+  margin-bottom:12px;
+}
+
+.poke-option-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.poke-option-row:last-of-type{ border-bottom:none; }
+
+.poke-option-row input[type="text"],
+.poke-option-row input[type="number"]{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#fff;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+}
+
+.poke-option-row .poke-opt-nome{ flex:1 1 160px; }
+.poke-option-row .poke-opt-desc{ flex:2 1 220px; }
+.poke-option-row .poke-opt-preco{ width:90px; }
+
+.poke-aviso-row{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.poke-aviso-row input{
+  flex:1;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#fff;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+}
+
 .produto-nome{
   font-size:15px;
   flex:1;
@@ -560,6 +618,36 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     <p style="color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:15px;">Cadastre novos pratos, adicionais ou combos. Eles aparecem automaticamente no site e passam a ser aceitos nos pedidos.</p>
     <button class="add-btn" onclick="abrirModalNovoItem()">+ Adicionar Novo Item</button>
     <div id="custom-items-lista" style="margin-top:18px;"></div>
+  </div>
+
+  <div class="section">
+    <h2>🍱 Poke Personalizado</h2>
+    <p style="color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:15px;">
+      Configure o preço base, os ingredientes disponíveis em cada categoria (arroz, proteína,
+      salada e crocante) e os avisos exibidos ao cliente no monte-seu-poke do site.
+    </p>
+
+    <div class="modal-field">
+      <label>Preço base do Poke (R$)</label>
+      <input type="number" id="poke-preco-base" class="section-input" step="0.01" min="0" style="max-width:180px;">
+    </div>
+
+    <div class="modal-field">
+      <label>Quantidade de opções de salada que o cliente escolhe</label>
+      <input type="number" id="poke-salada-qtd" class="section-input" step="1" min="1" max="5" style="max-width:120px;">
+    </div>
+
+    <div class="modal-field">
+      <label>⚠️ Avisos (exibidos para o cliente ao montar o Poke)</label>
+      <div id="poke-avisos-lista" style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;"></div>
+      <button class="add-btn" type="button" onclick="pokeAddAviso()">+ Adicionar aviso</button>
+    </div>
+
+    <div id="poke-grupos-container"></div>
+
+    <div class="modal-error" id="poke-erro" style="display:none;"></div>
+
+    <button class="add-btn" id="poke-save-btn" onclick="salvarPokeConfig()" style="margin-top:10px;">💾 Salvar Configurações do Poke</button>
   </div>
 
   <div class="section">
@@ -992,6 +1080,7 @@ async function loadData(){
     renderProdutos(data.config.produtos_esgotados || []);
     renderCombos(data.config.combos_esgotados || []);
     renderPedidos(data.pedidosHoje || []);
+    await loadPokeConfig();
 
   } catch(e) {
     console.error('Erro ao carregar dados:', e);
@@ -1130,11 +1219,186 @@ function renderPedidos(pedidos){
           👤 ${p.customer} — 📞 ${p.phone}<br>
           📍 ${p.address}, ${p.number} ${p.complement}<br>
           💳 ${p.payment}<br>
-          🍣 ${p.items?.map(i => i.name).join(', ')}
+          🍣 ${p.items?.map(i => {
+            if (i.isPoke && i.pokeDetails) {
+              const pd = i.pokeDetails;
+              const salada = Array.isArray(pd.salada) ? pd.salada.map(s => s.name).join(' + ') : '';
+              return `${i.quantity}x ${i.name} (${pd.arroz?.name || '-'}, ${pd.proteina?.name || '-'}, ${salada || '-'}, ${pd.crocante?.name || '-'})`;
+            }
+            return i.name;
+          }).join(', ')}
         </div>
         <span class="status-badge status-${statusClass}">${p.status}</span>${badgeDesconto}
       </div>`;
   });
+}
+
+// ========================
+// POKE PERSONALIZADO
+// ========================
+const POKE_GROUP_LABELS = {
+  arroz: '🍚 Arroz',
+  proteina: '🐟 Proteína',
+  salada: '🥗 Salada',
+  crocante: '🍤 Crocante',
+};
+const POKE_GROUP_ORDER = ['arroz', 'proteina', 'salada', 'crocante'];
+
+let pokeConfig = null;
+
+async function loadPokeConfig(){
+  try {
+    const res = await fetch('/api/poke');
+    pokeConfig = await res.json();
+  } catch(e) {
+    console.error('Erro ao carregar configuração do Poke:', e);
+    pokeConfig = { basePrice: 0, saladaQtd: 2, avisos: [], groups: { arroz: [], proteina: [], salada: [], crocante: [] } };
+  }
+  renderPokeConfig();
+}
+
+function renderPokeConfig(){
+  if(!pokeConfig) return;
+  document.getElementById('poke-preco-base').value = Number(pokeConfig.basePrice || 0).toFixed(2);
+  document.getElementById('poke-salada-qtd').value = pokeConfig.saladaQtd || 2;
+  renderPokeAvisos();
+  renderPokeGroups();
+}
+
+function pokeSlugify(str){
+  return String(str || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .slice(0, 60);
+}
+
+// ── Avisos ──
+function renderPokeAvisos(){
+  const container = document.getElementById('poke-avisos-lista');
+  const avisos = pokeConfig.avisos || [];
+  if(avisos.length === 0){
+    container.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Nenhum aviso cadastrado.</p>';
+    return;
+  }
+  container.innerHTML = '';
+  avisos.forEach((aviso, index) => {
+    const row = document.createElement('div');
+    row.className = 'poke-aviso-row';
+    row.innerHTML = `
+      <input type="text" value="${String(aviso).replace(/"/g,'&quot;')}" maxlength="200"
+        onchange="pokeConfig.avisos[${index}] = this.value.trim()">
+      <button onclick="pokeRemoveAviso(${index})" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:16px;">🗑️</button>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function pokeAddAviso(){
+  if(!pokeConfig.avisos) pokeConfig.avisos = [];
+  pokeConfig.avisos.push('');
+  renderPokeAvisos();
+}
+
+function pokeRemoveAviso(index){
+  pokeConfig.avisos.splice(index, 1);
+  renderPokeAvisos();
+}
+
+// ── Grupos de ingredientes ──
+function renderPokeGroups(){
+  const container = document.getElementById('poke-grupos-container');
+  container.innerHTML = '';
+
+  POKE_GROUP_ORDER.forEach(groupKey => {
+    const options = (pokeConfig.groups && pokeConfig.groups[groupKey]) || [];
+
+    const box = document.createElement('div');
+    box.className = 'poke-group-box';
+
+    const rowsHtml = options.map((opt, idx) => `
+      <div class="poke-option-row">
+        <input type="text" class="poke-opt-nome" placeholder="Nome" maxlength="60" value="${String(opt.name||'').replace(/"/g,'&quot;')}"
+          onchange="pokeUpdateOption('${groupKey}', ${idx}, 'name', this.value)">
+        <input type="text" class="poke-opt-desc" placeholder="Descrição (opcional)" maxlength="200" value="${String(opt.description||'').replace(/"/g,'&quot;')}"
+          onchange="pokeUpdateOption('${groupKey}', ${idx}, 'description', this.value)">
+        <input type="number" class="poke-opt-preco" placeholder="R$ extra" step="0.01" min="0" value="${Number(opt.price||0)}"
+          onchange="pokeUpdateOption('${groupKey}', ${idx}, 'price', this.value)">
+        <label class="toggle" style="transform:scale(0.85);">
+          <input type="checkbox" ${opt.available !== false ? 'checked' : ''}
+            onchange="pokeUpdateOption('${groupKey}', ${idx}, 'available', this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+        <button onclick="pokeRemoveOption('${groupKey}', ${idx})" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:16px;">🗑️</button>
+      </div>
+    `).join('');
+
+    box.innerHTML = `
+      <h3>${POKE_GROUP_LABELS[groupKey] || groupKey}</h3>
+      ${rowsHtml || '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Nenhuma opção cadastrada.</p>'}
+      <button class="add-btn" type="button" style="margin-top:10px;" onclick="pokeAddOption('${groupKey}')">+ Adicionar opção</button>
+    `;
+    container.appendChild(box);
+  });
+}
+
+function pokeUpdateOption(groupKey, index, field, value){
+  const opt = pokeConfig.groups[groupKey][index];
+  if(!opt) return;
+  if(field === 'price') opt.price = parseFloat(value) || 0;
+  else if(field === 'available') opt.available = !!value;
+  else opt[field] = value;
+
+  // Atualiza o id automaticamente a partir do nome (só se ainda não tiver sido definido manualmente)
+  if(field === 'name' && !opt._idLocked){
+    opt.id = pokeSlugify(value) || opt.id;
+  }
+}
+
+function pokeAddOption(groupKey){
+  if(!pokeConfig.groups[groupKey]) pokeConfig.groups[groupKey] = [];
+  pokeConfig.groups[groupKey].push({ id: '', name: '', description: '', price: 0, available: true });
+  renderPokeGroups();
+}
+
+function pokeRemoveOption(groupKey, index){
+  pokeConfig.groups[groupKey].splice(index, 1);
+  renderPokeGroups();
+}
+
+async function salvarPokeConfig(){
+  const erroBox = document.getElementById('poke-erro');
+  const btn = document.getElementById('poke-save-btn');
+  erroBox.style.display = 'none';
+
+  pokeConfig.basePrice = parseFloat(document.getElementById('poke-preco-base').value) || 0;
+  pokeConfig.saladaQtd = parseInt(document.getElementById('poke-salada-qtd').value) || 2;
+
+  btn.disabled = true;
+  btn.innerText = 'Salvando...';
+
+  try {
+    const res = await fetch('/api/poke?action=update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify(pokeConfig),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Erro ao salvar');
+    pokeConfig = data.config;
+    renderPokeConfig();
+    alert('Configurações do Poke salvas com sucesso! ✅');
+  } catch(e) {
+    erroBox.innerText = e.message || 'Erro ao salvar. Tente novamente.';
+    erroBox.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerText = '💾 Salvar Configurações do Poke';
+  }
 }
 
 // ========================

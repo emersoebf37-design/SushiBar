@@ -55,8 +55,6 @@ function getPrivateKey() {
 // ========================
 const QUALIFYING_COMBOS_FIXOS = new Set([
   "Mega Combo Hot Roll",
-  "Combo Osaka",
-  "Combo Shangai",
   "Combo Crocantissimo",
   "Combo Individual",
   "Combo de Frios",
@@ -77,8 +75,6 @@ const CREAM_CHEESE_ADDON_PRICES = {
 // ========================
 const QUALIFYING_COMBOS_TEMAKI_FIXOS = new Set([
   "Combo Apaixonados",
-  "Combo Shangai",
-  "Combo Osaka",
   "Combo Crocantissimo",
   "Combo Individual",
 ]);
@@ -211,6 +207,85 @@ async function getFullProductList(db) {
 }
 
 // ========================
+// CONFIGURAÇÃO DO POKE PERSONALIZADO (cadastrada pelo admin em admin.html)
+// Cache em memória para não estourar o limite de leitura do Firestore
+// ========================
+let pokeConfigCache = null;
+let pokeConfigCacheAt = 0;
+const POKE_CONFIG_CACHE_MS = 60 * 1000; // 60s
+
+async function getPokeConfig(db) {
+  const now = Date.now();
+  if (pokeConfigCache && (now - pokeConfigCacheAt < POKE_CONFIG_CACHE_MS)) {
+    return pokeConfigCache;
+  }
+  try {
+    const snap = await db.collection("poke_config").doc("settings").get();
+    const config = snap.exists ? snap.data() : null;
+    pokeConfigCache = config;
+    pokeConfigCacheAt = now;
+    return config;
+  } catch (e) {
+    console.warn("Erro ao buscar configuração do Poke:", e.message);
+    return pokeConfigCache; // usa o último valor conhecido, se houver
+  }
+}
+
+// Valida e resolve um item de Poke enviado pelo cliente, usando SEMPRE os
+// nomes/preços/disponibilidade cadastrados no Firestore (nunca os do cliente).
+function resolvePokeItem(item, pokeConfig) {
+  if (!pokeConfig) {
+    throw new Error("Poke Personalizado indisponível no momento.");
+  }
+
+  const quantity = Number(item.quantity);
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
+    throw new Error("Quantidade inválida para o Poke.");
+  }
+
+  const choices = item.pokeChoices || {};
+  const saladaQtd = Number(pokeConfig.saladaQtd) || 2;
+
+  function resolveOne(groupKey, id) {
+    const group = (pokeConfig.groups && pokeConfig.groups[groupKey]) || [];
+    const found = group.find(opt => opt.id === id);
+    if (!found) throw new Error(`Ingrediente inválido no grupo "${groupKey}".`);
+    if (found.available === false) throw new Error(`"${found.name}" está indisponível no momento.`);
+    return { id: found.id, name: found.name, price: Number(found.price) || 0 };
+  }
+
+  const arroz = resolveOne("arroz", clean(choices.arroz));
+  const proteina = resolveOne("proteina", clean(choices.proteina));
+  const crocante = resolveOne("crocante", clean(choices.crocante));
+
+  const saladaIds = Array.isArray(choices.salada) ? choices.salada.map(clean).filter(Boolean) : [];
+  if (saladaIds.length !== saladaQtd) {
+    throw new Error(`Escolha exatamente ${saladaQtd} opções de salada.`);
+  }
+  if (new Set(saladaIds).size !== saladaIds.length) {
+    throw new Error("Opções de salada repetidas.");
+  }
+  const salada = saladaIds.map(id => resolveOne("salada", id));
+
+  const basePrice = Number(pokeConfig.basePrice) || 0;
+  const unitPrice = Number((
+    basePrice + arroz.price + proteina.price + crocante.price +
+    salada.reduce((s, o) => s + o.price, 0)
+  ).toFixed(2));
+
+  const subtotal = Number((unitPrice * quantity).toFixed(2));
+
+  return {
+    name: "Poke Personalizado",
+    quantity,
+    unitPrice,
+    subtotal,
+    isPoke: true,
+    pokeDetails: { arroz, proteina, salada, crocante },
+  };
+}
+
+// ========================
 // API HANDLER
 // ========================
 export default async function handler(req, res) {
@@ -321,8 +396,26 @@ export default async function handler(req, res) {
       const { products: ALL_PRODUCTS, qualifyingCombos, qualifyingCombosTemaki, customAddonsById } = await getFullProductList(db);
       let total = 0;
       const validatedItems = [];
+      let pokeConfigLoaded = null;
 
       for (const item of order.items) {
+        // ── Poke Personalizado: item montado pelo cliente (arroz, proteína,
+        // salada e crocante). Preço e disponibilidade são sempre resolvidos
+        // no servidor a partir do Firestore, nunca confiando no cliente.
+        if (item && item.isPoke === true) {
+          if (pokeConfigLoaded === null) {
+            pokeConfigLoaded = await getPokeConfig(db);
+          }
+          try {
+            const resolved = resolvePokeItem(item, pokeConfigLoaded);
+            total += resolved.subtotal;
+            validatedItems.push(resolved);
+          } catch (pokeErr) {
+            return res.status(400).json({ error: pokeErr.message });
+          }
+          continue;
+        }
+
         const itemName = clean(item.name);
         const quantity = Number(item.quantity);
 
