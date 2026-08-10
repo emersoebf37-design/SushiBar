@@ -77,6 +77,8 @@ const CREAM_CHEESE_ADDON_PRICES = {
 // ========================
 const QUALIFYING_COMBOS_TEMAKI_FIXOS = new Set([
   "Combo Apaixonados",
+  "Combo Shangai",
+  "Combo Osaka",
   "Combo Crocantissimo",
   "Combo Individual",
 ]);
