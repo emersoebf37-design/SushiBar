@@ -112,6 +112,7 @@ const PRODUCTS = {
   // ── Porções ──
   "Lula à Dorê (6 unidades)": 26,
   "Shimeji na Manteiga": 15,
+  "Bolinho de bacalhau (8 unidades)": 5,
 
   // ── Saladas ──
   "Salada Sunomono": 5,
