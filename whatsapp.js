@@ -162,10 +162,10 @@ ${order.items.map(i => {
   if (i.isPoke && i.pokeDetails) {
     const pd = i.pokeDetails;
     const salada = Array.isArray(pd.salada) ? pd.salada.map(s => s.name).join(' + ') : '';
-    linha += `\n   🍚 ${pd.arroz?.name || '-'}` +
-             `\n   🐟 ${pd.proteina?.name || '-'}` +
-             `\n   🥗 ${salada || '-'}` +
-             `\n   🍤 ${pd.crocante?.name || '-'}`;
+    linha += `\n   Arroz: ${pd.arroz?.name || '-'}` +
+             `\n   Proteína: ${pd.proteina?.name || '-'}` +
+             `\n   Salada: ${salada || '-'}` +
+             `\n   Crocante: ${pd.crocante?.name || '-'}`;
   }
   return linha;
 }).join('\n')}

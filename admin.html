@@ -628,6 +628,16 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     </p>
 
     <div class="modal-field">
+      <label>Nome do produto (aparece no card do cardápio)</label>
+      <input type="text" id="poke-titulo" class="section-input" maxlength="60">
+    </div>
+
+    <div class="modal-field">
+      <label>Descrição do produto (aparece no card do cardápio)</label>
+      <textarea id="poke-descricao" class="section-input" maxlength="300" rows="2" style="resize:vertical;"></textarea>
+    </div>
+
+    <div class="modal-field">
       <label>Preço base do Poke (R$)</label>
       <input type="number" id="poke-preco-base" class="section-input" step="0.01" min="0" style="max-width:180px;">
     </div>
@@ -1248,7 +1258,7 @@ let pokeConfig = null;
 
 async function loadPokeConfig(){
   try {
-    const res = await fetch('/api/poke');
+    const res = await fetch('/api/poke', { cache: 'no-store' });
     pokeConfig = await res.json();
   } catch(e) {
     console.error('Erro ao carregar configuração do Poke:', e);
@@ -1259,6 +1269,8 @@ async function loadPokeConfig(){
 
 function renderPokeConfig(){
   if(!pokeConfig) return;
+  document.getElementById('poke-titulo').value = pokeConfig.title || 'Poke Personalizado';
+  document.getElementById('poke-descricao').value = pokeConfig.description || '';
   document.getElementById('poke-preco-base').value = Number(pokeConfig.basePrice || 0).toFixed(2);
   document.getElementById('poke-salada-qtd').value = pokeConfig.saladaQtd || 2;
   renderPokeAvisos();
@@ -1372,6 +1384,8 @@ async function salvarPokeConfig(){
   const btn = document.getElementById('poke-save-btn');
   erroBox.style.display = 'none';
 
+  pokeConfig.title = document.getElementById('poke-titulo').value.trim();
+  pokeConfig.description = document.getElementById('poke-descricao').value.trim();
   pokeConfig.basePrice = parseFloat(document.getElementById('poke-preco-base').value) || 0;
   pokeConfig.saladaQtd = parseInt(document.getElementById('poke-salada-qtd').value) || 2;
 

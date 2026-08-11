@@ -2177,7 +2177,7 @@ let pokeConfig = null;
 
 async function fetchPokeConfig(){
   try {
-    const res = await fetchComTimeout('/api/poke');
+    const res = await fetchComTimeout('/api/poke', { cache: 'no-store' });
     pokeConfig = await res.json();
   } catch(e) {
     console.warn('Não foi possível carregar a configuração do Poke:', e);
@@ -2187,9 +2187,9 @@ async function fetchPokeConfig(){
   // Garante um único card "Poke Personalizado" no cardápio (categoria Poke)
   if(!products.some(p => p.isPoke)){
     products.push({
-      name: 'Poke Personalizado',
+      name: (pokeConfig && pokeConfig.title) || 'Poke Personalizado',
       category: 'Poke',
-      description: 'Monte do seu jeito: escolha o arroz, a proteína, as saladas e o crocante.',
+      description: (pokeConfig && pokeConfig.description) || 'Monte do seu jeito: escolha o arroz, a proteína, as saladas e o crocante.',
       image: 'Imagens/poke.jpg',
       esgotado: false,
       isPoke: true,

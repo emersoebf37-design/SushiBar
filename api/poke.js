@@ -37,6 +37,8 @@ const GROUP_KEYS = ["arroz", "proteina", "salada", "crocante"];
 // Configuração padrão, usada na primeira vez (documento ainda não existe)
 // e como fallback caso o Firestore falhe.
 const DEFAULT_CONFIG = {
+  title: "Poke Personalizado",
+  description: "Monte do seu jeito: escolha o arroz, a proteína, as saladas e o crocante.",
   basePrice: 32.9,
   saladaQtd: 2,
   avisos: [],
@@ -77,6 +79,9 @@ function slugify(str) {
 
 // Sanitiza/valida a configuração recebida do admin antes de salvar.
 function sanitizeConfig(body) {
+  const title = clean(body.title).slice(0, 60) || DEFAULT_CONFIG.title;
+  const description = clean(body.description).slice(0, 300) || DEFAULT_CONFIG.description;
+
   const basePrice = Number(body.basePrice);
   if (!Number.isFinite(basePrice) || basePrice < 0 || basePrice > 500) {
     throw new Error("Preço base inválido.");
@@ -131,13 +136,14 @@ function sanitizeConfig(body) {
     });
   }
 
-  return { basePrice, saladaQtd, avisos, groups, updatedAt: Date.now() };
+  return { title, description, basePrice, saladaQtd, avisos, groups, updatedAt: Date.now() };
 }
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
