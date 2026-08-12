@@ -56,7 +56,7 @@ function getPrivateKey() {
 const QUALIFYING_COMBOS_FIXOS = new Set([
   "Mega Combo Hot Roll",
   "Combo Osaka",
-  "Combo Shangai",
+  "Combo Shanghai",
   "Combo Kawaguchi",
   "Combo de Frios",
   "Combo Premium",
@@ -78,7 +78,7 @@ const QUALIFYING_COMBOS_TEMAKI_FIXOS = new Set([
   "Combo Apaixonados",
   "Combo Crocantissimo",
   "Combo Individual",
-  "Combo Shangai",
+  "Combo Shanghai",
   "Combo Kawaguchi",
   "combo Osaka",
 ]);
@@ -137,7 +137,7 @@ const PRODUCTS = {
   // ── Combos ──
   "Mega Combo Hot Roll": 40,
   "Combo Osaka": 65,
-  "Combo Shangai": 35,
+  "Combo Shanghai": 35,
   "Combo Kawaguchi": 40,
   "Combo Crocantissimo": 50,
   "Combo Individual": 40,
