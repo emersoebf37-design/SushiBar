@@ -55,8 +55,9 @@ function getPrivateKey() {
 // ========================
 const QUALIFYING_COMBOS_FIXOS = new Set([
   "Mega Combo Hot Roll",
-  "Combo Crocantissimo",
-  "Combo Individual",
+  "Combo Osaka",
+  "Combo Shangai",
+  "Combo Kawaguchi",
   "Combo de Frios",
   "Combo Premium",
 ]);
@@ -77,9 +78,12 @@ const QUALIFYING_COMBOS_TEMAKI_FIXOS = new Set([
   "Combo Apaixonados",
   "Combo Crocantissimo",
   "Combo Individual",
+  "Combo Shangai",
+  "Combo Kawaguchi",
+  "combo Osaka",
 ]);
 
-const CREAM_CHEESE_TEMAKI_PRICE = 1.50;
+const CREAM_CHEESE_TEMAKI_PRICE = 2.00;
 
 // ========================
 // PRODUTOS (ATUALIZADO COM OS NOVOS TAMANHOS)
