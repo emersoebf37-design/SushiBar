@@ -94,7 +94,7 @@ const PRODUCTS = {
   "Hot Roll Skin (8 unidades)": 8,
   "Hot Roll Kani (8 unidades)": 10.50,
   "Temaki Frito": 24,
-  "Temaki": 20, // ← NOVO
+  //"Temaki": 20, // ← NOVO
   "Bolinho de Salmão (4 unidades)": 12,
 
   // ── Hossomaki ──
@@ -103,26 +103,26 @@ const PRODUCTS = {
   "Hossomaki Kani (8 unidades)": 8,
 
   // ── Sashimi / Joe ──
-  "Sashimi de Salmão (4 unidades)": 12,   // ← NOVO
+  //"Sashimi de Salmão (4 unidades)": 12,   // ← NOVO
  
 
   // ── Harumaki ──
   "Harumaki de Legumes (3 unidades)": 13,
-  "Harumaki de Salmão (3 unidades)": 19,
-  "Harumaki de queijo (3 unidades)": 13,
-  "Harumaki de Frango com Cream Cheese (3 unidades)": 13,
+  //"Harumaki de Salmão (3 unidades)": 19,
+  //"Harumaki de queijo (3 unidades)": 13,
+  //"Harumaki de Frango com Cream Cheese (3 unidades)": 13,
   "Harumaki de Doce de leite (3 unidades)": 13, // ← NOVO
 
   // ── Porções ──
-  "Lula à Dorê (6 unidades)": 26,
-  "Shimeji na Manteiga": 15,
+  //"Lula à Dorê (6 unidades)": 26,
+  //"Shimeji na Manteiga": 15,
   "Bolinho de bacalhau (8 unidades)": 5,
 
   // ── Saladas ──
-  "Salada Sunomono": 5,
+  //"Salada Sunomono": 5,
 
   // ── Yakisoba ──
-   "Frango Xadrez": 25, // ← NOVO
+  //"Frango Xadrez": 25, // ← NOVO
   "Yakisoba de Frango (M)": 25,
   "Yakisoba de Frango (G)": 30,
   "Yakisoba de Calabresa (M)": 19,
@@ -139,12 +139,12 @@ const PRODUCTS = {
   "Combo Osaka": 65,
   "Combo Shanghai": 35,
   "Combo Kawaguchi": 40,
-  "Combo Crocantissimo": 50,
-  "Combo Individual": 40,
-  "Combo de Frios": 30,
-  "Combo Premium": 75,
-  "Combo Primavera": 38,
-  "Combo Salmão Lovers": 50,       
+  //"Combo Crocantissimo": 50,
+  //"Combo Individual": 40,
+  //"Combo de Frios": 30,
+  //"Combo Premium": 75,
+  //"Combo Primavera": 38,
+  //"Combo Salmão Lovers": 50,       
 };
 
 // ========================
