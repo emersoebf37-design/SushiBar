@@ -95,7 +95,6 @@ const PRODUCTS = {
   "Hot Roll Kani (8 unidades)": 10.50,
   "Temaki Frito": 24,
   //"Temaki": 20, // ← NOVO
-  "Bolinho de Salmão (4 unidades)": 12,
 
   // ── Hossomaki ──
   "Hossomaki Philadelphia Salmão (8 unidades)": 14,
@@ -113,10 +112,11 @@ const PRODUCTS = {
   //"Harumaki de Frango com Cream Cheese (3 unidades)": 13,
   "Harumaki de Doce de leite (3 unidades)": 13, // ← NOVO
 
-  // ── Porções ──
+  // ── Entradas  ──
   //"Lula à Dorê (6 unidades)": 26,
   //"Shimeji na Manteiga": 15,
   "Bolinho de bacalhau (8 unidades)": 5,
+  "Bolinho de Salmão (4 unidades)": 12,
 
   // ── Saladas ──
   //"Salada Sunomono": 5,
