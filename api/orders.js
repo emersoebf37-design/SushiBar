@@ -93,6 +93,7 @@ const PRODUCTS = {
   "Hot Roll Philadelphia Salmão (8 unidades)": 16,
   "Hot Roll Skin (8 unidades)": 8,
   "Hot Roll Kani (8 unidades)": 10.50,
+  "Haru hot Philadelphia Salmão (8 unidades)": 22,
   "Temaki Frito": 24,
   //"Temaki": 20, // ← NOVO
 
