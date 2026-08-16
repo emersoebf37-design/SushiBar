@@ -2809,10 +2809,10 @@ window.confirmAddPoke = confirmAddPoke;
 function renderCombos(){
   const container = document.getElementById('combo-list');
   container.innerHTML = '';
-  combos.forEach(combo => {
+  combos.forEach((combo, index) => {
     container.innerHTML += `
       <div class="recommendation-card ${combo.esgotado ? 'combo-esgotado' : ''}"
-        onclick="${combo.esgotado ? '' : `openComboModal({name:'${combo.name}',description:'${combo.descricaoModal}',price:${combo.price},image:'${combo.image}'})`}"
+        onclick="${combo.esgotado ? '' : `onComboCardClick(${index})`}"
         style="${combo.esgotado ? 'cursor:default;opacity:0.7;' : ''}"
       >
         <div style="position:relative;flex-shrink:0;">
@@ -2833,6 +2833,25 @@ function renderCombos(){
     `;
   });
 }
+
+// onclick simples e direto (só recebe um número, nunca quebra por causa de
+// texto/apóstrofo/aspas no nome do combo). Tem um log temporário pra ajudar
+// a confirmar que o clique está sendo detectado — pode remover depois.
+function onComboCardClick(index){
+  console.log('[DEBUG] Clique detectado no combo, index:', index, combos[index]);
+  const combo = combos[index];
+  if (!combo) {
+    console.warn('[DEBUG] Combo não encontrado para o index', index);
+    return;
+  }
+  openComboModal({
+    name: combo.name,
+    description: combo.descricaoModal,
+    price: combo.price,
+    image: combo.image,
+  });
+}
+window.onComboCardClick = onComboCardClick;
 
 renderCombos();
 
