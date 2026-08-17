@@ -3397,20 +3397,54 @@ renderOrders();
 let selectedCombo = null;
 
 function openComboModal(combo){
+  console.log('[COMBO] Abrindo modal para:', combo?.name);
+
+  // Remove qualquer instância anterior do modal, se sobrou alguma
+  closeComboModal();
+
   selectedCombo = combo;
-  document.getElementById('combo-modal-img').src = combo.image;
-  document.getElementById('combo-modal-name').innerText = combo.name;
-  document.getElementById('combo-modal-desc').innerText = combo.description;
-  document.getElementById('combo-modal-price').innerHTML = `
-    <div style="color:#c40000;text-decoration:line-through;font-size:18px;margin-bottom:6px;">R$${Math.ceil(combo.price * 1.10).toFixed(2).replace('.', ',')}</div>
-    <div style="font-size:38px;font-weight:bold;color:black;">R$${combo.price.toFixed(2).replace('.', ',')}</div>
-    <div style="color:#008a2e;font-size:15px;font-weight:bold;margin-top:8px;">10% OFF no Pix e Dinheiro</div>
+
+  const overlay = document.createElement('div');
+  overlay.id = 'combo-modal';
+  overlay.style.cssText = `
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.65);
+    display:flex; align-items:center; justify-content:center;
+    z-index:999999; padding:20px; box-sizing:border-box;
   `;
-  document.getElementById('combo-modal').style.display = 'flex';
+
+  overlay.innerHTML = `
+    <div style="background:#fff; color:#000; width:100%; max-width:450px; max-height:85vh; overflow-y:auto; border-radius:18px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.3); font-family:inherit;">
+      <img src="${combo.image}" style="width:100%; height:200px; object-fit:cover; border-radius:18px; margin-bottom:15px; display:block;">
+      <h2 style="margin:0 0 8px; font-size:22px;">${combo.name}</h2>
+      <p style="margin:0 0 14px; color:#555;">${combo.description || ''}</p>
+      <div style="margin-bottom:20px;">
+        <div style="color:#c40000; text-decoration:line-through; font-size:18px; margin-bottom:6px;">R$${Math.ceil(combo.price * 1.10).toFixed(2).replace('.', ',')}</div>
+        <div style="font-size:38px; font-weight:bold; color:black;">R$${combo.price.toFixed(2).replace('.', ',')}</div>
+        <div style="color:#008a2e; font-size:15px; font-weight:bold; margin-top:8px;">10% OFF no Pix e Dinheiro</div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button id="combo-modal-cancel" style="flex:1; padding:14px; border:none; border-radius:10px; background:#eee; color:#333; font-weight:bold; font-size:15px; cursor:pointer;">Cancelar</button>
+        <button id="combo-modal-confirm" style="flex:1; padding:14px; border:none; border-radius:10px; background:#008a2e; color:#fff; font-weight:bold; font-size:15px; cursor:pointer;">Adicionar ao carrinho</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Fecha ao clicar fora da caixa branca
+  overlay.addEventListener('click', (e) => {
+    if(e.target === overlay) closeComboModal();
+  });
+  document.getElementById('combo-modal-cancel').addEventListener('click', closeComboModal);
+  document.getElementById('combo-modal-confirm').addEventListener('click', confirmAddCombo);
+
+  console.log('[COMBO] Modal inserido no DOM.');
 }
 
 function closeComboModal(){
-  document.getElementById('combo-modal').style.display = 'none';
+  const existing = document.getElementById('combo-modal');
+  if(existing) existing.remove();
 }
 
 function confirmAddCombo(){
@@ -3901,20 +3935,6 @@ window.addEventListener('popstate', (e) => {
     <div class="modal-buttons">
       <button class="modal-cancel" onclick="closeOrderModal()">Cancelar</button>
       <button class="modal-confirm" onclick="confirmOrder()">Confirmar</button>
-    </div>
-  </div>
-</div>
-
-<!-- COMBO MODAL -->
-<div id="combo-modal" class="modal-overlay">
-  <div class="modal-box">
-    <img id="combo-modal-img" style="width:100%;height:200px;object-fit:cover;border-radius:18px;margin-bottom:15px;">
-    <h2 id="combo-modal-name"></h2>
-    <p id="combo-modal-desc"></p>
-    <div class="modal-total" id="combo-modal-price"></div>
-    <div class="modal-buttons">
-      <button class="modal-cancel" onclick="closeComboModal()">Cancelar</button>
-      <button class="modal-confirm" onclick="confirmAddCombo()">Adicionar ao carrinho</button>
     </div>
   </div>
 </div>
