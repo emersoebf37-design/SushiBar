@@ -677,10 +677,10 @@ body{ background:#1a0000; color:white; min-height:100vh; }
 
 </div>
 
-<!-- MODAL: NOVO ITEM -->
+<!-- MODAL: NOVO ITEM / EDITAR ITEM -->
 <div class="modal-overlay" id="novo-item-overlay">
   <div class="modal-box">
-    <h3>🆕 Adicionar Novo Item</h3>
+    <h3 id="novo-item-titulo">🆕 Adicionar Novo Item</h3>
 
     <div class="modal-field">
       <label>Tipo</label>
@@ -715,12 +715,13 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     </div>
 
     <div class="modal-field" id="campo-adicional-info" style="display:none;">
-      <small>💡 Esse adicional vai aparecer como um card (com foto, preço e contador) dentro do modal de finalização do pedido, junto com hashi, geleia etc. — não aparece como prato no cardápio.</small>
+      <small>💡 Esse adicional vai aparecer como um card (com foto, preço e contador) dentro do modal de finalização do pedido — não aparece como prato no cardápio.</small>
     </div>
 
     <div class="modal-field">
-      <label>Preço (R$)</label>
-      <input type="number" id="novo-item-preco" class="section-input" placeholder="Ex: 25.00" step="0.01" min="0.01">
+      <label id="novo-item-preco-label">Preço (R$)</label>
+      <input type="number" id="novo-item-preco" class="section-input" placeholder="Ex: 25.00" step="0.01" min="0">
+      <small id="novo-item-preco-hint" style="display:none;">Deixe 0 para um adicional grátis (ex: hashi, talheres).</small>
     </div>
 
     <div class="modal-field">
@@ -734,20 +735,17 @@ body{ background:#1a0000; color:white; min-height:100vh; }
       <small>Aparece no modal de detalhes do combo, no site.</small>
     </div>
 
-    <div class="modal-field" id="campo-hot-hosso-min8" style="display:none;">
+    <div class="modal-field" id="campo-aplica-a" style="display:none;">
       <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-        <input type="checkbox" id="novo-item-hot-hosso-min8" style="width:auto;">
-        Tem 8 ou mais peças de Hot Roll/Hossomaki
+        <input type="checkbox" id="novo-item-aplica-todos" style="width:auto;" onchange="onAplicaTodosChange()">
+        Aplica a todos os pedidos (como hashi, talheres)
       </label>
-      <small>Libera os adicionais de cream cheese extra (Grátis/pago) para quem pedir esse combo.</small>
-    </div>
+      <small>Desmarcado: escolha abaixo a quais pratos e/ou combos esse adicional se aplica. Ele só vai aparecer pro cliente quando o carrinho tiver pelo menos um desses itens.</small>
 
-    <div class="modal-field" id="campo-temaki-frito" style="display:none;">
-      <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-        <input type="checkbox" id="novo-item-temaki-frito" style="width:auto;">
-        Contém Temaki Frito
-      </label>
-      <small>Libera o adicional "Cream cheese extra no temaki" para quem pedir esse combo.</small>
+      <div id="campo-aplica-a-lista-wrap" style="margin-top:10px;">
+        <input type="text" id="aplica-a-filtro" class="section-input" placeholder="Filtrar pratos/combos..." oninput="renderAplicaALista()" style="margin-bottom:8px;">
+        <div id="aplica-a-lista" style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px;"></div>
+      </div>
     </div>
 
     <div class="modal-field">
@@ -901,22 +899,31 @@ function renderCustomItemsList(){
 
   container.innerHTML = '';
   customItems.forEach(item => {
-    const badgeHotHosso = item.type === 'combo' && item.hotHossoMin8
-      ? '<span class="custom-item-thumb" style="background:#9e050533; color:#e57373;">🧀 8+ Hot Roll/Hossomaki</span>'
-      : '';
-    const badgeTemaki = item.type === 'combo' && item.temakiFrito
-      ? '<span class="custom-item-thumb" style="background:#9e050533; color:#e57373;">🧀 Temaki Frito</span>'
-      : '';
+    let badgeAplicaA = '';
+    if (item.type === 'adicional') {
+      if (item.appliesToAll) {
+        badgeAplicaA = '<span class="custom-item-thumb" style="background:#9e050533; color:#e57373;">🌐 Todos os pedidos</span>';
+      } else if (Array.isArray(item.appliesTo) && item.appliesTo.length > 0) {
+        const primeiros = item.appliesTo.slice(0, 2).join(', ');
+        const resto = item.appliesTo.length > 2 ? ` +${item.appliesTo.length - 2}` : '';
+        badgeAplicaA = `<span class="custom-item-thumb" style="background:#9e050533; color:#e57373;">🎯 ${primeiros}${resto}</span>`;
+      }
+    }
+    const precoTexto = item.type === 'adicional' && !(Number(item.price) > 0)
+      ? 'Grátis'
+      : `R$${Number(item.price).toFixed(2)}`;
     container.innerHTML += `
       <div class="produto-item">
         <div class="produto-nome">
           ${item.name}
           <span class="custom-item-thumb ${tipoClass[item.type] || ''}">${tipoLabel[item.type] || item.type}</span>
-          ${badgeHotHosso}
-          ${badgeTemaki}
-          <small>${item.category} · R$${Number(item.price).toFixed(2)}</small>
+          ${badgeAplicaA}
+          <small>${item.category} · ${precoTexto}</small>
         </div>
-        <button onclick="removeCustomItem('${item.id}')" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;">🗑️</button>
+        <div style="display:flex; gap:6px;">
+          <button onclick='abrirModalEditarItem(${JSON.stringify(item.id)})' style="background:none; border:none; color:#9ec5ff; cursor:pointer; font-size:16px;" aria-label="Editar">✏️</button>
+          <button onclick="removeCustomItem('${item.id}')" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;" aria-label="Remover">🗑️</button>
+        </div>
       </div>`;
   });
 }
@@ -939,9 +946,61 @@ async function removeCustomItem(id){
 }
 
 // ========================
-// MODAL: NOVO ITEM
+// MODAL: NOVO ITEM / EDITAR ITEM
 // ========================
+let itemEditando = null; // null = criando; objeto do item = editando
+let aplicaASelecionados = new Set();
+
+function listaCompletaPratosECombos(){
+  // Nomes de todos os pratos e combos (base + customizados) — fonte pro
+  // seletor "aplica a" dos adicionais.
+  const nomesProdutos = produtos.map(p => ({ name: p.name, tipo: 'Prato' }));
+  const nomesCombos = combos.map(c => ({ name: c.name, tipo: 'Combo' }));
+  return [...nomesProdutos, ...nomesCombos];
+}
+
+function renderAplicaALista(){
+  const wrap = document.getElementById('aplica-a-lista');
+  if(!wrap) return;
+  const filtro = (document.getElementById('aplica-a-filtro').value || '').toLowerCase().trim();
+
+  const todos = listaCompletaPratosECombos().filter(o =>
+    !filtro || o.name.toLowerCase().includes(filtro)
+  );
+
+  if(todos.length === 0){
+    wrap.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px; margin:0;">Nenhum prato/combo encontrado.</p>';
+    return;
+  }
+
+  wrap.innerHTML = todos.map(o => {
+    const checked = aplicaASelecionados.has(o.name) ? 'checked' : '';
+    const nomeSeguro = o.name.replace(/"/g, '&quot;');
+    return `
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;">
+        <input type="checkbox" value="${nomeSeguro}" ${checked} style="width:auto;" onchange="toggleAplicaA('${nomeSeguro.replace(/'/g, "\\'")}', this.checked)">
+        ${o.name} <small style="color:rgba(255,255,255,0.4);">(${o.tipo})</small>
+      </label>`;
+  }).join('');
+}
+
+function toggleAplicaA(name, checked){
+  if(checked) aplicaASelecionados.add(name);
+  else aplicaASelecionados.delete(name);
+}
+
+function onAplicaTodosChange(){
+  const todos = document.getElementById('novo-item-aplica-todos').checked;
+  document.getElementById('campo-aplica-a-lista-wrap').style.display = todos ? 'none' : 'block';
+}
+
 function abrirModalNovoItem(){
+  itemEditando = null;
+  aplicaASelecionados = new Set();
+
+  document.getElementById('novo-item-titulo').innerText = '🆕 Adicionar Novo Item';
+  document.getElementById('novo-item-save-btn').innerText = 'Adicionar';
+  document.getElementById('novo-item-tipo').disabled = false;
   document.getElementById('novo-item-tipo').value = 'produto';
   document.getElementById('novo-item-nome').value = '';
   document.getElementById('novo-item-categoria').value = '';
@@ -949,24 +1008,55 @@ function abrirModalNovoItem(){
   document.getElementById('novo-item-descricao').value = '';
   document.getElementById('novo-item-descricao-modal').value = '';
   document.getElementById('novo-item-imagem').value = '';
-  document.getElementById('novo-item-hot-hosso-min8').checked = false;
-  document.getElementById('novo-item-temaki-frito').checked = false;
+  document.getElementById('novo-item-aplica-todos').checked = false;
+  document.getElementById('aplica-a-filtro').value = '';
   document.getElementById('novo-item-erro').style.display = 'none';
   onTipoNovoItemChange();
+  renderAplicaALista();
+  document.getElementById('novo-item-overlay').style.display = 'flex';
+}
+
+function abrirModalEditarItem(id){
+  const item = customItems.find(i => i.id === id);
+  if(!item) return;
+
+  itemEditando = item;
+  aplicaASelecionados = new Set(Array.isArray(item.appliesTo) ? item.appliesTo : []);
+
+  document.getElementById('novo-item-titulo').innerText = '✏️ Editar Item';
+  document.getElementById('novo-item-save-btn').innerText = 'Salvar alterações';
+  document.getElementById('novo-item-tipo').value = item.type;
+  document.getElementById('novo-item-tipo').disabled = true; // não dá pra trocar o tipo depois de criado
+  document.getElementById('novo-item-nome').value = item.name || '';
+  document.getElementById('novo-item-categoria').value = item.category || '';
+  document.getElementById('novo-item-preco').value = item.price != null ? item.price : '';
+  document.getElementById('novo-item-descricao').value = item.description || '';
+  document.getElementById('novo-item-descricao-modal').value = item.descricaoModal || '';
+  document.getElementById('novo-item-imagem').value = (item.image || '').replace(/^Imagens\//, '');
+  document.getElementById('novo-item-aplica-todos').checked = item.appliesToAll === true;
+  document.getElementById('aplica-a-filtro').value = '';
+  document.getElementById('novo-item-erro').style.display = 'none';
+  onTipoNovoItemChange();
+  onAplicaTodosChange();
+  renderAplicaALista();
   document.getElementById('novo-item-overlay').style.display = 'flex';
 }
 
 function fecharModalNovoItem(){
   document.getElementById('novo-item-overlay').style.display = 'none';
+  document.getElementById('novo-item-tipo').disabled = false;
+  itemEditando = null;
 }
 
 function onTipoNovoItemChange(){
   const tipo = document.getElementById('novo-item-tipo').value;
   document.getElementById('campo-descricao-modal').style.display = (tipo === 'combo') ? 'block' : 'none';
-  document.getElementById('campo-hot-hosso-min8').style.display = (tipo === 'combo') ? 'block' : 'none';
-  document.getElementById('campo-temaki-frito').style.display = (tipo === 'combo') ? 'block' : 'none';
+  document.getElementById('campo-aplica-a').style.display = (tipo === 'adicional') ? 'block' : 'none';
   document.getElementById('campo-categoria').style.display = (tipo === 'adicional') ? 'none' : 'block';
   document.getElementById('campo-adicional-info').style.display = (tipo === 'adicional') ? 'block' : 'none';
+  document.getElementById('novo-item-preco-label').innerText = (tipo === 'adicional') ? 'Preço (R$) — opcional' : 'Preço (R$)';
+  document.getElementById('novo-item-preco-hint').style.display = (tipo === 'adicional') ? 'block' : 'none';
+  document.getElementById('novo-item-preco').min = (tipo === 'adicional') ? '0' : '0.01';
 }
 
 async function salvarNovoItem(){
@@ -974,29 +1064,48 @@ async function salvarNovoItem(){
   const erroBox = document.getElementById('novo-item-erro');
   erroBox.style.display = 'none';
 
+  const tipo = document.getElementById('novo-item-tipo').value;
+  const precoRaw = document.getElementById('novo-item-preco').value;
+
   const payload = {
-    type: document.getElementById('novo-item-tipo').value,
+    type: tipo,
     name: document.getElementById('novo-item-nome').value.trim(),
     category: document.getElementById('novo-item-categoria').value.trim(),
-    price: parseFloat(document.getElementById('novo-item-preco').value),
+    price: precoRaw === '' ? (tipo === 'adicional' ? 0 : NaN) : parseFloat(precoRaw),
     description: document.getElementById('novo-item-descricao').value.trim(),
     descricaoModal: document.getElementById('novo-item-descricao-modal').value.trim(),
     image: document.getElementById('novo-item-imagem').value.trim(),
-    hotHossoMin8: document.getElementById('novo-item-hot-hosso-min8').checked,
-    temakiFrito: document.getElementById('novo-item-temaki-frito').checked,
   };
 
-  if(!payload.name || !payload.category || !payload.description || !payload.image || !(payload.price > 0)){
+  if(tipo === 'adicional'){
+    payload.appliesToAll = document.getElementById('novo-item-aplica-todos').checked;
+    payload.appliesTo = Array.from(aplicaASelecionados);
+  }
+
+  const precoValido = tipo === 'adicional' ? (payload.price >= 0) : (payload.price > 0);
+  const categoriaOk = tipo === 'adicional' ? true : !!payload.category;
+  const descricaoOk = tipo === 'adicional' ? true : !!payload.description;
+
+  if(!payload.name || !categoriaOk || !descricaoOk || !payload.image || !precoValido || !Number.isFinite(payload.price)){
     erroBox.innerText = 'Preencha todos os campos obrigatórios corretamente.';
+    erroBox.style.display = 'block';
+    return;
+  }
+  if(tipo === 'adicional' && !payload.appliesToAll && payload.appliesTo.length === 0){
+    erroBox.innerText = 'Selecione ao menos um prato/combo, ou marque "aplica a todos os pedidos".';
     erroBox.style.display = 'block';
     return;
   }
 
   btn.disabled = true;
-  btn.innerText = 'Salvando...';
+  btn.innerText = itemEditando ? 'Salvando...' : 'Salvando...';
 
   try {
-    const res = await fetch('/api/products?action=create', {
+    const url = itemEditando
+      ? `/api/products?action=update&id=${encodeURIComponent(itemEditando.id)}`
+      : '/api/products?action=create';
+
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1017,7 +1126,7 @@ async function salvarNovoItem(){
     erroBox.style.display = 'block';
   } finally {
     btn.disabled = false;
-    btn.innerText = 'Adicionar';
+    btn.innerText = itemEditando ? 'Salvar alterações' : 'Adicionar';
   }
 }
 

@@ -49,41 +49,30 @@ function getPrivateKey() {
 }
 
 // ========================
-// COMBOS ELEGÍVEIS PARA CREAM CHEESE EXTRA
-// (8+ peças de Hot Roll/Hossomaki). Combos customizados cadastrados
-// pelo admin entram nessa lista dinamicamente via campo hotHossoMin8.
+// ADICIONAIS — sistema unificado
+// Todo adicional (hashi, geleia, cream cheese, ou qualquer outro criado
+// pelo admin) é um documento em custom_products (type: "adicional") com:
+//   - appliesToAll: true  → aparece/vale para qualquer pedido
+//   - appliesTo: [nomes]  → só vale se o pedido tiver pelo menos 1 desses itens
+// Nome e preço nunca são confiados do cliente — sempre lidos do Firestore.
 // ========================
-const QUALIFYING_COMBOS_FIXOS = new Set([
-  "Mega Combo Hot Roll",
-  "Combo Osaka",
-  "Combo Shanghai",
-  "Combo Kawaguchi",
-  "Combo de Frios",
-  "Combo Premium",
-]);
 
-const CREAM_CHEESE_ADDON_PRICES = {
-  creamCheeseExtra: 1.00,
-  creamCheeseCrocante: 1.50,
-  creamCheeseCouve: 1.50,
-  creamCheeseGeleiaPimenta: 1.50,
+// IDs fixos dos adicionais que existiam no sistema antigo (migrados
+// automaticamente por api/products.js). Mantidos aqui só para gravar o
+// pedido no MESMO formato de sempre (newOrder.addons.hashi, .geleia, etc.),
+// para não quebrar nada que já lê esse formato (ex: mensagens de WhatsApp).
+const LEGACY_ADDON_ID_MAP = {
+  "hashi": "hashi",
+  "geleia": "geleia",
+  "pimenta": "pimenta",
+  "amendoim": "amendoim",
+  "talheres": "talheres",
+  "cream-cheese-extra": "creamCheeseExtra",
+  "cream-cheese-crocante": "creamCheeseCrocante",
+  "cream-cheese-couve": "creamCheeseCouve",
+  "cream-cheese-geleia-pimenta": "creamCheeseGeleiaPimenta",
+  "cream-cheese-temaki": "creamCheeseTemaki",
 };
-
-// ========================
-// COMBOS ELEGÍVEIS PARA CREAM CHEESE EXTRA NO TEMAKI
-// (contêm Temaki Frito). Combos customizados entram dinamicamente
-// via campo temakiFrito.
-// ========================
-const QUALIFYING_COMBOS_TEMAKI_FIXOS = new Set([
-  "Combo Apaixonados",
-  "Combo Crocantissimo",
-  "Combo Individual",
-  "Combo Shanghai",
-  "Combo Kawaguchi",
-  "combo Osaka",
-]);
-
-const CREAM_CHEESE_TEMAKI_PRICE = 2.00;
 
 // ========================
 // PRODUTOS (ATUALIZADO COM OS NOVOS TAMANHOS)
@@ -153,8 +142,6 @@ const PRODUCTS = {
 // Cache em memória para não estourar o limite de leitura do Firestore
 // ========================
 let customProductsCache = null;
-let customQualifyingCombosCache = new Set();
-let customQualifyingCombosTemakiCache = new Set();
 let customAddonsByIdCache = {};
 let customProductsCacheAt = 0;
 const CUSTOM_PRODUCTS_CACHE_MS = 60 * 1000; // 60s
@@ -164,8 +151,6 @@ async function getFullProductList(db) {
   if (customProductsCache && (now - customProductsCacheAt < CUSTOM_PRODUCTS_CACHE_MS)) {
     return {
       products: { ...PRODUCTS, ...customProductsCache },
-      qualifyingCombos: new Set([...QUALIFYING_COMBOS_FIXOS, ...customQualifyingCombosCache]),
-      qualifyingCombosTemaki: new Set([...QUALIFYING_COMBOS_TEMAKI_FIXOS, ...customQualifyingCombosTemakiCache]),
       customAddonsById: customAddonsByIdCache,
     };
   }
@@ -173,41 +158,32 @@ async function getFullProductList(db) {
   try {
     const snap = await db.collection("custom_products").get();
     const custom = {};
-    const qualifying = new Set();
-    const qualifyingTemaki = new Set();
     const addonsById = {};
     snap.forEach(doc => {
       const data = doc.data();
-      if (data && data.name && Number.isFinite(data.price)) {
+      if (!data) return;
+      if (data.type === "adicional" && data.name && Number.isFinite(data.price)) {
+        addonsById[doc.id] = {
+          name: data.name,
+          price: data.price,
+          appliesToAll: data.appliesToAll === true,
+          appliesTo: Array.isArray(data.appliesTo) ? data.appliesTo : [],
+        };
+      } else if (data.name && Number.isFinite(data.price)) {
         custom[data.name] = data.price;
-        if (data.type === "combo" && data.hotHossoMin8 === true) {
-          qualifying.add(data.name);
-        }
-        if (data.type === "combo" && data.temakiFrito === true) {
-          qualifyingTemaki.add(data.name);
-        }
-        if (data.type === "adicional") {
-          addonsById[doc.id] = { name: data.name, price: data.price };
-        }
       }
     });
     customProductsCache = custom;
-    customQualifyingCombosCache = qualifying;
-    customQualifyingCombosTemakiCache = qualifyingTemaki;
     customAddonsByIdCache = addonsById;
     customProductsCacheAt = now;
     return {
       products: { ...PRODUCTS, ...custom },
-      qualifyingCombos: new Set([...QUALIFYING_COMBOS_FIXOS, ...qualifying]),
-      qualifyingCombosTemaki: new Set([...QUALIFYING_COMBOS_TEMAKI_FIXOS, ...qualifyingTemaki]),
       customAddonsById: addonsById,
     };
   } catch (e) {
     console.warn("Erro ao buscar produtos customizados, usando apenas os fixos:", e.message);
     return {
       products: { ...PRODUCTS },
-      qualifyingCombos: new Set(QUALIFYING_COMBOS_FIXOS),
-      qualifyingCombosTemaki: new Set(QUALIFYING_COMBOS_TEMAKI_FIXOS),
       customAddonsById: {},
     };
   }
@@ -435,7 +411,7 @@ export default async function handler(req, res) {
       }
 
       // Recalcula Total
-      const { products: ALL_PRODUCTS, qualifyingCombos, qualifyingCombosTemaki, customAddonsById } = await getFullProductList(db);
+      const { products: ALL_PRODUCTS, customAddonsById } = await getFullProductList(db);
       let total = 0;
       const validatedItems = [];
       let pokeConfigLoaded = null;
@@ -476,24 +452,6 @@ export default async function handler(req, res) {
         validatedItems.push({ name: itemName, quantity, unitPrice, subtotal });
       }
 
-      // Verifica se há algum Yakisoba de fato no pedido validado
-      const temYakisobaNoPedido = validatedItems.some(item => 
-        item.name.toLowerCase().includes("yakisoba")
-      );
-
-      // Verifica se há Hot Roll/Hossomaki avulso ou combo elegível (8+ peças) no pedido
-      const temHotRollOuHossomakiNoPedido = validatedItems.some(item =>
-        item.name.includes("Hot Roll") ||
-        item.name.includes("Hossomaki") ||
-        qualifyingCombos.has(item.name)
-      );
-
-      // Verifica se há Temaki Frito avulso ou combo elegível (contém Temaki Frito) no pedido
-      const temTemakiFritoNoPedido = validatedItems.some(item =>
-        item.name.includes("Temaki Frito") ||
-        qualifyingCombosTemaki.has(item.name)
-      );
-
       // Transação do ID sequencial
       const counterRef = db.collection("meta").doc("orderCounter");
       let nextId = 1;
@@ -509,47 +467,25 @@ export default async function handler(req, res) {
         }
       });
 
-      // Adicionais e Taxas
+      // ========================
+      // ADICIONAIS (sistema unificado)
+      // Chegam em order.addons com a chave "custom_<id do Firestore>" —
+      // TODOS os adicionais (hashi, geleia, cream cheese, temaki, ou
+      // qualquer um criado pelo admin) usam o mesmo formato agora.
+      // Nome, preço e elegibilidade (appliesToAll/appliesTo) são SEMPRE
+      // lidos do Firestore, nunca confiados do cliente.
+      // ========================
       const addons = order.addons || {};
-      const hashi = Math.max(0, parseInt(addons.hashi || 0));
-      const geleia = Math.max(0, parseInt(addons.geleia || 0));
-      const pimenta = Math.max(0, parseInt(addons.pimenta || 0));
-      const amendoim = Math.max(0, parseInt(addons.amendoim || 0));
-      const talheres = Math.max(0, parseInt(addons.talheres || 0));
-      const creamCheeseExtra = Math.max(0, parseInt(addons.creamCheeseExtra || 0));
-      const creamCheeseCrocante = Math.max(0, parseInt(addons.creamCheeseCrocante || 0));
-      const creamCheeseCouve = Math.max(0, parseInt(addons.creamCheeseCouve || 0));
-      const creamCheeseGeleiaPimenta = Math.max(0, parseInt(addons.creamCheeseGeleiaPimenta || 0));
-      const creamCheeseTemaki = Math.max(0, parseInt(addons.creamCheeseTemaki || 0));
 
-      if (
-        hashi > 20 || geleia > 20 || amendoim > 20 || talheres > 20 ||
-        creamCheeseExtra > 20 || creamCheeseCrocante > 20 ||
-        creamCheeseCouve > 20 || creamCheeseGeleiaPimenta > 20 ||
-        creamCheeseTemaki > 20
-      ) {
-        return res.status(400).json({ error: "Quantidade de adicionais inválida." });
-      }
-
-      if (pimenta > 0 && !temYakisobaNoPedido) {
-        return res.status(400).json({ error: "A pimenta de Sichuan é exclusiva para pedidos com Yakisoba." });
-      }
-
-      const totalCreamCheeseExtras = creamCheeseExtra + creamCheeseCrocante + creamCheeseCouve + creamCheeseGeleiaPimenta;
-      if (totalCreamCheeseExtras > 0 && !temHotRollOuHossomakiNoPedido) {
-        return res.status(400).json({ error: "Os adicionais de cream cheese extra são exclusivos para pedidos com Hot Roll, Hossomaki ou combos com 8 ou mais dessas peças." });
-      }
-
-      if (creamCheeseTemaki > 0 && !temTemakiFritoNoPedido) {
-        return res.status(400).json({ error: "O cream cheese extra no temaki é exclusivo para pedidos com Temaki Frito ou combos que o contenham." });
-      }
-
-      // ========================
-      // ADICIONAIS CUSTOMIZADOS (cadastrados pelo admin, type "adicional")
-      // Chegam dentro de order.addons com a chave "custom_<id do Firestore>".
-      // Nome e preço nunca são confiados do cliente — sempre lidos do banco.
-      // ========================
+      // addons no formato antigo (newOrder.addons.hashi, .geleia, etc.) —
+      // preservado para não quebrar integrações existentes (ex: WhatsApp).
+      const legacyAddons = {
+        hashi: 0, pimenta: 0, geleia: 0, amendoim: 0, talheres: 0,
+        creamCheeseExtra: 0, creamCheeseCrocante: 0, creamCheeseCouve: 0,
+        creamCheeseGeleiaPimenta: 0, creamCheeseTemaki: 0,
+      };
       const customAddonsResolved = [];
+
       for (const [key, rawQty] of Object.entries(addons)) {
         if (!key.startsWith("custom_")) continue;
 
@@ -565,10 +501,24 @@ export default async function handler(req, res) {
           return res.status(400).json({ error: "Um dos adicionais selecionados não está mais disponível." });
         }
 
+        // Confere elegibilidade: aplica a todos, ou o pedido precisa ter
+        // pelo menos um item (prato/combo) presente em appliesTo.
+        const elegivel = info.appliesToAll === true ||
+          (Array.isArray(info.appliesTo) && validatedItems.some(item => info.appliesTo.includes(item.name)));
+
+        if (!elegivel) {
+          return res.status(400).json({ error: `O adicional "${info.name}" não é válido para os itens deste pedido.` });
+        }
+
         const unitPrice = Number(info.price) || 0;
         const subtotal = Number((unitPrice * qty).toFixed(2));
         total += subtotal;
-        customAddonsResolved.push({ id, name: info.name, unitPrice, quantity: qty, subtotal });
+
+        if (id in LEGACY_ADDON_ID_MAP) {
+          legacyAddons[LEGACY_ADDON_ID_MAP[id]] = qty;
+        } else {
+          customAddonsResolved.push({ id, name: info.name, unitPrice, quantity: qty, subtotal });
+        }
       }
 
       const validPayments = ["Pix", "Cartão", "Dinheiro"];
@@ -580,12 +530,6 @@ export default async function handler(req, res) {
       if (taxaEntrega < 0 || taxaEntrega > 50) {
         return res.status(400).json({ error: "Taxa de entrega inválida." });
       }
-      total += geleia * 1.00;
-      total += creamCheeseExtra * CREAM_CHEESE_ADDON_PRICES.creamCheeseExtra;
-      total += creamCheeseCrocante * CREAM_CHEESE_ADDON_PRICES.creamCheeseCrocante;
-      total += creamCheeseCouve * CREAM_CHEESE_ADDON_PRICES.creamCheeseCouve;
-      total += creamCheeseGeleiaPimenta * CREAM_CHEESE_ADDON_PRICES.creamCheeseGeleiaPimenta;
-      total += creamCheeseTemaki * CREAM_CHEESE_TEMAKI_PRICE;
       total += taxaEntrega;
 
       if (isNovoCliente) total *= 0.90;
@@ -601,11 +545,7 @@ export default async function handler(req, res) {
         number:      order.number,
         complement:  order.complement,
         payment:     order.payment,
-        addons:      {
-          hashi, pimenta, geleia, amendoim, talheres,
-          creamCheeseExtra, creamCheeseCrocante, creamCheeseCouve, creamCheeseGeleiaPimenta,
-          creamCheeseTemaki,
-        },
+        addons:      legacyAddons,
         customAddons: customAddonsResolved,
         items:       validatedItems,
         taxaEntrega,
