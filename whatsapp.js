@@ -195,6 +195,8 @@ Olá, *${order.customer}*! Para confirmar seu pedido, realize o pagamento.
 
 🔑 *Chave Pix (CNPJ):*
 67.185.069/0001-08
+Banco Stone
+Emily da Silva de Araujo
 
 Após o pagamento, envie o *comprovante aqui nessa conversa* para confirmarmos seu pedido. 🙏
 
