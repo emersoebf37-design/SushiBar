@@ -1299,6 +1299,7 @@ body{
 }
 
 .addon-badge{
+  display: none !important;
   position:absolute;
   top:6px;
   left:6px;
@@ -2184,7 +2185,7 @@ function renderCustomAddonsUI(items){
       <div class="addon-photo">
         <img src="${item.image || ''}" alt="${nomeSeguro}" loading="lazy"
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-        <div class="addon-photo-fallback">🍥</div>
+        <div class="addon-photo-fallback">🍴</div>
       </div>
       <div class="addon-info">
         <p class="addon-name">${nomeSeguro}</p>
