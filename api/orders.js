@@ -104,7 +104,7 @@ const PRODUCTS = {
 
   // ── Entradas  ──
   //"Lula à Dorê (6 unidades)": 26,
-  //"Shimeji na Manteiga": 15,
+  "Croquete de Camarão (4 unidades)": 12,
   "Bolinho de bacalhau (8 unidades)": 8,
   //"Bolinho de Salmão (4 unidades)": 12,
 
