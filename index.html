@@ -1,0 +1,3652 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kaizora</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#ffff;
+  color:white;
+  display:flex;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* ========================= */
+/* SIDEBAR DESKTOP */
+/* ========================= */
+
+.sidebar{
+  width:270px;
+  background:#410202;
+  padding:30px 20px;
+  padding-top:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  height:100vh!important;
+  overflow-x: hidden;
+  overflow-y:hidden!important;
+}
+
+.logo{
+  font-size:42px;
+  font-weight:bold;
+  margin-bottom:40px;
+}
+
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.menu-item{
+  width:100%;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  color:white;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  font-size:18px;
+  font-weight:600;
+  padding:16px 18px;
+  border-radius:16px;
+  cursor:pointer;
+  transition:0.25s ease;
+  backdrop-filter: blur(6px);
+  position:relative;
+}
+
+.menu-item:hover{
+  background:rgba(255,255,255,0.15);
+  transform:translateX(6px);
+  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+}
+
+.menu-item:active{
+  transform:translateX(3px) scale(0.98);
+}
+
+.menu-item::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:10px;
+  bottom:10px;
+  width:4px;
+  border-radius:10px;
+  background:transparent;
+  transition:0.25s;
+}
+
+.menu-item:hover::before{
+  background:#ffffff;
+}
+
+/* ========================= */
+/* MAIN */
+/* ========================= */
+
+.main{
+  flex:1;
+  min-width:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  height:100vh;
+  padding:30px;
+  background:#ffffff;
+}
+
+.mobile-topbar{
+  display:none;
+}
+
+.mobile-menu{
+  display:none;
+}
+
+.cart-mobile-actions{
+  display:none;
+  gap:12px;
+  margin-top:20px;
+}
+
+@media(max-width:900px){
+    .mobile-topbar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#6b0505;
+    padding:12px 10px;
+    z-index:9999;
+    border-top:1px solid rgba(255,255,255,0.1);
+    }
+
+    .mobile-menu{
+    width:100%;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    gap:10px;
+    }
+
+    .mobile-menu button{
+    flex:1;
+    background:transparent;
+    color:white;
+    border:none;
+    padding:14px 8px;
+    border-radius:12px;
+    font-size:14px;
+    cursor:pointer;
+    transition:0.2s;
+    }
+
+    .mobile-menu button:hover{
+    background:rgba(255,255,255,0.1);
+    }
+
+  .main{
+    padding-bottom:110px;
+  }
+
+  .cart-mobile-actions{
+    display:flex !important;
+  }
+
+  .cart-mobile-actions .finish-order-btn{
+    flex:1;
+    margin-top:0;
+  }
+}
+
+/* ========================= */
+/* RECOMMENDATIONS */
+/* ========================= */
+
+.recommendations{
+  background:#3a0101ee;
+  padding:25px;
+  border-radius:25px;
+  margin-bottom:25px;
+}
+
+.recommendations h2{
+  font-size:36px;
+  margin-bottom:20px;
+}
+
+.recommendation-list{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding-bottom:10px;
+  scroll-behavior:smooth;
+}
+
+.recommendation-list::-webkit-scrollbar{
+  height:8px;
+}
+
+.recommendation-list::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,0.3);
+  border-radius:20px;
+}
+
+.recommendation-card{
+  min-width:320px;
+  flex-shrink:0;
+  background:white;
+  color:black;
+  border-radius:18px;
+  padding:15px;
+  display:flex;
+  gap:15px;
+  align-items:center;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.recommendation-card:hover{
+  transform:scale(1.02);
+}
+
+.recommendation-card img{
+  width:70px;
+  height:70px;
+  object-fit:cover;
+  border-radius:14px;
+}
+
+/* ========================= */
+/* MENU CONTAINER */
+/* ========================= */
+
+.menu-container{
+  background:#420101;
+  color:black;
+  border-radius:25px;
+  padding:30px;
+}
+
+/* ========================= */
+/* CATEGORIES */
+/* ========================= */
+
+.categories{
+  display:flex;
+  gap:15px;
+  overflow-x:auto;
+  padding-bottom:10px;
+  margin-bottom:30px;
+}
+
+.categories::-webkit-scrollbar{
+  height:6px;
+}
+
+.category-card{
+  min-width:120px;
+  background:#fffffff6;
+  border:none;
+  border-radius:18px;
+  padding:20px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.category-card:hover{
+  transform:translateY(-3px);
+}
+
+.category-icon{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.category-icon img{
+  width:52px;
+  height:52px;
+  object-fit:contain;
+  transition:0.25s;
+}
+
+.category-card:hover .category-icon img{
+  transform:scale(1.08) rotate(-4deg);
+}
+
+.category-name{
+  font-size:16px;
+}
+
+/* ========================= */
+/* PRODUCTS */
+/* ========================= */
+
+.products{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:25px;
+  padding-right:0;
+}
+
+.products::-webkit-scrollbar{
+  width:8px;
+}
+
+.products::-webkit-scrollbar-thumb{
+  background:#ffffff;
+  border-radius:20px;
+}
+
+.product-card{
+  background:white;
+  border-radius:25px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-height:450px;
+}
+
+.product-card img{
+  width:100%;
+  height:240px;
+  object-fit:cover;
+}
+
+.product-content{
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  flex:1;
+}
+
+.product-content h3{
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+.product-content p{
+  color:#555;
+  flex:1;
+  margin-bottom:15px;
+}
+
+.price{
+  font-size:28px;
+  font-weight:bold;
+}
+
+.add-cart-btn{
+  margin-top:20px;
+  border:none;
+  background:#9e0505;
+  color:white;
+  padding:15px;
+  border-radius:14px;
+  cursor:pointer;
+  font-size:16px;
+}
+
+.add-cart-btn:hover{
+  background:#c20707;
+  transform:translateY(-2px);
+  box-shadow:0 6px 15px rgba(158, 5, 5, 0.25);
+}
+
+.add-cart-btn:active{
+  transform:translateY(0px) scale(0.98);
+}
+
+/* ========================= */
+/* CART */
+/* ========================= */
+
+.cart-container{
+  background:white;
+  color:black;
+  padding:25px;
+  border-radius:25px;
+  margin-bottom:30px;
+}
+
+.cart-container h2{
+  margin-bottom:20px;
+}
+
+#cart-items{
+  overflow-y:auto;
+  max-height:55vh;
+  padding-right:6px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.cart-item{
+  background:#f3f3f3;
+  padding:15px 18px;
+  border-radius:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+  min-height:72px;
+}
+
+.trash-btn{
+  background:#b30000;
+  border:none;
+  color:white;
+  width:45px;
+  height:45px;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+.finish-order-btn{
+  margin-top:20px;
+  border:none;
+  background:#9e0505;
+  color:white;
+  padding:15px 20px;
+  border-radius:14px;
+  cursor:pointer;
+}
+
+.finish-order-btn:hover{
+  background:#c20707;
+  transform:translateY(-2px);
+  box-shadow:0 6px 15px rgba(158, 5, 5, 0.25);
+}
+
+.finish-order-btn:active{
+  transform:translateY(0px) scale(0.98);
+}
+
+/* ========================= */
+/* PAGE */
+/* ========================= */
+
+.page{
+  display:none;
+}
+
+/* ========================= */
+/* ACCOUNT PAGE — REVAMP */
+/* ========================= */
+
+.account-page{
+  font-family:'DM Sans', sans-serif;
+  color:#1a1208;
+}
+
+.acc-card{
+  max-width:620px;
+  background:#fff;
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:0 2px 0 rgba(0,0,0,0.06), 0 12px 40px rgba(0,0,0,0.08);
+}
+
+.acc-banner{
+  background:#420202;
+  padding:32px 32px 28px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.acc-avatar{
+  width:62px; height:62px;
+  border-radius:50%;
+  background:#6b0505;
+  border:3px solid rgba(255,255,255,0.18);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne', sans-serif;
+  font-size:26px; font-weight:700;
+  color:rgba(255,255,255,0.85);
+  letter-spacing:-1px;
+  flex-shrink:0;
+}
+
+.acc-banner-text h1{
+  font-family:'Syne', sans-serif;
+  font-size:24px; font-weight:700;
+  color:#fff;
+  letter-spacing:-.4px;
+  line-height:1.1;
+}
+
+.acc-banner-text p{
+  font-size:13px;
+  color:rgba(255,255,255,0.5);
+  margin-top:4px;
+}
+
+.acc-body{
+  padding:32px;
+  display:flex;
+  flex-direction:column;
+  gap:28px;
+}
+
+.acc-section-label{
+  font-family:'Syne', sans-serif;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#9e5a5a;
+  margin-bottom:14px;
+}
+
+.acc-field-group{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.acc-field-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:12px;
+}
+
+.acc-field{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.acc-field label{
+  font-size:12px;
+  font-weight:500;
+  color:#7a5a5a;
+  letter-spacing:.03em;
+}
+
+.acc-field input{
+  height:46px;
+  border:1.5px solid #e8ddd8;
+  border-radius:12px;
+  padding:0 14px;
+  font-family:'DM Sans', sans-serif;
+  font-size:15px;
+  color:#1a1208;
+  background:#fdfaf8;
+  outline:none;
+  transition:.2s;
+  width:100%;
+}
+
+.acc-field input:focus{
+  border-color:#9e0505;
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(158,5,5,0.08);
+}
+
+.acc-field input::placeholder{
+  color:#c4b5b0;
+}
+
+.acc-field input[readonly]{
+  color:#888;
+  background:#f5f0ee;
+  cursor:default;
+}
+
+.acc-cep-wrapper{
+  position:relative;
+}
+
+.acc-cep-wrapper input{
+  padding-right:48px;
+}
+
+.acc-cep-spinner{
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  width:18px; height:18px;
+  border:2px solid #e0d0d0;
+  border-top-color:#9e0505;
+  border-radius:50%;
+  animation:accSpin .7s linear infinite;
+  display:none;
+}
+
+.acc-cep-spinner.active{ display:block; }
+
+.acc-cep-ok{
+  position:absolute;
+  right:14px; top:50%;
+  transform:translateY(-50%);
+  font-size:18px;
+  display:none;
+}
+
+.acc-cep-ok.active{ display:block; }
+
+.acc-manual-toggle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:4px;
+  cursor:pointer;
+  user-select:none;
+  width:fit-content;
+}
+
+.acc-manual-toggle input[type=checkbox]{
+  display:none;
+}
+
+.acc-toggle-track{
+  width:38px; height:22px;
+  background:#e0d4d4;
+  border-radius:999px;
+  position:relative;
+  transition:.2s;
+  flex-shrink:0;
+}
+
+.acc-toggle-thumb{
+  width:16px; height:16px;
+  background:#fff;
+  border-radius:50%;
+  position:absolute;
+  top:3px; left:3px;
+  transition:.2s;
+  box-shadow:0 1px 4px rgba(0,0,0,0.2);
+}
+
+.acc-manual-toggle input:checked + .acc-toggle-track{
+  background:#9e0505;
+}
+
+.acc-manual-toggle input:checked + .acc-toggle-track .acc-toggle-thumb{
+  left:19px;
+}
+
+.acc-manual-toggle span{
+  font-size:13px;
+  color:#7a5a5a;
+  font-weight:500;
+}
+
+.acc-cep-error{
+  font-size:12px;
+  color:#c0392b;
+  margin-top:2px;
+  display:none;
+}
+
+.acc-cep-error.active{ display:block; }
+
+.acc-divider{
+  height:1px;
+  background:#f0e8e4;
+}
+
+.acc-save-btn{
+  width:100%;
+  height:52px;
+  background:#9e0505;
+  color:#fff;
+  font-family:'Syne', sans-serif;
+  font-size:16px;
+  font-weight:600;
+  letter-spacing:.02em;
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
+  transition:.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.acc-save-btn:hover{
+  background:#c20707;
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(158,5,5,0.25);
+}
+
+.acc-save-btn:active{
+  transform:translateY(0) scale(.98);
+}
+
+.acc-toast{
+  position:fixed;
+  bottom:30px; left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:#1a1208;
+  color:#fff;
+  font-size:14px;
+  padding:12px 24px;
+  border-radius:999px;
+  opacity:0;
+  transition:.3s;
+  pointer-events:none;
+  white-space:nowrap;
+  z-index:99999;
+  font-family:'DM Sans', sans-serif;
+}
+
+.acc-toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+@keyframes accSpin{ to{ transform:translateY(-50%) rotate(360deg); } }
+
+@media(max-width:560px){
+  .acc-field-row{ grid-template-columns:1fr; }
+  .acc-body{ padding:24px 20px; }
+  .acc-banner{ padding:24px 20px 20px; }
+}
+
+/* ========================= */
+/* ORDERS PAGE */
+/* ========================= */
+
+.orders-page{
+  background:#f6f6f6;
+  color:black;
+  padding:30px;
+  border-radius:25px;
+}
+
+.order-history{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.order-card{
+  background:white;
+  padding:20px;
+  border-radius:18px;
+}
+
+/* ========================= */
+/* MOBILE */
+/* ========================= */
+
+@media(max-width:900px){
+  body{
+    flex-direction:column;
+    overflow:auto;
+  }
+
+  .sidebar{
+    display:none;
+  }
+
+  .mobile-topbar{
+    display:flex;
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#490f00c5;
+    padding:12px 10px;
+    z-index:9999;
+    border-top:1px solid rgba(255,255,255,0.1);
+  }
+
+  .mobile-menu{
+    width:100%;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    gap:10px;
+  }
+
+  .mobile-menu button{
+    flex:1;
+    background:transparent;
+    color:white;
+    border:none;
+    padding:14px 8px;
+    border-radius:12px;
+    font-size:14px;
+    cursor:pointer;
+  }
+
+  .main{
+    height:auto;
+    overflow:visible;
+    padding:15px;
+    padding-bottom:110px;
+  }
+
+  .products{
+    grid-template-columns:1fr;
+    max-height:none;
+    overflow:visible;
+  }
+
+  .product-card{
+    min-height:auto;
+  }
+
+  .cart-item{
+    min-width:100%;
+  }
+}
+
+/* ========================= */
+/* MODAL */
+/* ========================= */
+
+.modal-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(255, 255, 255, 0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+  padding:20px;
+}
+
+.modal-box{
+  background:white;
+  color:black;
+  width:100%;
+  max-width:450px;
+  max-height:85vh;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  border-radius:25px;
+  padding:30px;
+  animation:modalShow 0.2s ease;
+}
+
+.modal-box h2{
+  margin-bottom:25px;
+  font-size:30px;
+}
+
+.modal-box p{
+  margin-bottom:12px;
+  font-size:18px;
+}
+
+.modal-total{
+  font-size:32px;
+  font-weight:bold;
+  margin:25px 0;
+}
+
+.modal-buttons{
+  display:flex;
+  gap:15px;
+  margin-top:30px;
+}
+
+.modal-buttons button{
+  flex:1;
+  border:none;
+  padding:16px;
+  border-radius:14px;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:bold;
+}
+
+.modal-cancel{
+  background:#ddd;
+}
+
+.modal-confirm{
+  background:#9e0505;
+  color:white;
+}
+
+@keyframes modalShow{
+  from{ transform:scale(0.9); opacity:0; }
+  to{ transform:scale(1); opacity:1; }
+}
+
+/* ========================= */
+/* STATUS COLORS */
+/* ========================= */
+
+.status-delivered{
+  background:#d4ffd4 !important;
+  border:2px solid #59c759;
+}
+
+.status-delivery{
+  background:#ffe3b3 !important;
+  border:2px solid #ff9800;
+}
+
+.order-status-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.order-status-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  background:transparent !important;
+  width:auto !important;
+  height:auto !important;
+  border-radius:0 !important;
+  padding:0 !important;
+  box-shadow:none !important;
+}
+
+.icon-received{ animation:statusPulse 2s infinite; }
+.icon-preparing{ animation:statusSpin 3s linear infinite; }
+.icon-out{ animation:statusMove 1s infinite alternate; }
+.icon-done{ animation:statusPop 1s infinite alternate; }
+
+@keyframes statusPulse{
+  0%{ transform:scale(1); }
+  50%{ transform:scale(1.1); }
+  100%{ transform:scale(1); }
+}
+
+@keyframes statusSpin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+@keyframes statusMove{
+  from{ transform:translateX(0); }
+  to{ transform:translateX(6px); }
+}
+
+@keyframes statusPop{
+  from{ transform:scale(1); }
+  to{ transform:scale(1.12); }
+}
+
+/* ========================= */
+/* MOBILE CART BUTTON */
+/* ========================= */
+
+#mobile-cart-btn{
+  display:none;
+}
+
+@media(max-width:900px){
+  #mobile-cart-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    position:fixed;
+    bottom:85px;
+    right:18px;
+    z-index:9999;
+    border:none;
+    background:#9e0505;
+    color:white;
+    padding:14px 18px;
+    border-radius:999px;
+    font-size:18px;
+    font-weight:bold;
+    box-shadow:0 8px 25px rgba(0,0,0,0.3);
+    cursor:pointer;
+  }
+
+  #mobile-cart-count{
+    background:white;
+    color:#9e0505;
+    min-width:24px;
+    height:24px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    font-weight:bold;
+    padding:2px;
+  }
+}
+
+/* ========================= */
+/* MOBILE HEADER */
+/* ========================= */
+
+.mobile-header{
+  display:none;
+}
+
+@media(max-width:900px){
+  .mobile-header{
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border-radius:0 0 28px 28px;
+    margin:-15px -15px 20px -15px;
+    background:#ffffff;
+    box-shadow:0 8px 25px rgba(0,0,0,0.25);
+  }
+
+  .mobile-logo{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+  }
+
+  .mobile-header-content{
+    padding:20px;
+  }
+
+  .mobile-header-content h1{
+    font-size:34px;
+    margin-bottom:8px;
+    color:white;
+  }
+
+  .mobile-header-content p{
+    color:rgba(0, 0, 0, 0.8);
+    font-size:16px;
+  }
+}
+
+#combo-modal-img{
+  animation: modalShow 0.2s ease;
+}
+
+@media(min-width:1200px){
+  .main{
+    padding:40px;
+  }
+
+  .recommendations{
+    padding:35px;
+    border-radius:32px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  }
+
+  .recommendation-list{
+    gap:25px;
+  }
+
+  .recommendation-card{
+    min-width:380px;
+    padding:18px;
+    border-radius:22px;
+    transition:0.25s;
+  }
+
+  .recommendation-card:hover{
+    transform:translateY(-4px) scale(1.02);
+    box-shadow:0 10px 25px rgba(0,0,0,0.12);
+  }
+
+  .recommendation-card img{
+    width:90px;
+    height:90px;
+  }
+
+  .menu-container{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 380px;
+    gap:30px;
+    align-items:start;
+    background:transparent;
+    padding:0;
+  }
+
+  .menu-content{
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+  }
+
+  .categories{
+    background:white;
+    padding:25px;
+    border-radius:28px;
+    margin-bottom:0;
+    box-shadow:0 8px 25px rgba(0,0,0,0.05);
+  }
+
+  .products{
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:30px;
+  }
+
+  .product-card{
+    border-radius:28px;
+    transition:0.25s;
+    box-shadow:0 8px 25px rgba(0,0,0,0.06);
+  }
+
+  .product-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 15px 35px rgba(0,0,0,0.10);
+  }
+
+  .product-card img{
+    height:260px;
+  }
+
+  .product-content{
+    padding:25px;
+  }
+
+  .product-content h3{
+    font-size:24px;
+    line-height:1.2;
+  }
+
+  .product-content p{
+    font-size:15px;
+    line-height:1.5;
+  }
+
+  .price{
+    font-size:30px;
+  }
+
+  .cart-container{
+    position:sticky;
+    top:30px;
+    border-radius:28px;
+    padding:30px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  }
+
+  .cart-container h2{
+    font-size:34px;
+  }
+
+  #cart-items{
+    flex-direction:column;
+    flex-wrap:nowrap;
+    max-height:400px;
+    overflow-y:auto;
+    padding-right:8px;
+  }
+
+  .cart-item{
+    min-width:100%;
+  }
+
+  .finish-order-btn{
+    width:100%;
+    padding:18px;
+    font-size:18px;
+  }
+}
+
+.close-cart-btn{
+  display:none;
+}
+
+@media(max-width:900px){
+  .close-cart-btn{
+    display:block;
+  }
+}
+
+/* ========================= */
+/* MOBILE CART FULLSCREEN */
+/* ========================= */
+
+@media(max-width:900px){
+  .cart-container{
+    position:fixed;
+    top:0;
+    right:-100%;
+    width:100%;
+    height:100vh;
+    background:white;
+    z-index:99999;
+    border-radius:0;
+    transition:0.3s ease;
+    overflow-y:auto;
+    padding:25px;
+    -webkit-overflow-scrolling:touch;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .cart-container::-webkit-scrollbar{
+    width:6px;
+  }
+
+  .cart-container::-webkit-scrollbar-thumb{
+    background:#ccc;
+    border-radius:20px;
+  }
+
+  .cart-container.active{
+    right:0;
+  }
+
+  .cart-mobile-actions{
+    display:flex !important;
+    gap:12px;
+    margin-top:20px;
+  }
+
+  .cart-mobile-actions .finish-order-btn{
+    flex:1;
+    margin-top:0;
+  }
+
+  #cart-items{
+    flex:1;
+    overflow-y:auto;
+    max-height:55vh;
+    padding-right:6px;
+  }
+
+  #cart-items::-webkit-scrollbar{
+    width:6px;
+  }
+
+  #cart-items::-webkit-scrollbar-thumb{
+    background:#ccc;
+    border-radius:20px;
+  }
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo img {
+  width: 290px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  transition: 0.3s;
+  object-fit: contain;
+}
+
+.logo img:hover {
+  transform: scale(1.05);
+}
+
+.addons-box{
+  margin-top:20px;
+  padding:18px;
+  border-radius:18px;
+  background:#f6f6f6;
+  border:1px solid #e6e6e6;
+}
+
+.addons-box h3{
+  margin-bottom:15px;
+  font-size:20px;
+}
+
+.addons-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(112px, 1fr));
+  gap:10px;
+}
+
+.addon-card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  background:white;
+  border:1px solid #e9e9e9;
+  border-radius:14px;
+  overflow:hidden;
+}
+
+.addon-card.addon-recommended{
+  border:2px solid #9e0505;
+}
+
+.addon-badge{
+  display: none !important;
+  position:absolute;
+  top:6px;
+  left:6px;
+  z-index:2;
+  max-width:calc(100% - 12px);
+  background:#9e0505;
+  color:white;
+  font-size:9.5px;
+  font-weight:bold;
+  padding:3px 7px;
+  border-radius:999px;
+  line-height:1.25;
+}
+
+.addon-photo{
+  position:relative;
+  width:100%;
+  height:78px;
+  background:#f6f0e8;
+  overflow:hidden;
+}
+
+.addon-photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.addon-photo-fallback{
+  display:none;
+  width:100%;
+  height:100%;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+}
+
+.addon-info{
+  padding:8px 10px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1;
+}
+
+.addon-name{
+  font-size:12.5px;
+  font-weight:600;
+  line-height:1.25;
+  margin:0;
+  min-height:31px;
+}
+
+.addon-price{
+  font-size:11px;
+  color:#777;
+}
+
+.qty-control{
+  margin-top:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  background:#f6f6f6;
+  padding:4px 6px;
+  border-radius:999px;
+}
+
+.qty-control button{
+  width:24px;
+  height:24px;
+  border:none;
+  border-radius:50%;
+  background:#9e0505;
+  color:white;
+  font-size:16px;
+  line-height:1;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:0.2s;
+  flex-shrink:0;
+}
+
+.qty-control button:hover{
+  background:#c20707;
+}
+
+.qty-control button:active{
+  transform:scale(0.9);
+}
+
+.qty-control span{
+  min-width:16px;
+  text-align:center;
+  font-weight:bold;
+  font-size:13px;
+}
+
+@media(max-width:420px){
+  .addons-grid{
+    grid-template-columns:repeat(2, minmax(0,1fr));
+  }
+  .addon-photo{
+    height:66px;
+  }
+}
+
+#desktop-finish-btn{
+  display:none;
+}
+
+@media(min-width:901px){
+  #desktop-finish-btn{
+    display:block;
+  }
+}
+
+@media(max-width:900px){
+  .modal-overlay{
+    align-items: center;
+    padding: 15px;
+  }
+}
+
+.esgotado-overlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:260px;
+  background:rgba(0,0,0,0.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2;
+}
+
+.esgotado-badge{
+  background:#b30000;
+  color:white;
+  font-size:22px;
+  font-weight:bold;
+  padding:10px 28px;
+  border-radius:12px;
+  letter-spacing:2px;
+  transform:rotate(-15deg);
+  box-shadow:0 4px 15px rgba(0,0,0,0.4);
+}
+
+.product-card.esgotado .add-cart-btn{
+  background:#aaa;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+
+.tempo-preparo{
+  margin-top:8px;
+  font-size:14px;
+  color:#666;
+  font-weight:600;
+}
+
+/* ========================= */
+/* LOADING OVERLAY */
+/* ========================= */
+
+.loading-overlay{
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  gap:20px;
+  z-index:999999;
+}
+
+.loading-overlay.active{
+  display:flex;
+}
+
+.loading-spinner{
+  width:60px;
+  height:60px;
+  border:6px solid rgba(255,255,255,0.2);
+  border-top:6px solid #fff;
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+
+.loading-text{
+  color:white;
+  font-size:18px;
+  font-weight:bold;
+}
+
+@keyframes spin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+
+/* ========================================== */
+/* ESTILIZAÇÃO DO MODAL DE TAMANHOS VARIÁVEIS */
+/* ========================================== */
+
+/* Fundo escurecido e borrado */
+.modal-size-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px); /* Suporte para iOS/Safari */
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Caixa central (Card) */
+.modal-size-card {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 390px;
+  padding: 24px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  animation: modalScaleOpen 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+
+/* Cabeçalho */
+.modal-size-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.modal-size-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.btn-modal-size-close {
+  background: #f3f4f6;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.btn-modal-size-close:hover {
+  background: #e5e7eb;
+}
+
+/* Subtítulo informativo */
+.modal-size-subtitle {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 20px 0;
+  line-height: 1.4;
+}
+
+/* Lista que envelopa as opções */
+.modal-size-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+/* Botão de Ação Principal */
+.btn-modal-size-confirm {
+  width: 100%;
+  background: #008a2e;
+  color: #ffffff;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 138, 46, 0.2);
+  transition: transform 0.1s ease, background 0.2s;
+}
+
+.btn-modal-size-confirm:active {
+  transform: scale(0.98);
+}
+
+/* Animação de entrada suave */
+@keyframes modalScaleOpen {
+  from { opacity: 0; transform: scale(0.93); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ========================================== */
+/* MONTE SEU POKE */
+/* ========================================== */
+
+.poke-group{
+  margin-bottom: 18px;
+}
+
+.poke-group-title{
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.poke-group-hint{
+  font-size: 11px;
+  font-weight: 500;
+  color: #999;
+  margin-left: 4px;
+}
+
+.poke-options-grid{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.poke-option-card{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 2px solid #eae5dc;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13.5px;
+  color: #333;
+  background: #fff;
+  transition: 0.15s;
+}
+
+.poke-option-card:hover{ border-color: #d8b9b9; }
+
+.poke-option-card.selected{
+  border-color: #c40000;
+  background: #fdf3f3;
+  color: #c40000;
+  font-weight: 700;
+}
+
+.poke-option-card.disabled{
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+.poke-option-main{ display:flex; flex-direction:column; gap:2px; flex:1; }
+.poke-option-desc{ font-size: 11px; font-weight: 400; color: #999; }
+.poke-option-price{ font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+</style>
+</head>
+
+<body>
+
+<!-- ========================= -->
+<!-- SIDEBAR -->
+<!-- ========================= -->
+
+<aside class="sidebar">
+<div class="logo">
+  <img src="Imagens/Kaizora.jpeg">
+  <div class="menu">
+    <button class="menu-item" onclick="showPage('home-page')">🍣 Cardápio</button>
+    <button class="menu-item" onclick="showPage('orders-page')">📄 Seus Pedidos</button>
+    <button class="menu-item" onclick="showPage('account-page')">⚙️ Sua Conta</button>
+  </div>
+</div>
+</aside>
+
+<!-- ========================= -->
+<!-- MAIN -->
+<!-- ========================= -->
+
+<main class="main">
+
+<div class="mobile-topbar">
+  <button id="mobile-cart-btn" onclick="toggleCart()">
+    🛒
+    <span id="mobile-cart-count">0</span>
+  </button>
+  <div class="mobile-menu">
+    <button onclick="showPage('home-page')">🍣 Cardápio</button>
+    <button onclick="showPage('orders-page')">📄 Pedidos</button>
+    <button onclick="showPage('account-page')">⚙️ Conta</button>
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- HOME PAGE -->
+<!-- ========================= -->
+
+<div id="home-page" class="page" style="display:block;">
+
+<div class="mobile-header">
+  <img class="mobile-logo" src="Imagens/Kaizora.jpeg">
+</div>
+
+<section class="recommendations">
+  <h2>Combos</h2>
+  <div class="recommendation-list" id="combo-list"></div>
+</section>
+
+<section class="menu-container">
+
+  <div class="menu-content">
+    <div class="categories" id="categories"></div>
+    <div class="products" id="products"></div>
+  </div>
+
+  <div class="cart-container">
+    <h2>🛒 Carrinho</h2>
+
+    <div id="entrega-info" style="
+      margin-bottom:15px;
+      padding:12px 15px;
+      background:#fff8f8;
+      border-left:4px solid #9e0505;
+      border-radius:8px;
+      font-size:14px;
+      color:#444;
+      line-height:1.8;
+    ">
+      🚲 Calculando taxa de entrega...
+    </div>
+
+    <div id="cart-items"></div>
+
+    <h3 style="margin-top:20px;">
+      Total: <span id="cart-total">R$0,00</span>
+    </h3>
+    <p id="entrega-detalhe" style="font-size:13px;color:#666;margin-top:5px;"></p>
+
+    <p id="payment-warning" style="margin-top:8px;color:#008a2e;font-size:14px;font-weight:bold;"></p>
+
+    <select id="payment-method" onchange="renderCart()" style="margin-top:20px;padding:14px;border-radius:12px;width:100%;">
+      <option value="">Forma de pagamento</option>
+      <option value="Pix">Pix</option>
+      <option value="Cartão">Cartão</option>
+      <option value="Dinheiro">Dinheiro</option>
+    </select>
+
+    <div id="aviso-fechado" style="
+      display:none;
+      background:#fff0f0;
+      border-left:4px solid #9e0505;
+      border-radius:8px;
+      padding:12px 15px;
+      margin-top:15px;
+      color:#9e0505;
+      font-size:14px;
+      font-weight:bold;
+    ">
+      🔴 Estamos fechados no momento. Volte em breve!
+      Horario de funcionamento: 19h às 00h (de Terça a Domingo e Feriados)
+    </div>
+
+    <button class="finish-order-btn" id="desktop-finish-btn" onclick="finishOrder()" style="width:100%;margin-top:15px;font-size:16px;font-weight:bold;">
+      Finalizar Pedido
+    </button>
+
+    <div class="cart-mobile-actions">
+      <button class="finish-order-btn close-cart-btn" onclick="toggleCart()">Fechar</button>
+      <button class="finish-order-btn" onclick="finishOrder()">Finalizar Pedido</button>
+    </div>
+  </div>
+
+</section>
+</div>
+
+<!-- ========================= -->
+<!-- ACCOUNT PAGE — REVAMP -->
+<!-- ========================= -->
+
+<div id="account-page" class="page">
+  <div class="account-page">
+
+    <div class="acc-card">
+
+      <!-- BANNER -->
+      <div class="acc-banner">
+        <div class="acc-avatar" id="acc-avatar">?</div>
+        <div class="acc-banner-text">
+          <h1 id="acc-banner-name">Sua Conta</h1>
+          <p>Gerencie seus dados de entrega</p>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="acc-body">
+
+        <!-- DADOS PESSOAIS -->
+        <div>
+          <div class="acc-section-label">Dados pessoais</div>
+          <div class="acc-field-group">
+            <div class="acc-field-row">
+              <div class="acc-field">
+                <label for="user-name">Nome completo</label>
+                <input type="text" id="user-name" placeholder="Ex: João Silva" oninput="accUpdateAvatar()">
+              </div>
+              <div class="acc-field">
+                <label for="user-phone">Celular</label>
+                <input type="tel" id="user-phone" placeholder="(00) 00000-0000" oninput="accPhoneMask(this)">
+              </div>
+            </div>
+            <div class="acc-field">
+              <label for="user-email">E-mail (opcional)</label>
+              <input type="email" id="user-email" placeholder="seu@email.com">
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-divider"></div>
+
+        <!-- ENDEREÇO -->
+        <div>
+          <div class="acc-section-label">Endereço de entrega</div>
+
+          <!-- CEP -->
+          <div class="acc-field" style="margin-bottom:12px;">
+            <label for="user-cep">CEP</label>
+            <div class="acc-cep-wrapper">
+              <input type="text" id="user-cep" placeholder="00000-000" oninput="accCepMask(this)" maxlength="9">
+              <div class="acc-cep-spinner" id="acc-cep-spinner"></div>
+              <span class="acc-cep-ok" id="acc-cep-ok">✅</span>
+            </div>
+            <span class="acc-cep-error" id="acc-cep-error">CEP não encontrado. Ative o preenchimento manual abaixo.</span>
+          </div>
+
+          <!-- TOGGLE MANUAL -->
+          <label class="acc-manual-toggle" onclick="accToggleManual()">
+            <input type="checkbox" id="acc-manual-check">
+            <div class="acc-toggle-track"><div class="acc-toggle-thumb"></div></div>
+            <span>Preencher endereço manualmente</span>
+          </label>
+
+          <!-- CAMPOS DE ENDEREÇO -->
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:12px;">
+            <div class="acc-field">
+              <label for="user-address">Rua / Avenida</label>
+              <input type="text" id="user-address" placeholder="Preenchido pelo CEP" readonly>
+            </div>
+            <div class="acc-field-row">
+              <div class="acc-field">
+                <label for="user-neighborhood">Bairro</label>
+                <input type="text" id="user-neighborhood" placeholder="Preenchido pelo CEP" readonly>
+              </div>
+              <div class="acc-field">
+                <label for="user-city">Cidade / UF</label>
+                <input type="text" id="user-city" placeholder="Preenchido pelo CEP" readonly>
+              </div>
+            </div>
+            <div class="acc-field-row">
+              <div class="acc-field">
+                <label for="user-number">Número</label>
+                <input type="text" id="user-number" placeholder="Ex: 123">
+              </div>
+              <div class="acc-field">
+                <label for="user-complement">Complemento</label>
+                <input type="text" id="user-complement" placeholder="Apto, Bloco...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-divider"></div>
+
+        <!-- SALVAR -->
+        <button class="acc-save-btn" onclick="saveUserData()">
+          Salvar dados
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- ORDERS PAGE -->
+<!-- ========================= -->
+
+<div id="orders-page" class="page">
+  <div class="orders-page">
+    <h1 style="margin-bottom:30px;">📄 Histórico de Pedidos</h1>
+    <div class="order-history" id="order-history"></div>
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- PRODUCTS SIZES -->
+<!-- ========================= -->
+
+<div id="size-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:9999; align-items:center; justify-content:center; padding:15px; box-sizing:border-box;">
+  <div style="background:#fff; border-radius:18px; padding:22px; width:100%; max-width:380px; max-height:90vh; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.2); font-family:sans-serif;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h3 id="m-title" style="margin:0; font-size:18px; color:#1a1a1a;">Escolha o tamanho</h3>
+      <button onclick="fecharModalTamanhos()" style="background:none; border:none; font-size:18px; cursor:pointer; color:#999; margin-left:auto;">✕</button>
+    </div>
+    <div id="m-options-box" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px; overflow:visible;"></div>
+    <button onclick="salvarTamanhoNoCarrinho()" style="width:100%; background:#008a2e; color:#fff; border:none; padding:14px; font-weight:bold; font-size:15px; border-radius:10px; cursor:pointer;">Adicionar ao Pedido</button>
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- MONTE SEU POKE -->
+<!-- ========================= -->
+
+<div id="poke-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:9999; align-items:center; justify-content:center; padding:15px; box-sizing:border-box;">
+  <div style="background:#fff; border-radius:18px; padding:22px; width:100%; max-width:460px; max-height:90vh; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.2); font-family:sans-serif;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <h3 style="margin:0; font-size:19px; color:#1a1a1a;">🍱 Monte seu Poke</h3>
+      <button onclick="closePokeModal()" style="background:none; border:none; font-size:18px; cursor:pointer; color:#999; margin-left:auto;">✕</button>
+    </div>
+    <p style="margin:0 0 14px; font-size:13px; color:#777;">Escolha 1 arroz, 1 proteína, <span id="poke-salada-qtd-texto">2 saladas</span> e 1 crocante.</p>
+
+    <div id="poke-avisos-box" style="display:none; background:#fff8e1; border:1px solid #ffe082; color:#8a6100; padding:10px 12px; border-radius:10px; font-size:13px; margin-bottom:16px;"></div>
+
+    <div id="poke-groups-box"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin:18px 0 14px; padding-top:14px; border-top:1px solid #eee;">
+      <span style="font-weight:600; color:#333;">Total</span>
+      <span id="poke-modal-total" style="font-weight:bold; font-size:18px; color:#c40000;">R$0,00</span>
+    </div>
+
+    <div id="poke-modal-erro" style="display:none; color:#c40000; font-size:13px; margin-bottom:12px;"></div>
+
+    <button onclick="confirmAddPoke()" style="width:100%; background:#008a2e; color:#fff; border:none; padding:14px; font-weight:bold; font-size:15px; border-radius:10px; cursor:pointer;">Adicionar ao Pedido</button>
+  </div>
+</div>
+
+</main>
+
+<!-- TOAST -->
+<div class="acc-toast" id="acc-toast"></div>
+
+<script>
+
+/* ========================= */
+/* PRODUCTS */
+/* ========================= */
+
+const productsBase = [
+{ name:'Hot Roll Philadelphia Salmão (8 unidades)', price:16, category:'Hots', description:'Sushi empanado com farinha Panko, recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Hot Roll Philadelphia.jpg', esgotado: false },
+{ name:'Haru hot Philadelphia Salmão (8 unidades)', price:22, category:'Hots', description:'Sushi recheado com salmão fresco, cream cheese e arroz, envolto em massa de rolinho primavera crocante.', image:'Imagens/Haru Salmão.jpg', esgotado: false },
+{ name:'Hot Roll Skin (8 unidades)', price:8, category:'Hots', description:'Sushi empanado com farinha Panko, recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Hot Roll Skin.jpg', esgotado: false },
+//{ name:'Hossomaki Skin (8 unidades)', price:6.50, category:'Hossomaki', description:'Sushi recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Roll Skin.jpg', esgotado: false },
+{ name:'Hot Roll Kani (8 unidades)', price:10.50, category:'Hots', description:'Sushi empanado com farinha Panko, recheado com kani, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Hot Roll Kani.jpg', esgotado: false },
+//{ name:'Hossomaki Kani (8 unidades)', price:8, category:'Hossomaki', description:'Sushi recheado com kani, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Roll Kani.jpg', esgotado: false },
+{ name:'Bolinho de bacalhau (8 unidades)', price:8, category:'Entradas', description:'Bolinhos de bacalhau crocantes.', image:'Imagens/Bolinho de bacalhau.jpg', esgotado: false },
+//{ name:'Harumaki de Legumes (3 unidades)', price:13, category:'Harumaki', description:'Rolinho primavera crocante recheado com cream cheese e legumes frescos e temperados.', image:'Imagens/Harumaki Legume.jpg', esgotado: false },
+//{ name:'Harumaki de Salmão (3 unidades)', price:19, category:'Harumaki', description:'Rolinho primavera recheado com salmão fresco e cream cheese, envolto em massa crocante.', image:'Imagens/Harumaki Salmão.jpeg', esgotado: false },
+//{ name:'Harumaki de queijo (3 unidades)', price:13, category:'Harumaki', description:'Rolinho primavera recheado com queijo e oregano, envolto em massa crocante.', image:'Imagens/Harumaki Queijo.jpg', esgotado: false },
+//{ name:'Harumaki de Frango com Cream Cheese (3 unidades)', price:13, category:'Harumaki', description:'Rolinho primavera recheado com frango e cream cheese, envolto em massa crocante.', image:'Imagens/Harumaki Frango.jpg', esgotado: false },
+{ name:'Harumaki de Doce de leite (3 unidades)', price:13, category:'Harumaki', description:'Rolinho primavera recheado com doce de leite, envolto em massa crocante.', image:'Imagens/Harumaki Doce de Leite.jpg', esgotado: false },
+{ name:'Big Dog Hot', price:30, category:'Hots', description:'Roll empanado frito com salmão fresco e cream cheese no topo', image:'Imagens/Big Dog Hot.jpg', esgotado: false },
+//{ name:'Shimeji na Manteiga', price:14.90, category:'Entradas', description:'Porção de cogumelo shimeji refogado na manteiga, temperado com shoyu e cebolinha.', image:'Imagens/Shimeji.jpg', esgotado: false },
+{ name:'Temaki Frito', price:24, category:'Hots', description:'Temaki empanado com farinha Panko, recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Temaki-Frito.jpg', esgotado: false },
+//{ name:'Temaki', price:20, category:'Hossomaki', description:'Temaki recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Temaki.jpg', esgotado: false },
+//{ name:'Sashimi de Salmão (4 unidades)', price:11.90, category:'Yakisoba', description:'Fatias frescas de salmão cortadas na espessura ideal, servidas com shoyu.', image:'Imagens/Sashimi de Salmão.jpg', esgotado: false },
+//{ name:'Frango Xadrez', price:25, category:'Refeições', description:'Arroz soltinho, cubos suculentos de frango, pimentões crocantes e coloridos envolvidos em um molho shoyu e finalizado com gergelim para aquele toque especial de textura. Adicional de amendoim sem sal.', image:'Imagens/Frango Xadrez.jpg', esgotado: false },
+{ name:'Croquete de Camarão (4 unidades)', price:12, category:'Entradas', description:'Croquete de camarão e cream cheese crocantes.', image:'Imagens/Croquete de Camarão.jpeg', esgotado: false },
+{
+    name: 'Yakisoba de Frango',
+    category: 'Refeições',
+    description: 'Macarrão oriental selado na chapa com frango suculento, legumes e shoyu.',
+    image: 'Imagens/Yakisoba Frango.jpg',
+    esgotado: false,
+    isVariable: true,
+    sizes: [
+      { id: 'M', label: 'Médio', price: 25 },
+      { id: 'G', label: 'Grande', price: 30}
+    ]
+  },
+  {
+    name: 'Yakisoba de Calabresa',
+    category: 'Refeições',
+    description: 'Macarrão oriental selado na chapa com linguiça calabresa macia, legumes e shoyu.',
+    image: 'Imagens/Yakisoba Calabresa.JPG',
+    esgotado: false,
+    isVariable: true,
+    sizes: [
+      { id: 'M', label: 'Médio', price: 19 },
+      { id: 'G', label: 'Grande', price: 27}
+    ]
+  },
+  {
+    name: 'Yakisoba de Carne',
+    category: 'Refeições',
+    description: 'Macarrão oriental selado na chapa com carne bovina macia, legumes e shoyu.',
+    image: 'Imagens/Yakisoba Carne.jpg',
+    esgotado: false,
+    isVariable: true,
+    sizes: [
+      { id: 'M', label: 'Médio', price: 28 },
+      { id: 'G', label: 'Grande', price: 35}
+    ]
+  },
+
+    {
+    name: 'Yakisoba de Legumes',
+    category: 'Refeições',
+    description: 'Macarrão oriental selado na chapa com cenoura, repolho roxo, cebola, brocolis e shoyu.',
+    image: 'Imagens/Yakisoba Legumes.jpg',
+    esgotado: false,
+    isVariable: true,
+    sizes: [
+      { id: 'M', label: 'Médio', price: 17},
+      { id: 'G', label: 'Grande', price: 25}
+    ]
+  },
+
+    {
+    name: 'Yakisoba Misto',
+    category: 'Refeições',
+    description: 'Macarrão oriental selado na chapa com carne bovina, frango, linguiça calabresa, legumes e shoyu.',
+    image: 'Imagens/Yakisoba Misto.jpg',
+    esgotado: false,
+    isVariable: true,
+    sizes: [
+      { id: 'M', label: 'Médio', price: 25 },
+      { id: 'G', label: 'Grande', price: 35}
+    ]
+  }
+];
+
+//
+
+const combosBase = [
+{ name: 'Mega Combo Hot Roll', description: 'Hot Roll até não dar mais.', descricaoModal: '32 Hot Roll Philadelphia.', price: 40, image: 'Imagens/Mega Combo Hot Roll.jpg', esgotado: false, hotHossoMin8: true },
+{ name: 'Combo Osaka', description: 'Combo completo individual', descricaoModal: '1 Temaki Frito de Salmão, 16 Hot Roll Philadelphia, 8 Hot Skin e 1 refrigerante Lata 350ml.', price: 65, image: 'Imagens/Combo Osaka.jpg', esgotado: false, hotHossoMin8: true, temakiFrito: true },
+{ name: 'Combo Shanghai', description: 'Um combo completo para se deliciar.', descricaoModal: '1 Yakisoba (Frango, Legumes ou calabresa), 8 Hot Roll Kani e 1 Guaravita.', price: 35, image: 'Imagens/Combo Shangai.jpg', esgotado: false, hotHossoMin8: true, temakiFrito: false },
+{ name: 'Combo Kawaguchi', description: '32 unidades de puro sabor', descricaoModal: '8 Hot roll de salmão, 8 Hot Kani, 16 bolinho de bacalhau e 2 refrigerantes Lata 350ml.', price: 47, image: 'Imagens/Combo Kawaguchi.jpg', esgotado: false, hotHossoMin8: true, temakiFrito: false },
+//{ name: 'Combo Individual', description: 'Uma seleção para as noites de muita fome.', descricaoModal: '1 Temaki Frito, 8 Hot Philadelphia, 2 Harumaki de Doce de Leite.', price: 40, image: 'Imagens/Combo Individual.png', esgotado: false, hotHossoMin8: true, temakiFrito: true },
+//{ name: 'Combo de Frios', description: 'Uma seleção de peças frias saborosas.', descricaoModal: '18 Hossomaki Skin, 18 Hossomaki Kani e Salada Sunomono.', price: 30, image: 'Imagens/Combo de Frios.png', esgotado: false, hotHossoMin8: true },
+//{ name: 'Combo Premium', description: 'Combo completo pensado para compartilhar.', descricaoModal: '24 Hot Philadelphia Salmão, 12 Hot Skin e 6 Lula à Dorê.', price: 75, image: 'Imagens/Combo Premium.png', esgotado: false, hotHossoMin8: true },
+//{ name: 'Combo Primavera', description: 'Uma seleção crocante de peças saborosas.', descricaoModal: '4 Harumaki de Legumes, 4 Harumaki de Queijo e 4 Harumaki de Frango.', price: 38, image: 'Imagens/Combo Primavera.jpg', esgotado: false },
+];
+
+let products = [...productsBase];
+let combos = [...combosBase];
+
+// ========================
+// PRODUTOS CUSTOMIZADOS (cadastrados pelo admin em admin.html)
+// ========================
+let customAdicionaisCache = [];
+
+async function fetchCustomProducts(){
+  try {
+    const res = await fetchComTimeout('/api/products');
+    const data = await res.json();
+    const customItems = data.items || [];
+
+    const customProdutos = customItems
+      .filter(i => i.type === 'produto')
+      .map(i => ({
+        name: i.name,
+        price: i.price,
+        category: i.category,
+        description: i.description,
+        image: i.image,
+        esgotado: false,
+      }));
+
+    const customCombos = customItems
+      .filter(i => i.type === 'combo')
+      .map(i => ({
+        name: i.name,
+        price: i.price,
+        description: i.description,
+        descricaoModal: i.descricaoModal || i.description,
+        image: i.image,
+        esgotado: false,
+      }));
+
+    // ✨ Adicionais (sistema unificado): TODOS os adicionais — os que já
+    // existiam (hashi, geleia, cream cheese etc, migrados automaticamente
+    // pelo back-end) e os criados pelo admin — chegam aqui com o mesmo
+    // formato: appliesToAll (aparece sempre) ou appliesTo (lista de pratos
+    // e/ou combos aos quais ele se aplica).
+    const customAdicionais = customItems
+      .filter(i => i.type === 'adicional')
+      .map(i => ({
+        id: i.id,
+        name: i.name,
+        price: i.price,
+        image: i.image,
+        appliesToAll: i.appliesToAll === true,
+        appliesTo: Array.isArray(i.appliesTo) ? i.appliesTo : [],
+      }));
+
+    products = [...productsBase, ...customProdutos];
+    combos = [...combosBase, ...customCombos];
+    customAdicionaisCache = customAdicionais;
+    renderCustomAddonsUI(customAdicionais);
+  } catch(e) {
+    console.warn('Não foi possível carregar itens customizados do cardápio:', e);
+    products = [...productsBase];
+    combos = [...combosBase];
+  }
+}
+
+// Cria dinamicamente TODOS os cards de adicionais dentro do modal de
+// finalização — tanto os fixos (hashi, geleia, cream cheese...) quanto os
+// criados pelo admin, já que agora usam o mesmo sistema.
+function renderCustomAddonsUI(items){
+  const grid = document.getElementById('addons-grid');
+  if(!grid) return;
+
+  grid.innerHTML = '';
+
+  if (!items || items.length === 0) {
+    grid.innerHTML = '<p style="grid-column:1/-1; font-size:13px; color:#888;">Nenhum adicional disponível no momento.</p>';
+    return;
+  }
+
+  // Universais (aparecem sempre) primeiro, depois os específicos por prato/combo
+  const ordenados = [...items].sort((a, b) => {
+    if (a.appliesToAll !== b.appliesToAll) return a.appliesToAll ? -1 : 1;
+    return 0;
+  });
+
+  ordenados.forEach(item => {
+    if(!item.id || !item.name) return;
+    const key = 'custom_' + item.id;
+
+    // Garante uma entrada no estado de adicionais e no mapa de preços
+    if(!(key in addons)) addons[key] = 0;
+    ADDON_PRICES[key] = Number(item.price) || 0;
+
+    const precoNum = Number(item.price) || 0;
+    const precoTexto = precoNum > 0 ? ('+R$' + precoNum.toFixed(2).replace('.', ',')) : 'Grátis';
+    const nomeSeguro = String(item.name).replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+    const especifico = !item.appliesToAll && item.appliesTo && item.appliesTo.length > 0;
+    let badgeHtml = '';
+    if (especifico) {
+      const primeiros = item.appliesTo.slice(0, 2).join(', ');
+      const resto = item.appliesTo.length > 2 ? ` +${item.appliesTo.length - 2}` : '';
+      const badgeSeguro = String(primeiros + resto).replace(/</g, '&lt;').replace(/"/g, '&quot;');
+      badgeHtml = `<span class="addon-badge">${badgeSeguro}</span>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'addon-card' + (especifico ? ' addon-recommended' : '');
+    card.id = `addon-card-${item.id}`;
+    card.dataset.customAddon = 'true';
+    card.style.display = 'none'; // verificarVisibilidadeBrinde() decide a visibilidade real
+    card.innerHTML = `
+      ${badgeHtml}
+      <div class="addon-photo">
+        <img src="${item.image || ''}" alt="${nomeSeguro}" loading="lazy"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="addon-photo-fallback">🍴</div>
+      </div>
+      <div class="addon-info">
+        <p class="addon-name">${nomeSeguro}</p>
+        <span class="addon-price">${precoTexto}</span>
+        <div class="qty-control">
+          <button onclick="changeAddon('${key}', -1)" aria-label="Diminuir ${nomeSeguro}">−</button>
+          <span id="qty-${key}">0</span>
+          <button onclick="changeAddon('${key}', 1)" aria-label="Aumentar ${nomeSeguro}">+</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  verificarVisibilidadeBrinde();
+}
+
+// ========================
+// POKE PERSONALIZADO (configuração cadastrada pelo admin em admin.html)
+// ========================
+let pokeConfig = null;
+
+async function fetchPokeConfig(){
+  try {
+    const res = await fetchComTimeout('/api/poke', { cache: 'no-store' });
+    pokeConfig = await res.json();
+  } catch(e) {
+    console.warn('Não foi possível carregar a configuração do Poke:', e);
+    pokeConfig = null;
+  }
+
+  // Garante um único card "Poke Personalizado" no cardápio (categoria Poke)
+  if(!products.some(p => p.isPoke)){
+    products.push({
+      name: (pokeConfig && pokeConfig.title) || 'Poke Personalizado',
+      category: 'Poke',
+      description: (pokeConfig && pokeConfig.description) || 'Monte do seu jeito: escolha o arroz, a proteína, as saladas e o crocante.',
+      image: 'Imagens/Poke.jpg',
+      esgotado: false,
+      isPoke: true,
+    });
+  }
+}
+
+const categories = [
+{ image:'Imagens/todos.png', name:'Todos' },
+//{ image:'Imagens/Rolls.png', name:'Hossomaki' },
+{ image:'Imagens/Porções.png', name:'Entradas' },
+{ image:'Imagens/Hots.png', name:'Hots' },
+{ image:'Imagens/Yakisoba.png', name:'Refeições' },
+{ image:'Imagens/Harumaki.png', name:'Harumaki' },
+{ image:'Imagens/Poke Icon.png', name:'Poke' },
+//{ image:'Imagens/Saladas.png', name:'Saladas' },
+//{ image:'Imagens/Sashimi.jpeg', name:'Sashimi' },
+{ image:'Imagens/Bebidas.jpg', name:'Bebidas' }
+];
+
+
+function getUserData(){
+  try {
+    return JSON.parse(localStorage.getItem('userData')) || null;
+  } catch(e) {
+    console.warn('localStorage indisponível:', e);
+    return null;
+  }
+}
+
+function saveUserDataLocal(data){
+  try {
+    localStorage.setItem('userData', JSON.stringify(data));
+    return true;
+  } catch(e) {
+    console.warn('localStorage indisponível:', e);
+    return false;
+  }
+}
+
+function getCartData(){
+  try {
+    return JSON.parse(localStorage.getItem('cart')) || [];
+  } catch(e) {
+    return [];
+  }
+}
+
+async function fetchComTimeout(url, options = {}, timeoutMs = 10000){
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return res;
+  } catch(e) {
+    clearTimeout(id);
+    throw e;
+  }
+}
+
+/* ========================= */
+/* STORAGE */
+/* ========================= */
+
+let cart = getCartData() || [];
+let orders = [];
+try {
+  orders = JSON.parse(localStorage.getItem('orders')) || [];
+} catch(e) {
+  console.warn('Não foi possível ler os pedidos do localStorage:', e);
+}
+
+let siteConfig = {
+  motoboy_on: false,
+  restaurante_aberto: true,
+  produtos_esgotados: [],
+  combos_esgotados: [],
+};
+
+let lastConfigFetch = 0;
+const CONFIG_CACHE_MS = 5 * 60 * 1000;
+
+async function fetchConfig(force = false){
+  const agora = Date.now();
+  if(!force && agora - lastConfigFetch < CONFIG_CACHE_MS) return;
+  try {
+    const res = await fetchComTimeout('/api/config');
+    const data = await res.json();
+    siteConfig = data;
+    lastConfigFetch = agora;
+    applyEsgotados();
+    checkRestauranteAberto();
+  } catch(e) {
+    console.warn('Não foi possível buscar configurações:', e);
+  }
+}
+
+function applyEsgotados(){
+  products.forEach(p => { p.esgotado = siteConfig.produtos_esgotados?.includes(p.name) || false; });
+  combos.forEach(c => { c.esgotado = siteConfig.combos_esgotados?.includes(c.name) || false; });
+  renderProducts(products);
+  renderCombos();
+}
+
+function checkRestauranteAberto(){
+  const finishBtns = document.querySelectorAll('.finish-order-btn');
+  const aviso = document.getElementById('aviso-fechado');
+
+  if(!siteConfig.restaurante_aberto){
+    finishBtns.forEach(btn => {
+      if(btn.classList.contains('close-cart-btn')) return;
+      btn.disabled = true;
+      btn.style.background = '#aaa';
+      btn.style.cursor = 'not-allowed';
+      btn.innerText = '🔴 Restaurante fechado';
+    });
+    if(aviso) aviso.style.display = 'block';
+  } else {
+    finishBtns.forEach(btn => {
+      if(btn.classList.contains('close-cart-btn')) return;
+      btn.disabled = false;
+      btn.style.background = '';
+      btn.style.cursor = '';
+      btn.innerText = 'Finalizar Pedido';
+    });
+    if(aviso) aviso.style.display = 'none';
+  }
+}
+
+async function initCardapio(){
+  await fetchCustomProducts();
+  await fetchPokeConfig();
+  await fetchConfig(true);
+}
+initCardapio();
+
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible') fetchConfig();
+});
+
+/* ========================= */
+/* CÁLCULO DE DISTÂNCIA */
+/* ========================= */
+
+let entregaAtual = {
+  taxa: 2,
+  entrega: true,
+  distanciaKm: null,
+  distanciaTexto: null,
+  duracaoTexto: null,
+  motivo: null,
+};
+
+async function calcularEntrega(){
+  // ✅ Agora sim garante o config atualizado de verdade antes de prosseguir
+  await fetchConfig();
+
+  const user = getUserData();
+
+  if(!user || !user.address || !user.number){
+    document.getElementById('entrega-info').innerHTML =
+      '📍 <strong>Preencha seu endereço</strong> na aba Conta para calcular a entrega.';
+    entregaAtual = { taxa: 2, entrega: true, distanciaKm: null };
+    renderCart();
+    return;
+  }
+
+  const enderecoCompleto = `${user.address}, ${user.number}, ${user.neighborhood || ''}, ${user.city || 'São João de Meriti / RJ'}, Brasil`;
+
+  document.getElementById('entrega-info').innerHTML = '🚲 Calculando taxa de entrega...';
+
+  try {
+    const motoboyOn = (siteConfig && siteConfig.motoboy_on) ? 'true' : 'false';
+    // ✅ Corrigido de ${motoboy} para ${motoboyOn}
+    const res = await fetch(`/api/distance?address=${encodeURIComponent(enderecoCompleto)}&motoboy_on=${motoboyOn}`);
+    const data = await res.json();
+
+    if(!res.ok || !data.entrega){
+      entregaAtual = { taxa: 0, entrega: false, distanciaKm: data.distanciaKm, motivo: data.motivo };
+      document.getElementById('entrega-info').innerHTML = `❌ <strong style="color:#9e0505;">${data.motivo || 'Fora da área de entrega.'}</strong>`;
+      document.querySelectorAll('.finish-order-btn').forEach(btn => {
+        if(!btn.classList.contains('close-cart-btn')){
+          btn.disabled = true;
+          btn.style.background = '#aaa';
+          btn.innerText = '❌ Fora da área';
+        }
+      });
+    } else {
+      entregaAtual = { taxa: data.taxa, entrega: true, distanciaKm: data.distanciaKm, distanciaTexto: data.distanciaTexto, duracaoTexto: data.duracaoTexto };
+      document.getElementById('entrega-info').innerHTML = `🚲 <strong>${data.distanciaTexto}</strong> — Taxa: <strong>R$${data.taxa.toFixed(2).replace('.', ',')}</strong><span style="color:#666;font-size:12px;"> · ⏱️ ~${data.duracaoTexto}</span>`;
+      if(siteConfig.restaurante_aberto){
+        document.querySelectorAll('.finish-order-btn').forEach(btn => {
+          if(!btn.classList.contains('close-cart-btn')){
+            btn.disabled = false;
+            btn.style.background = '';
+            btn.innerText = 'Finalizar Pedido';
+          }
+        });
+      }
+    }
+    renderCart();
+  } catch(e) {
+    console.warn('Erro ao calcular entrega:', e);
+    document.getElementById('entrega-info').innerHTML = '🚲 <strong>Entrega até 1km</strong> — R$2,00';
+    entregaAtual = { taxa: 2, entrega: true };
+    renderCart();
+  }
+}
+
+/* ========================= */
+/* SHOW PAGE */
+/* ========================= */
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(page => { page.style.display = 'none'; });
+  document.getElementById(id).style.display = 'block';
+
+  const cartBtn = document.getElementById('mobile-cart-btn');
+  if(cartBtn) cartBtn.style.display = (id === 'home-page') ? 'flex' : 'none';
+
+  if(id === 'orders-page') renderOrders();
+  if(id === 'home-page' && entregaAtual.distanciaKm === null) {
+    calcularEntrega();
+  };
+}
+
+/* ========================= */
+/* RENDER CATEGORIES */
+/* ========================= */
+
+const categoriesContainer = document.getElementById('categories');
+categories.forEach(category => {
+  categoriesContainer.innerHTML += `
+    <button class="category-card" onclick="filterCategory('${category.name}')">
+      <div class="category-icon"><img src="${category.image}" alt="${category.name}"></div>
+      <div class="category-name">${category.name}</div>
+    </button>
+  `;
+});
+
+/* ========================= */
+/* FILTER */
+/* ========================= */
+
+function filterCategory(category){
+  if(category === 'Todos'){ renderProducts(products); return; }
+  renderProducts(products.filter(product => product.category === category));
+}
+
+function gercardPrice(price){
+  return Math.ceil(price * 1.10);
+}
+function formatPrice(value){ return value.toFixed(2).replace('.', ','); }
+
+/* ========================= */
+/* RENDER PRODUCTS */
+/* ========================= */
+
+function renderProducts(data){
+  const container = document.getElementById('products');
+  container.innerHTML = '';
+  data.forEach(product => {
+    
+    let priceHTML = '';
+    let buttonAction = '';
+
+    // POKE PERSONALIZADO — abre o modal de montagem em vez de ir direto pro carrinho
+    if (product.isPoke) {
+      const basePrice = (pokeConfig && Number(pokeConfig.basePrice)) || 0;
+      const cardPrice = gercardPrice(basePrice);
+      priceHTML = `
+        <div style="color:#c40000;text-decoration:line-through;font-size:14px;margin-bottom:5px;">
+          R$${formatPrice(cardPrice)}
+        </div>
+        <div class="price">R$${formatPrice(basePrice)}</div>
+      `;
+      buttonAction = `openPokeModal()`;
+
+      container.innerHTML += `
+        <div class="product-card ${product.esgotado ? 'esgotado' : ''}">
+          <div style="position:relative;">
+            <img src="${product.image}" onerror="this.style.opacity='0';">
+            ${product.esgotado ? `<div class="esgotado-overlay"><span class="esgotado-badge">ESGOTADO</span></div>` : ''}
+          </div>
+          <div class="product-content">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            ${priceHTML}
+            <div style="color:#008a2e;font-size:14px;font-weight:bold;margin-top:5px;">10% OFF no Pix e Dinheiro</div>
+            <button class="add-cart-btn" ${product.esgotado ? 'disabled' : ''} onclick="${buttonAction}">
+              ${product.esgotado ? 'Esgotado' : 'Montar meu Poke'}
+            </button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    // VERIFICA SE O PRODUTO TEM VARIANTES DE TAMANHO
+    if (product.isVariable) {
+      const prices = product.sizes.map(s => s.price);
+      const minPrice = Math.min(...prices);
+      const minCardPrice = gercardPrice(minPrice);
+
+      priceHTML = `
+        <div style="color:#c40000;text-decoration:line-through;font-size:14px;margin-bottom:5px;">
+          R$${formatPrice(minCardPrice)}
+        </div>
+        <div class="price">A partir de R$${formatPrice(minPrice)}</div>
+      `;
+
+      buttonAction = `abrirModalTamanhos('${product.name}')`;
+    } else {
+      // PRODUTO NORMAL (Mantém a sua lógica original intacta)
+      const cardPrice = gercardPrice(product.price);
+      
+      priceHTML = `
+        <div style="color:#c40000;text-decoration:line-through;font-size:16px;margin-bottom:5px;">
+          R$${formatPrice(cardPrice)}
+        </div>
+        <div class="price">R$${formatPrice(product.price)}</div>
+      `;
+      
+      // Se for normal, adiciona direto ao carrinho
+      buttonAction = `addToCart('${product.name}')`;
+    }
+
+    container.innerHTML += `
+      <div class="product-card ${product.esgotado ? 'esgotado' : ''}">
+        <div style="position:relative;">
+          <img src="${product.image}">
+          ${product.esgotado ? `<div class="esgotado-overlay"><span class="esgotado-badge">ESGOTADO</span></div>` : ''}
+        </div>
+        <div class="product-content">
+          <h3>${product.name}</h3>
+          <p>${product.description}</p>
+          
+          ${priceHTML}
+          
+          <div style="color:#008a2e;font-size:14px;font-weight:bold;margin-top:5px;">10% OFF no Pix e Dinheiro</div>
+          <button class="add-cart-btn" ${product.esgotado ? 'disabled' : ''} onclick="${buttonAction}">
+            ${product.esgotado ? 'Esgotado' : 'Adicionar'}
+          </button>
+        </div>
+      </div>
+    `;
+  });
+}
+renderProducts(products);
+
+let produtoSelecionadoNoModal = null;
+let tamanhoEscolhidoNoModal = null;
+
+// Abre o modal buscando o produto pelo nome
+function abrirModalTamanhos(productName) {
+  const produto = products.find(p => p.name === productName);
+  if (!produto) return;
+
+  produtoSelecionadoNoModal = produto;
+  tamanhoEscolhidoNoModal = null;
+
+  document.getElementById('m-title').innerText = produto.name;
+  const container = document.getElementById('m-options-box');
+  container.innerHTML = "";
+
+  produto.sizes.forEach((size, index) => {
+    const itemOpt = document.createElement('div');
+    itemOpt.id = `opt-size-${produto.name.replace(/\s/g,'-')}-${size.id}`;
+    itemOpt.style.cssText = "display:flex; justify-content:space-between; padding:14px; border:2px solid #eae5dc; border-radius:10px; cursor:pointer; font-weight:600; font-size:14px; transition:0.2s; color:#333; background:#fff;";
+
+    itemOpt.onclick = () => {
+      tamanhoEscolhidoNoModal = size;
+      document.querySelectorAll(`[id^="opt-size-${produto.name.replace(/\s/g,'-')}-"]`).forEach(el => {
+        el.style.borderColor = "#eae5dc";
+        el.style.background = "#fff";
+        el.style.color = "#333";
+      });
+      itemOpt.style.borderColor = "#c40000";
+      itemOpt.style.background = "#fdf3f3";
+      itemOpt.style.color = "#c40000";
+    };
+
+    itemOpt.innerHTML = `<span>${size.label}</span><span>R$ ${formatPrice(size.price)}</span>`;
+    container.appendChild(itemOpt);
+
+    if (index === 0) {
+      tamanhoEscolhidoNoModal = size;
+      itemOpt.style.borderColor = "#c40000";
+      itemOpt.style.background = "#fdf3f3";
+      itemOpt.style.color = "#c40000";
+    }
+  });
+
+  document.getElementById('size-modal-overlay').style.display = "flex";
+}
+
+function fecharModalTamanhos() {
+  document.getElementById('size-modal-overlay').style.display = "none";
+}
+
+// Finaliza a escolha e joga no seu carrinho global
+function salvarTamanhoNoCarrinho() {
+  if (!tamanhoEscolhidoNoModal) {
+    alert("Por favor, selecione um tamanho antes de adicionar!");
+    return;
+  }
+
+  // Monta o nome extamente como cadastramos na sua API PRODUCTS: "Nome do Produto (ID)"
+  // Exemplo: "Poke de Salmão Tradicional (M)"
+  const itemFinal = {
+    name: `${produtoSelecionadoNoModal.name} (${tamanhoEscolhidoNoModal.id})`,
+    price: tamanhoEscolhidoNoModal.price,
+    quantity: 1
+  };
+
+  // Insere o item na sua estrutura de carrinho (geralmente chamada de 'cart')
+  // Altere 'cart' abaixo caso sua variável global de carrinho tenha outro nome
+  if (typeof cart !== 'undefined') {
+    const jaExiste = cart.find(item => item.name === itemFinal.name);
+    if (jaExiste) {
+      jaExiste.quantity += 1;
+    } else {
+      cart.push(itemFinal);
+    }
+  }
+
+  // Executa as suas funções de atualização do carrinho na tela
+  if (typeof saveCart === "function") saveCart();
+  if (typeof renderCart === "function") renderCart();
+
+  fecharModalTamanhos();
+}
+
+/* ========================= */
+/* MONTE SEU POKE */
+/* ========================= */
+
+const POKE_GROUP_LABELS = { arroz: '🍚 Arroz', proteina: '🐟 Proteína', salada: '🥗 Salada', crocante: '🍤 Crocante' };
+const POKE_GROUP_ORDER = ['arroz', 'proteina', 'salada', 'crocante'];
+
+let pokeSelection = { arroz: null, proteina: null, salada: [], crocante: null };
+
+function openPokeModal(){
+  if(!pokeConfig || !pokeConfig.groups){
+    alert('O Poke Personalizado está indisponível no momento. Tente novamente em instantes.');
+    return;
+  }
+  pokeSelection = { arroz: null, proteina: null, salada: [], crocante: null };
+  renderPokeAvisosModal();
+  renderPokeModalGroups();
+  updatePokeModalTotal();
+  document.getElementById('poke-modal-erro').style.display = 'none';
+  document.getElementById('poke-modal-overlay').style.display = 'flex';
+}
+
+function closePokeModal(){
+  document.getElementById('poke-modal-overlay').style.display = 'none';
+}
+
+function renderPokeAvisosModal(){
+  const box = document.getElementById('poke-avisos-box');
+  const avisos = (pokeConfig.avisos || []).filter(Boolean);
+  if(avisos.length === 0){ box.style.display = 'none'; return; }
+  box.innerHTML = avisos.map(a => `⚠️ ${a}`).join('<br>');
+  box.style.display = 'block';
+}
+
+function pokeFindOption(groupKey, id){
+  return (pokeConfig.groups[groupKey] || []).find(o => o.id === id);
+}
+
+function renderPokeModalGroups(){
+  const container = document.getElementById('poke-groups-box');
+  container.innerHTML = '';
+
+  const saladaQtd = Number(pokeConfig.saladaQtd) || 2;
+  const qtdTexto = document.getElementById('poke-salada-qtd-texto');
+  if(qtdTexto) qtdTexto.innerText = `${saladaQtd} salada${saladaQtd > 1 ? 's' : ''}`;
+
+  POKE_GROUP_ORDER.forEach(groupKey => {
+    const options = pokeConfig.groups[groupKey] || [];
+    const isMulti = groupKey === 'salada';
+    const hint = isMulti ? `(escolha ${saladaQtd})` : '(escolha 1)';
+
+    const optionsHtml = options.map(opt => {
+      const disabled = opt.available === false;
+      const isSelected = isMulti
+        ? pokeSelection.salada.includes(opt.id)
+        : pokeSelection[groupKey] === opt.id;
+      const precoTxt = opt.price > 0 ? `+R$${formatPrice(opt.price)}` : 'Grátis';
+      const descHtml = opt.description ? `<span class="poke-option-desc">${opt.description}</span>` : '';
+      return `
+        <div class="poke-option-card ${isSelected ? 'selected' : ''} ${disabled ? 'disabled' : ''}"
+          onclick="${disabled ? '' : `pokeSelectOption('${groupKey}', '${opt.id}', ${isMulti})`}">
+          <div class="poke-option-main">
+            <span>${opt.name}${disabled ? ' (Indisponível)' : ''}</span>
+            ${descHtml}
+          </div>
+          <span class="poke-option-price">${precoTxt}</span>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML += `
+      <div class="poke-group">
+        <div class="poke-group-title">${POKE_GROUP_LABELS[groupKey]}<span class="poke-group-hint">${hint}</span></div>
+        <div class="poke-options-grid">${optionsHtml || '<p style="font-size:12px;color:#999;">Nenhuma opção disponível no momento.</p>'}</div>
+      </div>
+    `;
+  });
+}
+
+function pokeSelectOption(groupKey, id, isMulti){
+  const saladaQtd = Number(pokeConfig.saladaQtd) || 2;
+  if(isMulti){
+    const idx = pokeSelection.salada.indexOf(id);
+    if(idx >= 0){
+      pokeSelection.salada.splice(idx, 1);
+    } else {
+      if(pokeSelection.salada.length >= saladaQtd){
+        pokeSelection.salada.shift(); // libera espaço automaticamente pra próxima escolha
+      }
+      pokeSelection.salada.push(id);
+    }
+  } else {
+    pokeSelection[groupKey] = id;
+  }
+  renderPokeModalGroups();
+  updatePokeModalTotal();
+}
+
+function pokeCalcTotal(){
+  const base = Number(pokeConfig.basePrice) || 0;
+  let total = base;
+  ['arroz', 'proteina', 'crocante'].forEach(g => {
+    const opt = pokeSelection[g] && pokeFindOption(g, pokeSelection[g]);
+    if(opt) total += Number(opt.price) || 0;
+  });
+  pokeSelection.salada.forEach(id => {
+    const opt = pokeFindOption('salada', id);
+    if(opt) total += Number(opt.price) || 0;
+  });
+  return total;
+}
+
+function updatePokeModalTotal(){
+  const el = document.getElementById('poke-modal-total');
+  if(el) el.innerText = `R$${formatPrice(pokeCalcTotal())}`;
+}
+
+function pokeModalErro(msg){
+  const erroBox = document.getElementById('poke-modal-erro');
+  erroBox.innerText = msg;
+  erroBox.style.display = 'block';
+}
+
+function confirmAddPoke(){
+  document.getElementById('poke-modal-erro').style.display = 'none';
+  const saladaQtd = Number(pokeConfig.saladaQtd) || 2;
+
+  if(!pokeSelection.arroz) return pokeModalErro('Escolha uma opção de arroz.');
+  if(!pokeSelection.proteina) return pokeModalErro('Escolha uma opção de proteína.');
+  if(pokeSelection.salada.length !== saladaQtd) return pokeModalErro(`Escolha exatamente ${saladaQtd} opções de salada.`);
+  if(!pokeSelection.crocante) return pokeModalErro('Escolha uma opção de crocante.');
+
+  const arrozOpt = pokeFindOption('arroz', pokeSelection.arroz);
+  const proteinaOpt = pokeFindOption('proteina', pokeSelection.proteina);
+  const crocanteOpt = pokeFindOption('crocante', pokeSelection.crocante);
+  const saladaOpts = pokeSelection.salada.map(id => pokeFindOption('salada', id)).filter(Boolean);
+
+  if(!arrozOpt || !proteinaOpt || !crocanteOpt || saladaOpts.length !== saladaQtd){
+    return pokeModalErro('Uma das opções escolhidas não está mais disponível. Escolha novamente.');
+  }
+
+  const unitPrice = Number(pokeCalcTotal().toFixed(2));
+  const saladaIdsOrdenados = [...pokeSelection.salada].sort();
+  const signature = JSON.stringify({
+    arroz: arrozOpt.id, proteina: proteinaOpt.id, salada: saladaIdsOrdenados, crocante: crocanteOpt.id,
+  });
+
+  const existing = cart.find(i => i.isPoke && i.pokeSignature === signature);
+  if(existing){
+    existing.quantity = Math.min(20, (existing.quantity || 1) + 1);
+  } else {
+    cart.push({
+      name: 'Poke Personalizado',
+      isPoke: true,
+      quantity: 1,
+      price: unitPrice,
+      pokeSignature: signature,
+      pokeChoices: {
+        arroz: arrozOpt.id,
+        proteina: proteinaOpt.id,
+        salada: [...pokeSelection.salada],
+        crocante: crocanteOpt.id,
+      },
+      pokeSummary: {
+        arroz: arrozOpt.name,
+        proteina: proteinaOpt.name,
+        salada: saladaOpts.map(o => o.name),
+        crocante: crocanteOpt.name,
+      },
+    });
+  }
+
+  saveCart();
+  renderCart();
+  closePokeModal();
+}
+
+window.openPokeModal = openPokeModal;
+window.closePokeModal = closePokeModal;
+window.pokeSelectOption = pokeSelectOption;
+window.confirmAddPoke = confirmAddPoke;
+
+function renderCombos(){
+  const container = document.getElementById('combo-list');
+  container.innerHTML = '';
+  combos.forEach((combo, index) => {
+    container.innerHTML += `
+      <div class="recommendation-card ${combo.esgotado ? 'combo-esgotado' : ''}"
+        onclick="${combo.esgotado ? '' : `onComboCardClick(${index})`}"
+        style="${combo.esgotado ? 'cursor:default;opacity:0.7;' : ''}"
+      >
+        <div style="position:relative;flex-shrink:0;">
+          <img src="${combo.image}">
+          ${combo.esgotado ? `<div class="esgotado-overlay" style="height:70px;border-radius:14px;"><span class="esgotado-badge" style="font-size:13px;padding:5px 12px;">ESGOTADO</span></div>` : ''}
+        </div>
+        <div>
+          <h3>${combo.name}</h3>
+          <p>${combo.description}</p>
+          <div style="color:#c40000;text-decoration:line-through;font-size:14px;margin-top:6px;">
+            R$ ${gercardPrice(combo.price).toFixed(2).replace('.', ',')}
+          </div>
+          <h3 style="margin-top:4px;">R$ ${combo.price.toFixed(2).replace('.', ',')}</h3>
+          <p style="color:#008a2e;font-size:13px;font-weight:bold;margin-top:4px;">10% OFF no Pix e Dinheiro</p>
+          ${combo.esgotado ? '<p style="color:#b30000;font-weight:bold;font-size:13px;">Indisponível</p>' : ''}
+        </div>
+      </div>
+    `;
+  });
+}
+
+// onclick simples e direto (só recebe um número, nunca quebra por causa de
+// texto/apóstrofo/aspas no nome do combo). Tem um log temporário pra ajudar
+// a confirmar que o clique está sendo detectado — pode remover depois.
+function onComboCardClick(index){
+  console.log('[DEBUG] Clique detectado no combo, index:', index, combos[index]);
+  const combo = combos[index];
+  if (!combo) {
+    console.warn('[DEBUG] Combo não encontrado para o index', index);
+    return;
+  }
+  openComboModal({
+    name: combo.name,
+    description: combo.descricaoModal,
+    price: combo.price,
+    image: combo.image,
+  });
+}
+window.onComboCardClick = onComboCardClick;
+
+renderCombos();
+
+/* ========================= */
+/* ADD CART */
+/* ========================= */
+
+function addToCart(name){
+  const product = products.find(p => p.name === name);
+  if(!product) return;
+  const existing = cart.find(i => i.name === product.name);
+  if(existing){ existing.quantity += 1; }
+  else{ cart.push({ name: product.name, quantity: 1 }); }
+  saveCart();
+  renderCart();
+}
+
+function removeCart(index){
+  cart.splice(index,1);
+  saveCart();
+  renderCart();
+}
+
+function saveCart(){
+  try {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  } catch(e) {
+    console.warn('Não foi possível salvar o carrinho no localStorage:', e);
+  }
+}
+
+/* ========================= */
+/* RENDER CART */
+/* ========================= */
+
+function increaseCart(index) {
+  if(cart[index].quantity < 20) cart[index].quantity += 1;
+  saveCart(); renderCart();
+}
+
+function decreaseCart(index) {
+  if(cart[index].quantity > 1){ cart[index].quantity -= 1; }
+  else{ cart.splice(index, 1); }
+  saveCart(); renderCart();
+}
+
+window.increaseCart = increaseCart;
+window.decreaseCart = decreaseCart;
+
+function renderCart(){
+  const cartItems = document.getElementById('cart-items');
+  cartItems.innerHTML='';
+  let total = 0;
+  const payment = document.getElementById('payment-method')?.value;
+  if(cart.length > 0) total += entregaAtual.taxa || 2;
+
+  cart.forEach((item,index)=>{
+    const product = products.find(p => p.name === item.name);
+    const combo = combos.find(c => c.name === item.name);
+    const itemPrice = item.price || product?.price || combo?.price || 0;
+    total += itemPrice * (item.quantity || 1);
+    const pokeResumoHtml = (item.isPoke && item.pokeSummary) ? `
+      <p style="font-size:11.5px; color:#888; line-height:1.5; margin:3px 0 0;">
+        🍚 ${item.pokeSummary.arroz} · 🐟 ${item.pokeSummary.proteina}<br>
+        🥗 ${(item.pokeSummary.salada || []).join(' + ')} · 🍤 ${item.pokeSummary.crocante}
+      </p>
+    ` : '';
+
+    cartItems.innerHTML += `
+      <div class="cart-item">
+        <div style="flex:1;">
+          <strong>${item.name}</strong>
+          ${pokeResumoHtml}
+          <p>R$${(itemPrice * (item.quantity || 1)).toFixed(2)}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button onclick="decreaseCart(${index})" style="width:28px;height:28px;border:none;border-radius:50%;background:#9e0505;color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+          <span style="font-weight:bold;min-width:20px;text-align:center;">${item.quantity || 1}x</span>
+          <button onclick="increaseCart(${index})" style="width:28px;height:28px;border:none;border-radius:50%;background:#9e0505;color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+          <button class="trash-btn" onclick="removeCart(${index})">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+
+  if(payment === 'Cartão') total *= 1.10;
+
+  document.getElementById('cart-total').innerText = `R$${total.toFixed(2).replace('.', ',')}`;
+
+  const detalhe = document.getElementById('entrega-detalhe');
+  if(detalhe && cart.length > 0 && entregaAtual.distanciaKm){
+    detalhe.innerText = `Taxa de entrega: R$${(entregaAtual.taxa || 2).toFixed(2).replace('.', ',')}`;
+  } else if(detalhe){ detalhe.innerText = ''; }
+
+  const totalItens = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  document.getElementById('mobile-cart-count').innerText = totalItens;
+
+  const warning = document.getElementById('payment-warning');
+  warning.innerText = '10% OFF para pagamentos no Pix e Dinheiro';
+}
+
+renderCart();
+
+/* ========================= */
+/* ACCOUNT — CEP AUTOCOMPLETE */
+/* ========================= */
+
+function accCepMask(el){
+  let v = el.value.replace(/\D/g,'').slice(0,8);
+  if(v.length > 5) v = v.slice(0,5)+'-'+v.slice(5);
+  el.value = v;
+  if(v.replace(/\D/g,'').length === 8) accFetchCep(v.replace(/\D/g,''));
+  else accClearCepFields();
+}
+
+function accPhoneMask(el){
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+  else if(v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d*)/, '($1) $2-$3');
+  else if(v.length > 2) v = v.replace(/^(\d{2})(\d*)/, '($1) $2');
+  el.value = v;
+}
+
+async function accFetchCep(cep){
+  const spinner = document.getElementById('acc-cep-spinner');
+  const ok = document.getElementById('acc-cep-ok');
+  const err = document.getElementById('acc-cep-error');
+
+  spinner.classList.add('active');
+  ok.classList.remove('active');
+  err.classList.remove('active');
+
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const d = await res.json();
+
+    if(d.erro){
+      spinner.classList.remove('active');
+      err.classList.add('active');
+      accClearCepFields();
+      return;
+    }
+
+    document.getElementById('user-address').value = d.logradouro || '';
+    document.getElementById('user-neighborhood').value = d.bairro || '';
+    document.getElementById('user-city').value = `${d.localidade} / ${d.uf}`;
+
+    spinner.classList.remove('active');
+    ok.classList.add('active');
+    document.getElementById('user-number').focus();
+
+  } catch(e){
+    spinner.classList.remove('active');
+    err.classList.add('active');
+    accClearCepFields();
+  }
+}
+
+function accClearCepFields(){
+  const manual = document.getElementById('acc-manual-check').checked;
+  if(!manual){
+    ['user-address','user-neighborhood','user-city'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  }
+  document.getElementById('acc-cep-ok').classList.remove('active');
+}
+
+function accToggleManual(){
+  const cb = document.getElementById('acc-manual-check');
+  cb.checked = !cb.checked;
+  const fields = ['user-address','user-neighborhood','user-city'];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if(cb.checked){
+      el.readOnly = false;
+      el.style.background = '';
+      el.style.color = '';
+      if(id === 'user-address') el.placeholder = 'Ex: Rua das Flores';
+      if(id === 'user-neighborhood') el.placeholder = 'Ex: Centro';
+      if(id === 'user-city') el.placeholder = 'Ex: Rio de Janeiro / RJ';
+    } else {
+      el.readOnly = true;
+      el.style.background = '#f5f0ee';
+      el.style.color = '#888';
+      el.placeholder = 'Preenchido pelo CEP';
+    }
+  });
+}
+
+function accUpdateAvatar(){
+  const name = document.getElementById('user-name').value.trim();
+  const av = document.getElementById('acc-avatar');
+  const banner = document.getElementById('acc-banner-name');
+  if(name){
+    const parts = name.split(' ');
+    const initials = parts.length >= 2 ? parts[0][0]+parts[parts.length-1][0] : parts[0].slice(0,2);
+    av.textContent = initials.toUpperCase();
+    banner.textContent = parts[0];
+  } else {
+    av.textContent = '?';
+    banner.textContent = 'Sua Conta';
+  }
+}
+
+function accShowToast(msg){
+  const t = document.getElementById('acc-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2800);
+}
+
+/* ========================= */
+/* SAVE USER */
+/* ========================= */
+
+function saveUserData(){
+  const name = document.getElementById('user-name').value.trim();
+  const phone = document.getElementById('user-phone').value.trim();
+  const address = document.getElementById('user-address').value.trim();
+  const number = document.getElementById('user-number').value.trim();
+
+  if(!name || !phone || !address || !number){
+    accShowToast('⚠️ Preencha nome, celular, endereço e número');
+    return;
+  }
+
+  const user = {
+    name,
+    email: document.getElementById('user-email').value.trim(),
+    phone,
+    address,
+    number,
+    complement: document.getElementById('user-complement').value.trim(),
+    cep: document.getElementById('user-cep').value.trim(),
+    neighborhood: document.getElementById('user-neighborhood').value.trim(),
+    city: document.getElementById('user-city').value.trim(),
+  };
+
+  saveUserDataLocal(user);
+  accShowToast('✅ Dados salvos com sucesso!');
+  calcularEntrega();
+}
+
+/* ========================= */
+/* LOAD USER */
+/* ========================= */
+
+function loadUser(){
+  const user = getUserData();
+  if(!user) return;
+
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val || ''; };
+  set('user-name', user.name);
+  set('user-email', user.email);
+  set('user-phone', user.phone);
+  set('user-cep', user.cep);
+  set('user-address', user.address);
+  set('user-neighborhood', user.neighborhood);
+  set('user-city', user.city);
+  set('user-number', user.number);
+  set('user-complement', user.complement);
+
+  accUpdateAvatar();
+  if(user.address) document.getElementById('acc-cep-ok').classList.add('active');
+  calcularEntrega();
+}
+
+loadUser();
+
+let pendingOrder = null;
+
+/* ========================= */
+/* FINISH ORDER */
+/* ========================= */
+
+async function finishOrder(){
+  try {
+    if(cart.length === 0){ alert('Carrinho vazio!'); return; }
+
+    await fetchConfig();
+    if(!siteConfig.restaurante_aberto){
+      alert('O restaurante está fechado no momento. Tente mais tarde!');
+      return;
+    }
+
+    try {
+      await calcularEntrega();
+    } catch(e) {
+      console.warn('Erro ao calcular entrega:', e);
+    }
+
+    if(entregaAtual && entregaAtual.entrega === false){
+      alert(entregaAtual.motivo || 'Seu endereço está fora da área de entrega.');
+      return;
+    }
+
+    const payment = document.getElementById('payment-method').value;
+    if(payment === ''){ alert('Escolha uma forma de pagamento!'); return; }
+
+    const user = getUserData();
+
+    if(!user || !user.name || !user.phone || !user.address || !user.number){
+      alert('Preencha seus dados de entrega antes de finalizar o pedido!');
+      const cartEl = document.querySelector('.cart-container');
+      if(cartEl && cartEl.classList.contains('active')){
+        cartEl.classList.remove('active');
+      }
+      showPage('account-page');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const addonsCopy = { ...addons };
+
+    let total = calculateTotal();
+
+    pendingOrder = {
+      customer: user.name,
+      phone: user.phone,
+      address: user.address,
+      number: user.number,
+      complement: user.complement || '',
+      payment,
+      items: [...cart],
+      taxaEntrega: entregaAtual.taxa || 0,
+      distanciaKm: entregaAtual.distanciaKm || null,
+      total,
+      addons: addonsCopy,
+      status: 'Recebido',
+      createdAt: Date.now()
+    };
+
+    document.getElementById('modal-content').innerHTML = `
+      <p><strong>Cliente:</strong> ${user.name}</p>
+      <p><strong>Telefone:</strong> ${user.phone}</p>
+      <p><strong>Endereço:</strong><br>${user.address}, ${user.number}</p>
+      <p>${user.complement || ''}</p>
+      <p><strong>Pagamento:</strong> ${payment}</p>
+      <div class="modal-total">R$${total.toFixed(2).replace('.', ',')}</div>
+    `;
+
+    // Abre o modal na tela
+    document.getElementById('order-modal').style.display = 'flex';
+
+    verificarVisibilidadeBrinde();
+
+    requestAnimationFrame(() => {
+      const box = document.querySelector('.modal-box');
+      if(box) box.scrollTop = 0;
+    });
+
+  } catch(e) {
+    console.error('Erro no finishOrder:', e);
+    alert('Ocorreu um erro ao processar seu pedido. Tente novamente.');
+  }
+}
+
+function closeOrderModal(){
+  document.getElementById('order-modal').style.display = 'none';
+}
+
+async function confirmOrder(){
+  if(!pendingOrder) return;
+
+  // Atualiza adicionais com o estado atual antes de enviar
+  pendingOrder.addons = { ...addons };
+
+  // Recalcula total com adicionais atuais utilizando a função centralizada
+  pendingOrder.total = Number(calculateTotal().toFixed(2));
+
+  document.getElementById('loading-overlay').classList.add('active');
+  document.querySelector('.modal-confirm').disabled = true;
+
+  try {
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pendingOrder),
+    });
+    const data = await response.json();
+    if(!response.ok) throw new Error(data.error || 'Erro desconhecido');
+    cart = [];
+    saveCart();
+    renderCart();
+    resetAddonUI();
+    closeOrderModal();
+    alert(`Pedido #${data.orderId} realizado com sucesso! 🍣`);
+  } catch(error){
+    alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
+  } finally {
+    document.getElementById('loading-overlay').classList.remove('active');
+    const btn = document.querySelector('.modal-confirm');
+    if(btn) btn.disabled = false;
+  }
+}
+
+/* ========================= */
+/* GLOBAL FUNCTIONS */
+/* ========================= */
+
+window.closeOrderModal = closeOrderModal;
+window.confirmOrder = confirmOrder;
+window.finishOrder = finishOrder;
+window.showPage = showPage;
+window.addToCart = addToCart;
+window.removeCart = removeCart;
+window.filterCategory = filterCategory;
+window.saveUserData = saveUserData;
+window.renderCart = renderCart;
+
+/* ========================= */
+/* RENDER ORDERS */
+/* ========================= */
+
+async function renderOrders(){
+  const container = document.getElementById('order-history');
+  const user = getUserData();
+
+  if(!user || !user.phone){
+    container.innerHTML = '<p>Preencha seus dados na aba Conta para ver seus pedidos.</p>';
+    return;
+  }
+
+  container.innerHTML = '<p>Carregando pedidos...</p>';
+
+  try {
+    const phoneLimpo = user.phone.replace(/\D/g, "");
+    const response = await fetch(`/api/orders?phone=${encodeURIComponent(phoneLimpo)}`);
+    const data = await response.json();
+    if(!response.ok) throw new Error(data.error);
+
+    const orders = data.orders;
+    container.innerHTML = '';
+    if(orders.length === 0){ container.innerHTML = '<p>Você ainda não possui pedidos.</p>'; return; }
+
+    const icons = { 'Recebido':'📨', 'Preparando':'🍣', 'Saiu para entrega':'🚲', 'Entregue':'✅' };
+    const iconClasses = { 'Recebido':'icon-received', 'Preparando':'icon-preparing', 'Saiu para entrega':'icon-out', 'Entregue':'icon-done' };
+
+    orders.forEach(order => {
+      let statusClass = '';
+      if(order.status === 'Entregue') statusClass = 'status-delivered';
+      else if(order.status === 'Saiu para entrega') statusClass = 'status-delivery';
+
+      container.innerHTML += `
+        <div class="order-card ${statusClass}">
+          <div class="order-status-row">
+            <div class="order-status-icon ${iconClasses[order.status] || ''}">${icons[order.status] || ''}</div>
+            <h3>${order.status}</h3>
+          </div>
+          <p><strong>Pedido #${order.orderId || '—'}</strong></p>
+          <p>Cliente: ${order.customer}</p>
+          <p>Telefone: ${order.phone}</p>
+          <p>Status: <strong>${order.status}</strong></p>
+          <p>Pagamento: ${order.payment}</p>
+          <p>Itens: ${order.items.map(i => `${i.quantity > 1 ? `${i.quantity}x ` : ''}${i.name}`).join(', ')}</p>
+          <h2>R$${order.total.toFixed(2)}</h2>
+          <p class="tempo-preparo">⏱️ Tempo estimado de preparo: 30 min</p>
+        </div>`;
+    });
+
+  } catch(error){
+    container.innerHTML = '<p>Erro ao carregar pedidos. Tente novamente.</p>';
+    console.error(error);
+  }
+}
+
+renderOrders();
+
+let selectedCombo = null;
+
+function openComboModal(combo){
+  console.log('[COMBO] Abrindo modal para:', combo?.name);
+
+  // Remove qualquer instância anterior do modal, se sobrou alguma
+  closeComboModal();
+
+  selectedCombo = combo;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'combo-modal';
+  overlay.style.cssText = `
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.65);
+    display:flex; align-items:center; justify-content:center;
+    z-index:999999; padding:20px; box-sizing:border-box;
+  `;
+
+  overlay.innerHTML = `
+    <div style="background:#fff; color:#000; width:100%; max-width:450px; max-height:85vh; overflow-y:auto; border-radius:18px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.3); font-family:inherit;">
+      <img src="${combo.image}" style="width:100%; height:200px; object-fit:cover; border-radius:18px; margin-bottom:15px; display:block;">
+      <h2 style="margin:0 0 8px; font-size:22px;">${combo.name}</h2>
+      <p style="margin:0 0 14px; color:#555;">${combo.description || ''}</p>
+      <div style="margin-bottom:20px;">
+        <div style="color:#c40000; text-decoration:line-through; font-size:18px; margin-bottom:6px;">R$${Math.ceil(combo.price * 1.10).toFixed(2).replace('.', ',')}</div>
+        <div style="font-size:38px; font-weight:bold; color:black;">R$${combo.price.toFixed(2).replace('.', ',')}</div>
+        <div style="color:#008a2e; font-size:15px; font-weight:bold; margin-top:8px;">10% OFF no Pix e Dinheiro</div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button id="combo-modal-cancel" style="flex:1; padding:14px; border:none; border-radius:10px; background:#eee; color:#333; font-weight:bold; font-size:15px; cursor:pointer;">Cancelar</button>
+        <button id="combo-modal-confirm" style="flex:1; padding:14px; border:none; border-radius:10px; background:#008a2e; color:#fff; font-weight:bold; font-size:15px; cursor:pointer;">Adicionar ao carrinho</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Fecha ao clicar fora da caixa branca
+  overlay.addEventListener('click', (e) => {
+    if(e.target === overlay) closeComboModal();
+  });
+  document.getElementById('combo-modal-cancel').addEventListener('click', closeComboModal);
+  document.getElementById('combo-modal-confirm').addEventListener('click', confirmAddCombo);
+
+  console.log('[COMBO] Modal inserido no DOM.');
+}
+
+function closeComboModal(){
+  const existing = document.getElementById('combo-modal');
+  if(existing) existing.remove();
+}
+
+function confirmAddCombo(){
+  if(!selectedCombo) return;
+  const existing = cart.find(i => i.name === selectedCombo.name);
+  if(existing){ existing.quantity += 1; }
+  else{ cart.push({ name: selectedCombo.name, quantity: 1, isCombo: true }); }
+  saveCart();
+  renderCart();
+  closeComboModal();
+}
+
+window.openComboModal = openComboModal;
+window.closeComboModal = closeComboModal;
+window.confirmAddCombo = confirmAddCombo;
+
+/* ========================= */
+/* CARRINHO COM HISTÓRICO   */
+/* ========================= */
+
+let carrinhoFechadoManualmente = false;
+
+function toggleCart(){
+  const cartEl = document.querySelector('.cart-container');
+  if(!cartEl) return;
+
+  if(!cartEl.classList.contains('active')){
+    cartEl.classList.add('active');
+    try {
+      history.pushState({ isCart: true }, '', '');
+    } catch(e) {
+      console.warn('pushState não suportado:', e);
+    }
+  } else {
+    cartEl.classList.remove('active');
+    carrinhoFechadoManualmente = true;
+    try {
+      if(history.state?.isCart) history.back();
+    } catch(e) {
+      console.warn('history.back não suportado:', e);
+    }
+  }
+}
+
+window.toggleCart = toggleCart;
+
+const comboList = document.querySelector('.recommendation-list');
+comboList.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  comboList.scrollLeft += e.deltaY;
+});
+
+// Estado dos adicionais — populado dinamicamente a partir da API
+// (ver renderCustomAddonsUI). Cada adicional (fixo ou criado pelo admin)
+// vira uma chave "custom_<id>" aqui.
+let addons = {};
+
+// Preço unitário de cada adicional — populado dinamicamente também.
+const ADDON_PRICES = {};
+
+function addonsExtraCost(a){
+  return Object.entries(ADDON_PRICES).reduce((sum, [key, price]) => sum + ((a[key] || 0) * price), 0);
+}
+
+// Verifica se um adicional deve aparecer para o carrinho atual:
+// - appliesToAll: true → sempre aparece
+// - senão, aparece só se o carrinho tiver pelo menos 1 item (prato/combo)
+//   cujo nome está em appliesTo
+function addonElegivel(item){
+  if (item.appliesToAll) return true;
+  const applies = Array.isArray(item.appliesTo) ? item.appliesTo : [];
+  if (applies.length === 0) return false;
+  return cart.some(c => applies.includes(c.name));
+}
+
+// Atualiza a visibilidade de TODOS os cards de adicionais com base no
+// carrinho atual. Substitui as antigas checagens hardcoded (yakisoba,
+// frango xadrez, hot roll/hossomaki, temaki frito) por uma única regra
+// genérica baseada em appliesToAll/appliesTo de cada adicional.
+function verificarVisibilidadeBrinde() {
+  (customAdicionaisCache || []).forEach(item => {
+    if (!item.id) return;
+    const key = 'custom_' + item.id;
+    const card = document.getElementById(`addon-card-${item.id}`);
+    if (!card) return;
+
+    if (addonElegivel(item)) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+      addons[key] = 0;
+      const qtyEl = document.getElementById(`qty-${key}`);
+      if (qtyEl) qtyEl.innerText = 0;
+    }
+  });
+}
+
+/* ========================= */
+/* CÁLCULO CENTRALIZADO DE TOTAL */
+/* ========================= */
+
+function calculateTotal(){
+  const payment = document.getElementById('payment-method')?.value;
+
+  let total = cart.reduce((sum, item) => {
+    const product = products.find(p => p.name === item.name);
+    const combo = combos.find(c => c.name === item.name);
+    const price = item.price || (product ? product.price : 0) || (combo ? combo.price : 0) || 0;
+    return sum + (price * (item.quantity || 1));
+  }, 0);
+
+  total += cart.length > 0 ? (entregaAtual.taxa ?? 0) : 0;
+
+  // Soma adicionais pagos
+  total += addonsExtraCost(addons);
+
+  // Aplica acréscimo se a forma de pagamento for Cartão
+  if(payment === 'Cartão') total *= 1.10;
+
+  return total;
+}
+
+function updateModalTotal(){
+  const total = calculateTotal();
+  const orderModal = document.getElementById('order-modal');
+  const el = orderModal ? orderModal.querySelector('.modal-total') : null;
+  if(el) el.innerText = `R$${total.toFixed(2).replace('.', ',')}`;
+}
+
+function changeAddon(type, value){
+  if(!addons[type] && addons[type] !== 0) return;
+  addons[type] = Math.max(0, addons[type] + value);
+  const el = document.getElementById(`qty-${type}`);
+  if(el) el.innerText = addons[type];
+  updateModalTotal();
+}
+
+function resetAddonUI(){
+  Object.keys(addons).forEach(key=>{
+    addons[key] = 0;
+    const el = document.getElementById(`qty-${key}`);
+    if(el) el.innerText = 0;
+  });
+  updateModalTotal();
+}
+
+window.changeAddon = changeAddon;
+window.resetAddonUI = resetAddonUI;
+window.updateModalTotal = updateModalTotal;
+
+// ========================
+// BOTÃO VOLTAR MOBILE INTEGRADO
+// ========================
+
+function getCurrentPage(){
+  const pages = ['home-page', 'orders-page', 'account-page'];
+  return pages.find(id => document.getElementById(id).style.display !== 'none') || 'home-page';
+}
+
+// Empurra um estado no histórico ao trocar de página
+const originalShowPage = showPage;
+window.showPage = function(id){
+  originalShowPage(id);
+  try {
+    history.pushState({ page: id }, '', '');
+  } catch(e) {
+    console.warn('pushState não suportado:', e);
+  }
+};
+
+// Estado inicial
+history.replaceState({ page: 'home-page' }, '', '');
+
+// Intercepta o clique no botão voltar físico ou virtual do celular
+window.addEventListener('popstate', (e) => {
+  // Se o carrinho foi fechado pelo clique do botão no site, ignora o evento para evitar loops
+  if (carrinhoFechadoManualmente) {
+    carrinhoFechadoManualmente = false;
+    return;
+  }
+
+  const cartEl = document.querySelector('.cart-container');
+  
+  // 📱 SE O CARRINHO ESTIVER ABERTO: O botão voltar do celular apenas fecha ele
+  if (cartEl && cartEl.classList.contains('active')) {
+    cartEl.classList.remove('active');
+    return; // Para aqui para não mudar de página indesejadamente
+  }
+
+  // Se o estado disparado for o do carrinho (vindo de outra página), apenas garante que ele suma
+  if (e.state && e.state.isCart) {
+    return;
+  }
+
+  const page = e.state?.page || 'home-page';
+
+  // ✅ CORREÇÃO SAFARI/MOBILE: Se já está na home e o histórico diz que o destino é a home,
+  // não force um history.back(). Apenas saia da função e deixe o navegador fechar/voltar naturalmente.
+  if (page === 'home-page' && getCurrentPage() === 'home-page') {
+    return;
+  }
+
+  // Volta para a página anterior (Conta ou Pedidos) sem empurrar novo estado
+  originalShowPage(page);
+});
+
+</script>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Enviando pedido...</div>
+</div>
+
+
+<!-- ORDER MODAL -->
+<div id="order-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Confirmar Pedido 🍣</h2>
+    <div id="modal-content"></div>
+    
+    <div class="addons-box">
+      <h3>Adicionais</h3>
+
+      <div class="addons-grid" id="addons-grid">
+        <div class="addons-loading" style="grid-column:1/-1; font-size:13px; color:#888;">Carregando adicionais...</div>
+      </div>
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="modal-cancel" onclick="closeOrderModal()">Cancelar</button>
+      <button class="modal-confirm" onclick="confirmOrder()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Vercel Analytics -->
+<script>
+  window.va = window.va || function () {
+    (window.vaq = window.vaq || []).push(arguments);
+  };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

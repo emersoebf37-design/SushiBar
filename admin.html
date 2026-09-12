@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kaizora Admin</title>
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
+
+body{ background:#1a0000; color:white; min-height:100vh; }
+
+/* ========================= */
+/* LOGIN */
+/* ========================= */
+
+.login-screen{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding:20px;
+}
+
+.login-box{
+  background:#2a0101;
+  border-radius:24px;
+  padding:40px;
+  width:100%;
+  max-width:400px;
+  text-align:center;
+}
+
+.login-box h1{
+  font-size:32px;
+  margin-bottom:8px;
+}
+
+.login-box p{
+  color:rgba(255,255,255,0.6);
+  margin-bottom:30px;
+}
+
+.login-box input{
+  width:100%;
+  padding:16px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.05);
+  color:white;
+  font-size:16px;
+  margin-bottom:15px;
+  text-align:center;
+}
+
+.login-box input::placeholder{ color:rgba(255,255,255,0.3); }
+
+.login-btn{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:12px;
+  background:#9e0505;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.login-btn:hover{ background:#c20707; }
+
+.login-error{
+  color:#ff6b6b;
+  margin-top:12px;
+  font-size:14px;
+  display:none;
+}
+
+/* ========================= */
+/* ADMIN PANEL */
+/* ========================= */
+
+.admin-panel{
+  display:none;
+  padding:30px;
+  max-width:900px;
+  margin:0 auto;
+}
+
+.admin-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
+}
+
+.admin-header h1{ font-size:28px; }
+
+.logout-btn{
+  background:rgba(255,255,255,0.1);
+  border:none;
+  color:white;
+  padding:10px 20px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:14px;
+}
+
+/* ========================= */
+/* CARDS */
+/* ========================= */
+
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+  margin-bottom:25px;
+}
+
+@media(max-width:600px){
+  .cards-grid{ grid-template-columns:1fr; }
+  .admin-panel{ padding:15px; }
+}
+
+.stat-card{
+  background:#2a0101;
+  border-radius:18px;
+  padding:25px;
+  text-align:center;
+}
+
+.stat-card .stat-value{
+  font-size:36px;
+  font-weight:bold;
+  color:#ff6b6b;
+  margin-bottom:8px;
+}
+
+.stat-card .stat-label{
+  color:rgba(255,255,255,0.6);
+  font-size:14px;
+}
+
+/* ========================= */
+/* SECTION */
+/* ========================= */
+
+.section{
+  background:#2a0101;
+  border-radius:18px;
+  padding:25px;
+  margin-bottom:20px;
+}
+
+.section h2{
+  font-size:20px;
+  margin-bottom:20px;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+/* INPUTS DE SEÇÃO */
+.section-input {
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 14px;
+}
+.section-input::placeholder { color: rgba(255,255,255,0.3); }
+
+.add-btn {
+  padding: 12px 20px;
+  background: #2ecc71;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.add-btn:hover { background: #27ae60; }
+
+/* ========================= */
+/* TOGGLE */
+/* ========================= */
+
+.toggle-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+
+.toggle-row:last-child{ border-bottom:none; }
+
+.toggle-label{
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.toggle-label small{
+  color:rgba(255,255,255,0.5);
+  font-size:12px;
+  display:block;
+  margin-top:2px;
+}
+
+.toggle{
+  position:relative;
+  width:52px;
+  height:28px;
+  flex-shrink:0;
+}
+
+.toggle input{ opacity:0; width:0; height:0; }
+
+.toggle-slider{
+  position:absolute;
+  cursor:pointer;
+  top:0; left:0; right:0; bottom:0;
+  background:#555;
+  border-radius:28px;
+  transition:0.3s;
+}
+
+.toggle-slider:before{
+  content:'';
+  position:absolute;
+  width:20px;
+  height:20px;
+  left:4px;
+  bottom:4px;
+  background:white;
+  border-radius:50%;
+  transition:0.3s;
+}
+
+.toggle input:checked + .toggle-slider{ background:#2ecc71; }
+.toggle input:checked + .toggle-slider:before{ transform:translateX(24px); }
+
+.toggle input.danger:checked + .toggle-slider{ background:#9e0505; }
+
+/* ========================= */
+/* PRODUTOS */
+/* ========================= */
+
+.produto-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+
+.produto-item:last-child{ border-bottom:none; }
+
+/* ========================= */
+/* POKE PERSONALIZADO */
+/* ========================= */
+
+.poke-group-box{
+  margin-top:20px;
+  padding:14px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;
+}
+
+.poke-group-box h3{
+  font-size:15px;
+  margin-bottom:12px;
+}
+
+.poke-option-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.poke-option-row:last-of-type{ border-bottom:none; }
+
+.poke-option-row input[type="text"],
+.poke-option-row input[type="number"]{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#fff;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+}
+
+.poke-option-row .poke-opt-nome{ flex:1 1 160px; }
+.poke-option-row .poke-opt-desc{ flex:2 1 220px; }
+.poke-option-row .poke-opt-preco{ width:90px; }
+
+.poke-aviso-row{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.poke-aviso-row input{
+  flex:1;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#fff;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+}
+
+.produto-nome{
+  font-size:15px;
+  flex:1;
+  padding-right:15px;
+}
+
+.produto-nome small{
+  color:rgba(255,255,255,0.5);
+  font-size:12px;
+  display:block;
+}
+
+/* ========================= */
+/* PEDIDOS */
+/* ========================= */
+
+.pedido-card{
+  background:rgba(255,255,255,0.05);
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:12px;
+}
+
+.pedido-card:last-child{ margin-bottom:0; }
+
+.pedido-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+.pedido-numero{ font-weight:bold; font-size:16px; }
+
+.pedido-total{
+  font-weight:bold;
+  color:#ff6b6b;
+  font-size:16px;
+}
+
+.pedido-info{
+  color:rgba(255,255,255,0.7);
+  font-size:13px;
+  line-height:1.6;
+}
+
+.status-badge{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:bold;
+  margin-top:6px;
+}
+
+.status-Recebido{ background:#3498db22; color:#3498db; border:1px solid #3498db; }
+.status-Preparando{ background:#f1c40f22; color:#f1c40f; border:1px solid #f1c40f; }
+.status-Saiu{ background:#e67e2222; color:#e67e22; border:1px solid #e67e22; }
+.status-Entregue{ background:#2ecc7122; color:#2ecc71; border:1px solid #2ecc71; }
+
+/* ========================= */
+/* SAVE BTN */
+/* ========================= */
+
+.save-btn{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:12px;
+  background:#9e0505;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+  margin-top:10px;
+}
+
+.save-btn:hover{ background:#c20707; }
+.save-btn:disabled{ background:#555; cursor:not-allowed; }
+
+.save-feedback{
+  text-align:center;
+  margin-top:10px;
+  font-size:14px;
+  color:#2ecc71;
+  display:none;
+}
+
+/* ========================= */
+/* LOADING */
+/* ========================= */
+
+.loading{
+  text-align:center;
+  padding:40px;
+  color:rgba(255,255,255,0.5);
+}
+
+/* ========================= */
+/* MODAL - NOVO ITEM */
+/* ========================= */
+
+.modal-overlay{
+  display:none;
+  position:fixed;
+  top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  z-index:9999;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  box-sizing:border-box;
+}
+
+.modal-box{
+  background:#2a0101;
+  border-radius:18px;
+  padding:25px;
+  width:100%;
+  max-width:420px;
+  max-height:90vh;
+  overflow-y:auto;
+}
+
+.modal-box h3{
+  margin-bottom:18px;
+  font-size:19px;
+}
+
+.modal-field{
+  margin-bottom:14px;
+}
+
+.modal-field label{
+  display:block;
+  font-size:13px;
+  color:rgba(255,255,255,0.6);
+  margin-bottom:6px;
+}
+
+.modal-field .section-input,
+.modal-field select,
+.modal-field textarea{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.05);
+  color:white;
+  border:1px solid rgba(255,255,255,0.1);
+  font-size:14px;
+  font-family:Arial,sans-serif;
+}
+
+.modal-field textarea{
+  resize:vertical;
+  min-height:70px;
+}
+
+.modal-field small{
+  display:block;
+  color:rgba(255,255,255,0.4);
+  font-size:11px;
+  margin-top:5px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+
+.modal-actions button{
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.modal-cancel-btn{
+  background:rgba(255,255,255,0.1);
+  color:white;
+}
+
+.modal-save-btn{
+  background:#2ecc71;
+  color:white;
+}
+
+.modal-save-btn:disabled{ background:#555; cursor:not-allowed; }
+
+.modal-error{
+  color:#ff6b6b;
+  font-size:13px;
+  margin-top:10px;
+  display:none;
+}
+
+.custom-item-thumb{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:bold;
+  margin-left:8px;
+}
+.tipo-produto{ background:#3498db33; color:#3498db; }
+.tipo-adicional{ background:#f1c40f33; color:#f1c40f; }
+.tipo-combo{ background:#9b59b633; color:#9b59b6; }
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <h1>🍣 Kaizora</h1>
+    <p>Painel Administrativo</p>
+    <input type="password" id="admin-password" placeholder="Senha" onkeydown="if(event.key==='Enter') doLogin()">
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="login-error">Senha incorreta.</div>
+  </div>
+</div>
+
+<div class="admin-panel" id="admin-panel">
+
+  <div class="admin-header">
+  <h1>🍣 Kaizora Admin</h1>
+  <div style="display:flex; gap:10px;">
+    <button class="logout-btn" id="refresh-btn" onclick="loadData()">🔄 Atualizar</button>
+    <button class="logout-btn" onclick="doLogout()">Sair</button>
+  </div>
+</div>
+
+  <div class="admin-header">
+    <h1>🍣 Kaizora Admin</h1>
+    <button class="logout-btn" onclick="doLogout()">Sair</button>
+  </div>
+
+  <div class="cards-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-pedidos">—</div>
+      <div class="stat-label">Pedidos hoje</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-ticket">—</div>
+      <div class="stat-label">Ticket médio</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-label">Total do dia</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-status">—</div>
+      <div class="stat-label">Status do restaurante</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>⚙️ Controles</h2>
+
+    <div class="toggle-row">
+      <div class="toggle-label">
+        🔓 Restaurante aberto
+        <small>Clientes podem fazer pedidos</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-restaurante" onchange="saveConfig()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-label">
+        🛵 Sistema de Motoboy
+        <small>Ativa envio de alertas para entregadores (acima de 3km)</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-motoboy" onchange="saveConfig()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🛵 Equipe de Motoboys</h2>
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+      <input type="text" id="moto-name" class="section-input" placeholder="Nome do Motoboy" style="flex: 1; min-width: 150px;">
+      <input type="text" id="moto-phone" class="section-input" placeholder="WhatsApp (Ex: 5521999999999)" style="flex: 1; min-width: 200px;">
+      <button class="add-btn" onclick="addMotoboy()">+ Cadastrar</button>
+    </div>
+    <div id="motoboys-lista"></div>
+  </div>
+
+  <div class="section">
+    <h2>🆕 Cardápio</h2>
+    <p style="color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:15px;">Cadastre novos pratos, adicionais ou combos. Eles aparecem automaticamente no site e passam a ser aceitos nos pedidos.</p>
+    <button class="add-btn" onclick="abrirModalNovoItem()">+ Adicionar Novo Item</button>
+    <div id="custom-items-lista" style="margin-top:18px;"></div>
+  </div>
+
+  <div class="section">
+    <h2>🍱 Poke Personalizado</h2>
+    <p style="color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:15px;">
+      Configure o preço base, os ingredientes disponíveis em cada categoria (arroz, proteína,
+      salada e crocante) e os avisos exibidos ao cliente no monte-seu-poke do site.
+    </p>
+
+    <div class="modal-field">
+      <label>Nome do produto (aparece no card do cardápio)</label>
+      <input type="text" id="poke-titulo" class="section-input" maxlength="60">
+    </div>
+
+    <div class="modal-field">
+      <label>Descrição do produto (aparece no card do cardápio)</label>
+      <textarea id="poke-descricao" class="section-input" maxlength="300" rows="2" style="resize:vertical;"></textarea>
+    </div>
+
+    <div class="modal-field">
+      <label>Preço base do Poke (R$)</label>
+      <input type="number" id="poke-preco-base" class="section-input" step="0.01" min="0" style="max-width:180px;">
+    </div>
+
+    <div class="modal-field">
+      <label>Quantidade de opções de salada que o cliente escolhe</label>
+      <input type="number" id="poke-salada-qtd" class="section-input" step="1" min="1" max="5" style="max-width:120px;">
+    </div>
+
+    <div class="modal-field">
+      <label>⚠️ Avisos (exibidos para o cliente ao montar o Poke)</label>
+      <div id="poke-avisos-lista" style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;"></div>
+      <button class="add-btn" type="button" onclick="pokeAddAviso()">+ Adicionar aviso</button>
+    </div>
+
+    <div id="poke-grupos-container"></div>
+
+    <div class="modal-error" id="poke-erro" style="display:none;"></div>
+
+    <button class="add-btn" id="poke-save-btn" onclick="salvarPokeConfig()" style="margin-top:10px;">💾 Salvar Configurações do Poke</button>
+  </div>
+
+  <div class="section">
+    <h2>📦 Produtos</h2>
+    <div id="produtos-lista"><div class="loading">Carregando...</div></div>
+  </div>
+
+  <div class="section">
+    <h2>🎁 Combos</h2>
+    <div id="combos-lista"><div class="loading">Carregando...</div></div>
+  </div>
+
+  <div class="section">
+    <h2>📋 Pedidos de hoje</h2>
+    <div id="pedidos-lista"><div class="loading">Carregando...</div></div>
+  </div>
+
+</div>
+
+<!-- MODAL: NOVO ITEM / EDITAR ITEM -->
+<div class="modal-overlay" id="novo-item-overlay">
+  <div class="modal-box">
+    <h3 id="novo-item-titulo">🆕 Adicionar Novo Item</h3>
+
+    <div class="modal-field">
+      <label>Tipo</label>
+      <select id="novo-item-tipo" onchange="onTipoNovoItemChange()">
+        <option value="produto">Prato</option>
+        <option value="adicional">Adicional</option>
+        <option value="combo">Combo</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label>Nome</label>
+      <input type="text" id="novo-item-nome" class="section-input" placeholder="Ex: Hot Roll Especial (8 unidades)" maxlength="80">
+    </div>
+
+    <div class="modal-field" id="campo-categoria">
+      <label>Categoria</label>
+      <input type="text" id="novo-item-categoria" class="section-input" list="categorias-existentes" placeholder="Ex: Hots, Harumaki, Adicionais...">
+      <datalist id="categorias-existentes">
+        <option value="Hots">
+        <option value="Hossomaki">
+        <option value="Harumaki">
+        <option value="Porções">
+        <option value="Saladas">
+        <option value="Refeições">
+        <option value="Sashimi">
+        <option value="Adicionais">
+        <option value="Bebidas">
+        </option>
+      </datalist>
+      <small>Se usar uma categoria já existente (ex: Hots), o item aparece no filtro dessa categoria. Categorias novas aparecem só em "Todos".</small>
+    </div>
+
+    <div class="modal-field" id="campo-adicional-info" style="display:none;">
+      <small>💡 Esse adicional vai aparecer como um card (com foto, preço e contador) dentro do modal de finalização do pedido — não aparece como prato no cardápio.</small>
+    </div>
+
+    <div class="modal-field">
+      <label id="novo-item-preco-label">Preço (R$)</label>
+      <input type="number" id="novo-item-preco" class="section-input" placeholder="Ex: 25.00" step="0.01" min="0">
+      <small id="novo-item-preco-hint" style="display:none;">Deixe 0 para um adicional grátis (ex: hashi, talheres).</small>
+    </div>
+
+    <div class="modal-field">
+      <label>Descrição</label>
+      <textarea id="novo-item-descricao" maxlength="400" placeholder="Descrição que aparece no card do produto"></textarea>
+    </div>
+
+    <div class="modal-field" id="campo-descricao-modal" style="display:none;">
+      <label>Descrição do Combo (lista de itens)</label>
+      <textarea id="novo-item-descricao-modal" maxlength="400" placeholder="Ex: 2 Temaki Frito, 8 Hot Skin..."></textarea>
+      <small>Aparece no modal de detalhes do combo, no site.</small>
+    </div>
+
+    <div class="modal-field" id="campo-aplica-a" style="display:none;">
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+        <input type="checkbox" id="novo-item-aplica-todos" style="width:auto;" onchange="onAplicaTodosChange()">
+        Aplica a todos os pedidos (como hashi, talheres)
+      </label>
+      <small>Desmarcado: escolha abaixo a quais pratos e/ou combos esse adicional se aplica. Ele só vai aparecer pro cliente quando o carrinho tiver pelo menos um desses itens.</small>
+
+      <div id="campo-aplica-a-lista-wrap" style="margin-top:10px;">
+        <input type="text" id="aplica-a-filtro" class="section-input" placeholder="Filtrar pratos/combos..." oninput="renderAplicaALista()" style="margin-bottom:8px;">
+        <div id="aplica-a-lista" style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px;"></div>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label>Nome do arquivo da imagem</label>
+      <input type="text" id="novo-item-imagem" class="section-input" placeholder="Ex: hot-roll-especial.jpg">
+      <small>Só o nome do arquivo. A imagem precisa estar na pasta "Imagens/" do site.</small>
+    </div>
+
+    <div class="modal-error" id="novo-item-erro"></div>
+
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="fecharModalNovoItem()">Cancelar</button>
+      <button class="modal-save-btn" id="novo-item-save-btn" onclick="salvarNovoItem()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  async function loadData(){
+  const btn = document.getElementById('refresh-btn');
+  if(btn){ btn.disabled = true; btn.innerText = '⏳ Carregando...'; }
+
+  try {
+    const res = await fetch('/api/admin', {
+      headers: { 'Authorization': `Bearer ${adminToken}` },
+    });
+
+    if(res.status === 401){ doLogout(); return; }
+
+    const data = await res.json();
+    currentConfig = data.config;
+
+    document.getElementById('stat-pedidos').innerText = data.totalPedidos;
+    document.getElementById('stat-ticket').innerText = `R$${data.ticketMedio.toFixed(2)}`;
+    document.getElementById('stat-total').innerText = `R$${data.totalDia.toFixed(2)}`;
+    document.getElementById('stat-status').innerText = data.config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
+
+    document.getElementById('toggle-restaurante').checked = data.config.restaurante_aberto ?? true;
+    document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
+
+    await loadCustomItems();
+    renderCustomItemsList();
+    renderMotoboys(data.config.motoboys || []);
+    renderProdutos(data.config.produtos_esgotados || []);
+    renderCombos(data.config.combos_esgotados || []);
+    renderPedidos(data.pedidosHoje || []);
+
+  } catch(e) {
+    console.error('Erro ao carregar dados:', e);
+    alert('Erro ao atualizar. Tente novamente.');
+  } finally {
+    if(btn){ btn.disabled = false; btn.innerText = '🔄 Atualizar'; }
+  }
+}
+
+const produtosBase = [
+  { name:'Hot Roll Philadelphia Salmão (8 unidades)', category:'Hots' },
+  { name:'Temaki Frito', category:'Hots' },
+  { name:'Haru hot Philadelphia Salmão (8 unidades)', category:'Hots' },
+  //{ name:'Hossomaki Philadelphia Salmão (8 unidades)', category:'Hossomaki' },
+  //{ name:'Shimeji na Manteiga', category:'Porções' },
+  { name:'Hot Roll Skin (8 unidades)', category:'Hots' },
+  //{ name:'Hossomaki Skin (8 unidades)', category:'Hossomaki' },
+  { name:'Hot Roll Kani (8 unidades)', category:'Hots' },
+  //{ name:'Hossomaki Kani (8 unidades)', category:'Hossomaki' },
+  //{ name:'Lula à Dorê (6 unidades)', category:'Porções' },
+  { name:'Bolinho de bacalhau (8 unidades)', category:'Porções' },
+  { name:'Harumaki de Legumes (3 unidades)', category:'Harumaki' },
+  //{ name:'Harumaki de Salmão (3 unidades)', category:'Harumaki' },
+  //{ name:'Harumaki de queijo (3 unidades)', category:'Harumaki' },
+  //{ name:'Harumaki de Frango com Cream Cheese (3 unidades)', category:'Harumaki' },
+  { name:'Harumaki de Doce de leite (3 unidades)', category:'Harumaki' },
+  //{ name:'Salada Sunomono', category:'Saladas' },
+  //{ name:'Sashimi de Salmão (4 unidades)', category:'Sashimi' },
+  //{ name:'Joe de Salmão com Cream Cheese (4 unidades)', category:'Sashimi' },
+  { name:'Bolinho de Salmão (4 unidades)', category:'Hots' },
+  { name:'Yakisoba de Frango (M)', category:'Refeições' },
+  { name:'Yakisoba de Frango (G)', category:'Refeições' },
+  { name:'Yakisoba de Calabresa (M)', category:'Refeições' },
+  { name:'Yakisoba de Calabresa (G)', category:'Refeições' },
+  { name:'Yakisoba de Carne (M)', category:'Refeições' },
+  { name:'Yakisoba de Carne (G)', category:'Refeições' },
+  { name:'Yakisoba de Legumes (M)', category:'Refeições' },
+  { name:'Yakisoba de Legumes (G)', category:'Refeições' },
+  { name:'Yakisoba Misto (M)', category:'Refeições' },
+  { name:'Yakisoba Misto (G)', category:'Refeições' },
+  //{ name:'Frango Xadrez', category:'Refeições' },
+];
+
+const combosBase = [
+  { name:'Mega Combo Hot Roll' },
+  //{ name:'Combo Apaixonados' },
+  //{ name:'Combo Crocantissimo' },
+  //{ name:'Combo Individual' },
+  //{ name:'Combo de Frios' },
+  //{ name:'Combo Premium' },
+  //{ name:'Combo Primavera' },
+  //{ name:'Combo Salmão Lovers' },
+  { name:'Combo Osaka'},
+  { name:'Combo Shanghai'},
+  { name:'Combo Kawaguchi'}
+];
+
+let produtos = [...produtosBase];
+let combos = [...combosBase];
+let customItems = [];
+
+let adminToken = localStorage.getItem('admin_token') || null;
+let currentConfig = {};
+
+// ========================
+// CARDÁPIO CUSTOMIZADO (itens criados pelo admin)
+// ========================
+async function loadCustomItems(){
+  try {
+    const res = await fetch('/api/products');
+    const data = await res.json();
+    customItems = data.items || [];
+  } catch(e) {
+    console.error('Erro ao carregar itens customizados:', e);
+    customItems = [];
+  }
+  mergeCustomItems();
+}
+
+function mergeCustomItems(){
+  const produtosCustom = customItems
+    .filter(i => i.type === 'produto')
+    .map(i => ({ name: i.name, category: i.category, custom: true, id: i.id, tipo: i.type }));
+
+  const combosCustom = customItems
+    .filter(i => i.type === 'combo')
+    .map(i => ({ name: i.name, custom: true, id: i.id }));
+
+  produtos = [...produtosBase, ...produtosCustom];
+  combos = [...combosBase, ...combosCustom];
+}
+
+function renderCustomItemsList(){
+  const container = document.getElementById('custom-items-lista');
+  if(!container) return;
+
+  if(!customItems || customItems.length === 0){
+    container.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Nenhum item customizado cadastrado ainda.</p>';
+    return;
+  }
+
+  const tipoLabel = { produto: 'Prato', adicional: 'Adicional', combo: 'Combo' };
+  const tipoClass = { produto: 'tipo-produto', adicional: 'tipo-adicional', combo: 'tipo-combo' };
+
+  container.innerHTML = '';
+  customItems.forEach(item => {
+    let badgeAplicaA = '';
+    if (item.type === 'adicional') {
+      if (item.appliesToAll) {
+        badgeAplicaA = '<span class="custom-item-thumb" style="background:#9e050533; color:#e57373;">🌐 Todos os pedidos</span>';
+      } else if (Array.isArray(item.appliesTo) && item.appliesTo.length > 0) {
+        const primeiros = item.appliesTo.slice(0, 2).join(', ');
+        const resto = item.appliesTo.length > 2 ? ` +${item.appliesTo.length - 2}` : '';
+        badgeAplicaA = `<span class="custom-item-thumb" style="background:#9e050533; color:#e57373;">🎯 ${primeiros}${resto}</span>`;
+      }
+    }
+    const precoTexto = item.type === 'adicional' && !(Number(item.price) > 0)
+      ? 'Grátis'
+      : `R$${Number(item.price).toFixed(2)}`;
+    container.innerHTML += `
+      <div class="produto-item">
+        <div class="produto-nome">
+          ${item.name}
+          <span class="custom-item-thumb ${tipoClass[item.type] || ''}">${tipoLabel[item.type] || item.type}</span>
+          ${badgeAplicaA}
+          <small>${item.category} · ${precoTexto}</small>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button onclick='abrirModalEditarItem(${JSON.stringify(item.id)})' style="background:none; border:none; color:#9ec5ff; cursor:pointer; font-size:16px;" aria-label="Editar">✏️</button>
+          <button onclick="removeCustomItem('${item.id}')" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;" aria-label="Remover">🗑️</button>
+        </div>
+      </div>`;
+  });
+}
+
+async function removeCustomItem(id){
+  if(!confirm('Remover este item do cardápio? Ele deixará de aparecer no site.')) return;
+  try {
+    const res = await fetch(`/api/products?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${adminToken}` },
+    });
+    if(!res.ok) throw new Error('Erro ao remover');
+    await loadCustomItems();
+    renderCustomItemsList();
+    renderProdutos(currentConfig.produtos_esgotados || []);
+    renderCombos(currentConfig.combos_esgotados || []);
+  } catch(e) {
+    alert('Erro ao remover item. Tente novamente.');
+  }
+}
+
+// ========================
+// MODAL: NOVO ITEM / EDITAR ITEM
+// ========================
+let itemEditando = null; // null = criando; objeto do item = editando
+let aplicaASelecionados = new Set();
+
+function listaCompletaPratosECombos(){
+  // Nomes de todos os pratos e combos (base + customizados) — fonte pro
+  // seletor "aplica a" dos adicionais.
+  const nomesProdutos = produtos.map(p => ({ name: p.name, tipo: 'Prato' }));
+  const nomesCombos = combos.map(c => ({ name: c.name, tipo: 'Combo' }));
+  return [...nomesProdutos, ...nomesCombos];
+}
+
+function renderAplicaALista(){
+  const wrap = document.getElementById('aplica-a-lista');
+  if(!wrap) return;
+  const filtro = (document.getElementById('aplica-a-filtro').value || '').toLowerCase().trim();
+
+  const todos = listaCompletaPratosECombos().filter(o =>
+    !filtro || o.name.toLowerCase().includes(filtro)
+  );
+
+  if(todos.length === 0){
+    wrap.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px; margin:0;">Nenhum prato/combo encontrado.</p>';
+    return;
+  }
+
+  wrap.innerHTML = todos.map(o => {
+    const checked = aplicaASelecionados.has(o.name) ? 'checked' : '';
+    const nomeSeguro = o.name.replace(/"/g, '&quot;');
+    return `
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;">
+        <input type="checkbox" value="${nomeSeguro}" ${checked} style="width:auto;" onchange="toggleAplicaA('${nomeSeguro.replace(/'/g, "\\'")}', this.checked)">
+        ${o.name} <small style="color:rgba(255,255,255,0.4);">(${o.tipo})</small>
+      </label>`;
+  }).join('');
+}
+
+function toggleAplicaA(name, checked){
+  if(checked) aplicaASelecionados.add(name);
+  else aplicaASelecionados.delete(name);
+}
+
+function onAplicaTodosChange(){
+  const todos = document.getElementById('novo-item-aplica-todos').checked;
+  document.getElementById('campo-aplica-a-lista-wrap').style.display = todos ? 'none' : 'block';
+}
+
+function abrirModalNovoItem(){
+  itemEditando = null;
+  aplicaASelecionados = new Set();
+
+  document.getElementById('novo-item-titulo').innerText = '🆕 Adicionar Novo Item';
+  document.getElementById('novo-item-save-btn').innerText = 'Adicionar';
+  document.getElementById('novo-item-tipo').disabled = false;
+  document.getElementById('novo-item-tipo').value = 'produto';
+  document.getElementById('novo-item-nome').value = '';
+  document.getElementById('novo-item-categoria').value = '';
+  document.getElementById('novo-item-preco').value = '';
+  document.getElementById('novo-item-descricao').value = '';
+  document.getElementById('novo-item-descricao-modal').value = '';
+  document.getElementById('novo-item-imagem').value = '';
+  document.getElementById('novo-item-aplica-todos').checked = false;
+  document.getElementById('aplica-a-filtro').value = '';
+  document.getElementById('novo-item-erro').style.display = 'none';
+  onTipoNovoItemChange();
+  renderAplicaALista();
+  document.getElementById('novo-item-overlay').style.display = 'flex';
+}
+
+function abrirModalEditarItem(id){
+  const item = customItems.find(i => i.id === id);
+  if(!item) return;
+
+  itemEditando = item;
+  aplicaASelecionados = new Set(Array.isArray(item.appliesTo) ? item.appliesTo : []);
+
+  document.getElementById('novo-item-titulo').innerText = '✏️ Editar Item';
+  document.getElementById('novo-item-save-btn').innerText = 'Salvar alterações';
+  document.getElementById('novo-item-tipo').value = item.type;
+  document.getElementById('novo-item-tipo').disabled = true; // não dá pra trocar o tipo depois de criado
+  document.getElementById('novo-item-nome').value = item.name || '';
+  document.getElementById('novo-item-categoria').value = item.category || '';
+  document.getElementById('novo-item-preco').value = item.price != null ? item.price : '';
+  document.getElementById('novo-item-descricao').value = item.description || '';
+  document.getElementById('novo-item-descricao-modal').value = item.descricaoModal || '';
+  document.getElementById('novo-item-imagem').value = (item.image || '').replace(/^Imagens\//, '');
+  document.getElementById('novo-item-aplica-todos').checked = item.appliesToAll === true;
+  document.getElementById('aplica-a-filtro').value = '';
+  document.getElementById('novo-item-erro').style.display = 'none';
+  onTipoNovoItemChange();
+  onAplicaTodosChange();
+  renderAplicaALista();
+  document.getElementById('novo-item-overlay').style.display = 'flex';
+}
+
+function fecharModalNovoItem(){
+  document.getElementById('novo-item-overlay').style.display = 'none';
+  document.getElementById('novo-item-tipo').disabled = false;
+  itemEditando = null;
+}
+
+function onTipoNovoItemChange(){
+  const tipo = document.getElementById('novo-item-tipo').value;
+  document.getElementById('campo-descricao-modal').style.display = (tipo === 'combo') ? 'block' : 'none';
+  document.getElementById('campo-aplica-a').style.display = (tipo === 'adicional') ? 'block' : 'none';
+  document.getElementById('campo-categoria').style.display = (tipo === 'adicional') ? 'none' : 'block';
+  document.getElementById('campo-adicional-info').style.display = (tipo === 'adicional') ? 'block' : 'none';
+  document.getElementById('novo-item-preco-label').innerText = (tipo === 'adicional') ? 'Preço (R$) — opcional' : 'Preço (R$)';
+  document.getElementById('novo-item-preco-hint').style.display = (tipo === 'adicional') ? 'block' : 'none';
+  document.getElementById('novo-item-preco').min = (tipo === 'adicional') ? '0' : '0.01';
+}
+
+async function salvarNovoItem(){
+  const btn = document.getElementById('novo-item-save-btn');
+  const erroBox = document.getElementById('novo-item-erro');
+  erroBox.style.display = 'none';
+
+  const tipo = document.getElementById('novo-item-tipo').value;
+  const precoRaw = document.getElementById('novo-item-preco').value;
+
+  const payload = {
+    type: tipo,
+    name: document.getElementById('novo-item-nome').value.trim(),
+    category: document.getElementById('novo-item-categoria').value.trim(),
+    price: precoRaw === '' ? (tipo === 'adicional' ? 0 : NaN) : parseFloat(precoRaw),
+    description: document.getElementById('novo-item-descricao').value.trim(),
+    descricaoModal: document.getElementById('novo-item-descricao-modal').value.trim(),
+    image: document.getElementById('novo-item-imagem').value.trim(),
+  };
+
+  if(tipo === 'adicional'){
+    payload.appliesToAll = document.getElementById('novo-item-aplica-todos').checked;
+    payload.appliesTo = Array.from(aplicaASelecionados);
+  }
+
+  const precoValido = tipo === 'adicional' ? (payload.price >= 0) : (payload.price > 0);
+  const categoriaOk = tipo === 'adicional' ? true : !!payload.category;
+  const descricaoOk = tipo === 'adicional' ? true : !!payload.description;
+
+  if(!payload.name || !categoriaOk || !descricaoOk || !payload.image || !precoValido || !Number.isFinite(payload.price)){
+    erroBox.innerText = 'Preencha todos os campos obrigatórios corretamente.';
+    erroBox.style.display = 'block';
+    return;
+  }
+  if(tipo === 'adicional' && !payload.appliesToAll && payload.appliesTo.length === 0){
+    erroBox.innerText = 'Selecione ao menos um prato/combo, ou marque "aplica a todos os pedidos".';
+    erroBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = itemEditando ? 'Salvando...' : 'Salvando...';
+
+  try {
+    const url = itemEditando
+      ? `/api/products?action=update&id=${encodeURIComponent(itemEditando.id)}`
+      : '/api/products?action=create';
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Erro ao salvar');
+
+    await loadCustomItems();
+    renderCustomItemsList();
+    renderProdutos(currentConfig.produtos_esgotados || []);
+    renderCombos(currentConfig.combos_esgotados || []);
+    fecharModalNovoItem();
+  } catch(e) {
+    erroBox.innerText = e.message || 'Erro ao salvar. Tente novamente.';
+    erroBox.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerText = itemEditando ? 'Salvar alterações' : 'Adicionar';
+  }
+}
+
+// ========================
+// LOGIN
+// ========================
+async function doLogin(){
+  const password = document.getElementById('admin-password').value;
+  const btn = document.querySelector('.login-btn');
+  btn.disabled = true;
+  btn.innerText = 'Entrando...';
+
+  try {
+    const res = await fetch('/api/admin?action=login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error);
+
+    adminToken = data.token;
+    localStorage.setItem('admin_token', adminToken);
+    showPanel();
+  } catch(e) {
+    document.getElementById('login-error').style.display = 'block';
+    btn.disabled = false;
+    btn.innerText = 'Entrar';
+  }
+}
+
+function doLogout(){
+  localStorage.removeItem('admin_token');
+  adminToken = null;
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+// ========================
+// CARREGAR PAINEL
+// ========================
+async function showPanel(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  await loadData();
+}
+
+async function loadData(){
+  try {
+    const res = await fetch('/api/admin', {
+      headers: { 'Authorization': `Bearer ${adminToken}` },
+    });
+
+    if(res.status === 401){ doLogout(); return; }
+
+    const data = await res.json();
+    currentConfig = data.config;
+
+    // Stats
+    document.getElementById('stat-pedidos').innerText = data.totalPedidos;
+    document.getElementById('stat-ticket').innerText = `R$${data.ticketMedio.toFixed(2)}`;
+    document.getElementById('stat-total').innerText = `R$${data.totalDia.toFixed(2)}`;
+    document.getElementById('stat-status').innerText = data.config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
+
+    // Toggles
+    document.getElementById('toggle-restaurante').checked = data.config.restaurante_aberto ?? true;
+    document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
+
+    // Renderizações
+    await loadCustomItems();
+    renderCustomItemsList();
+    renderMotoboys(data.config.motoboys || []);
+    renderProdutos(data.config.produtos_esgotados || []);
+    renderCombos(data.config.combos_esgotados || []);
+    renderPedidos(data.pedidosHoje || []);
+    await loadPokeConfig();
+
+  } catch(e) {
+    console.error('Erro ao carregar dados:', e);
+  }
+}
+
+// ========================
+// RENDER MOTOBOYS
+// ========================
+function renderMotoboys(motoboys) {
+  const container = document.getElementById('motoboys-lista');
+  if(!motoboys || motoboys.length === 0) {
+    container.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:14px; text-align:center; padding:10px;">Nenhum motoboy cadastrado.</p>';
+    return;
+  }
+  container.innerHTML = '';
+  motoboys.forEach((m, index) => {
+    container.innerHTML += `
+      <div class="produto-item">
+        <div class="produto-nome">
+          🏍️ <b>${m.name}</b>
+          <small>📞 ${m.phone}</small>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <label class="toggle">
+            <input type="checkbox" ${m.active ? 'checked' : ''} onchange="toggleMotoboyStatus(${index}, this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+          <button onclick="removeMotoboy(${index})" style="background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 16px;">🗑️</button>
+        </div>
+      </div>`;
+  });
+}
+
+function addMotoboy() {
+  const nameInput = document.getElementById('moto-name');
+  const phoneInput = document.getElementById('moto-phone');
+  const name = nameInput.value.trim();
+  const phone = phoneInput.value.trim().replace(/\D/g, '');
+
+  if(!name || !phone) {
+    alert('Por favor, insira o Nome e o WhatsApp (somente números) do motoboy.');
+    return;
+  }
+
+  if(!currentConfig.motoboys) currentConfig.motoboys = [];
+  currentConfig.motoboys.push({ name, phone, active: true });
+
+  nameInput.value = '';
+  phoneInput.value = '';
+  
+  renderMotoboys(currentConfig.motoboys);
+  saveConfig();
+}
+
+function toggleMotoboyStatus(index, isChecked) {
+  if(currentConfig.motoboys && currentConfig.motoboys[index]) {
+    currentConfig.motoboys[index].active = isChecked;
+    saveConfig();
+  }
+}
+
+function removeMotoboy(index) {
+  if(confirm(`Deseja remover este motoboy da lista?`)) {
+    currentConfig.motoboys.splice(index, 1);
+    renderMotoboys(currentConfig.motoboys);
+    saveConfig();
+  }
+}
+
+// ========================
+// RENDER PRODUTOS
+// ========================
+function renderProdutos(esgotados){
+  const container = document.getElementById('produtos-lista');
+  container.innerHTML = '';
+  produtos.forEach(p => {
+    const isEsgotado = esgotados.includes(p.name);
+    container.innerHTML += `
+      <div class="produto-item">
+        <div class="produto-nome">
+          ${p.name}
+          <small>${p.category}</small>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" class="danger" ${isEsgotado ? 'checked' : ''}
+            onchange="toggleProduto('${p.name.replace(/'/g, "\\'")}', this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>`;
+  });
+}
+
+// ========================
+// RENDER COMBOS
+// ========================
+function renderCombos(esgotados){
+  const container = document.getElementById('combos-lista');
+  container.innerHTML = '';
+  combos.forEach(c => {
+    const isEsgotado = esgotados.includes(c.name);
+    container.innerHTML += `
+      <div class="produto-item">
+        <div class="produto-nome">${c.name}</div>
+        <label class="toggle">
+          <input type="checkbox" class="danger" ${isEsgotado ? 'checked' : ''}
+            onchange="toggleCombo('${c.name}', this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>`;
+  });
+}
+
+// ========================
+// RENDER PEDIDOS
+// ========================
+function renderPedidos(pedidos){
+  const container = document.getElementById('pedidos-lista');
+  if(pedidos.length === 0){
+    container.innerHTML = '<p style="color:rgba(255,255,255,0.4);text-align:center;padding:20px;">Nenhum pedido hoje ainda.</p>';
+    return;
+  }
+  container.innerHTML = '';
+  pedidos.forEach(p => {
+    const statusClass = p.status?.replace(' ', '') || 'Recebido';
+    const badgeDesconto = p.descontoPrimeiroPedido
+      ? '<span class="status-badge" style="background:#00c85333;color:#00e676;margin-left:6px;">🎉 1º pedido -10%</span>'
+      : '';
+    container.innerHTML += `
+      <div class="pedido-card">
+        <div class="pedido-header">
+          <span class="pedido-numero">Pedido #${p.orderId || '—'}</span>
+          <span class="pedido-total">R$${p.total?.toFixed(2)}</span>
+        </div>
+        <div class="pedido-info">
+          👤 ${p.customer} — 📞 ${p.phone}<br>
+          📍 ${p.address}, ${p.number} ${p.complement}<br>
+          💳 ${p.payment}<br>
+          🍣 ${p.items?.map(i => {
+            if (i.isPoke && i.pokeDetails) {
+              const pd = i.pokeDetails;
+              const salada = Array.isArray(pd.salada) ? pd.salada.map(s => s.name).join(' + ') : '';
+              return `${i.quantity}x ${i.name} (${pd.arroz?.name || '-'}, ${pd.proteina?.name || '-'}, ${salada || '-'}, ${pd.crocante?.name || '-'})`;
+            }
+            return i.name;
+          }).join(', ')}
+        </div>
+        <span class="status-badge status-${statusClass}">${p.status}</span>${badgeDesconto}
+      </div>`;
+  });
+}
+
+// ========================
+// POKE PERSONALIZADO
+// ========================
+const POKE_GROUP_LABELS = {
+  arroz: '🍚 Arroz',
+  proteina: '🐟 Proteína',
+  salada: '🥗 Salada',
+  crocante: '🍤 Crocante',
+};
+const POKE_GROUP_ORDER = ['arroz', 'proteina', 'salada', 'crocante'];
+
+let pokeConfig = null;
+
+async function loadPokeConfig(){
+  try {
+    const res = await fetch('/api/poke', { cache: 'no-store' });
+    pokeConfig = await res.json();
+  } catch(e) {
+    console.error('Erro ao carregar configuração do Poke:', e);
+    pokeConfig = { basePrice: 0, saladaQtd: 2, avisos: [], groups: { arroz: [], proteina: [], salada: [], crocante: [] } };
+  }
+  renderPokeConfig();
+}
+
+function renderPokeConfig(){
+  if(!pokeConfig) return;
+  document.getElementById('poke-titulo').value = pokeConfig.title || 'Poke Personalizado';
+  document.getElementById('poke-descricao').value = pokeConfig.description || '';
+  document.getElementById('poke-preco-base').value = Number(pokeConfig.basePrice || 0).toFixed(2);
+  document.getElementById('poke-salada-qtd').value = pokeConfig.saladaQtd || 2;
+  renderPokeAvisos();
+  renderPokeGroups();
+}
+
+function pokeSlugify(str){
+  return String(str || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .slice(0, 60);
+}
+
+// ── Avisos ──
+function renderPokeAvisos(){
+  const container = document.getElementById('poke-avisos-lista');
+  const avisos = pokeConfig.avisos || [];
+  if(avisos.length === 0){
+    container.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Nenhum aviso cadastrado.</p>';
+    return;
+  }
+  container.innerHTML = '';
+  avisos.forEach((aviso, index) => {
+    const row = document.createElement('div');
+    row.className = 'poke-aviso-row';
+    row.innerHTML = `
+      <input type="text" value="${String(aviso).replace(/"/g,'&quot;')}" maxlength="200"
+        onchange="pokeConfig.avisos[${index}] = this.value.trim()">
+      <button onclick="pokeRemoveAviso(${index})" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:16px;">🗑️</button>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function pokeAddAviso(){
+  if(!pokeConfig.avisos) pokeConfig.avisos = [];
+  pokeConfig.avisos.push('');
+  renderPokeAvisos();
+}
+
+function pokeRemoveAviso(index){
+  pokeConfig.avisos.splice(index, 1);
+  renderPokeAvisos();
+}
+
+// ── Grupos de ingredientes ──
+function renderPokeGroups(){
+  const container = document.getElementById('poke-grupos-container');
+  container.innerHTML = '';
+
+  POKE_GROUP_ORDER.forEach(groupKey => {
+    const options = (pokeConfig.groups && pokeConfig.groups[groupKey]) || [];
+
+    const box = document.createElement('div');
+    box.className = 'poke-group-box';
+
+    const rowsHtml = options.map((opt, idx) => `
+      <div class="poke-option-row">
+        <input type="text" class="poke-opt-nome" placeholder="Nome" maxlength="60" value="${String(opt.name||'').replace(/"/g,'&quot;')}"
+          onchange="pokeUpdateOption('${groupKey}', ${idx}, 'name', this.value)">
+        <input type="text" class="poke-opt-desc" placeholder="Descrição (opcional)" maxlength="200" value="${String(opt.description||'').replace(/"/g,'&quot;')}"
+          onchange="pokeUpdateOption('${groupKey}', ${idx}, 'description', this.value)">
+        <input type="number" class="poke-opt-preco" placeholder="R$ extra" step="0.01" min="0" value="${Number(opt.price||0)}"
+          onchange="pokeUpdateOption('${groupKey}', ${idx}, 'price', this.value)">
+        <label class="toggle" style="transform:scale(0.85);">
+          <input type="checkbox" ${opt.available !== false ? 'checked' : ''}
+            onchange="pokeUpdateOption('${groupKey}', ${idx}, 'available', this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+        <button onclick="pokeRemoveOption('${groupKey}', ${idx})" style="background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:16px;">🗑️</button>
+      </div>
+    `).join('');
+
+    box.innerHTML = `
+      <h3>${POKE_GROUP_LABELS[groupKey] || groupKey}</h3>
+      ${rowsHtml || '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Nenhuma opção cadastrada.</p>'}
+      <button class="add-btn" type="button" style="margin-top:10px;" onclick="pokeAddOption('${groupKey}')">+ Adicionar opção</button>
+    `;
+    container.appendChild(box);
+  });
+}
+
+function pokeUpdateOption(groupKey, index, field, value){
+  const opt = pokeConfig.groups[groupKey][index];
+  if(!opt) return;
+  if(field === 'price') opt.price = parseFloat(value) || 0;
+  else if(field === 'available') opt.available = !!value;
+  else opt[field] = value;
+
+  // Atualiza o id automaticamente a partir do nome (só se ainda não tiver sido definido manualmente)
+  if(field === 'name' && !opt._idLocked){
+    opt.id = pokeSlugify(value) || opt.id;
+  }
+}
+
+function pokeAddOption(groupKey){
+  if(!pokeConfig.groups[groupKey]) pokeConfig.groups[groupKey] = [];
+  pokeConfig.groups[groupKey].push({ id: '', name: '', description: '', price: 0, available: true });
+  renderPokeGroups();
+}
+
+function pokeRemoveOption(groupKey, index){
+  pokeConfig.groups[groupKey].splice(index, 1);
+  renderPokeGroups();
+}
+
+async function salvarPokeConfig(){
+  const erroBox = document.getElementById('poke-erro');
+  const btn = document.getElementById('poke-save-btn');
+  erroBox.style.display = 'none';
+
+  pokeConfig.title = document.getElementById('poke-titulo').value.trim();
+  pokeConfig.description = document.getElementById('poke-descricao').value.trim();
+  pokeConfig.basePrice = parseFloat(document.getElementById('poke-preco-base').value) || 0;
+  pokeConfig.saladaQtd = parseInt(document.getElementById('poke-salada-qtd').value) || 2;
+
+  btn.disabled = true;
+  btn.innerText = 'Salvando...';
+
+  try {
+    const res = await fetch('/api/poke?action=update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify(pokeConfig),
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Erro ao salvar');
+    pokeConfig = data.config;
+    renderPokeConfig();
+    alert('Configurações do Poke salvas com sucesso! ✅');
+  } catch(e) {
+    erroBox.innerText = e.message || 'Erro ao salvar. Tente novamente.';
+    erroBox.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerText = '💾 Salvar Configurações do Poke';
+  }
+}
+
+// ========================
+// TOGGLE PRODUTO/COMBO
+// ========================
+function toggleProduto(name, isEsgotado){
+  if(!currentConfig.produtos_esgotados) currentConfig.produtos_esgotados = [];
+  if(isEsgotado){
+    if(!currentConfig.produtos_esgotados.includes(name))
+      currentConfig.produtos_esgotados.push(name);
+  } else {
+    currentConfig.produtos_esgotados = currentConfig.produtos_esgotados.filter(n => n !== name);
+  }
+  saveConfig();
+}
+
+function toggleCombo(name, isEsgotado){
+  if(!currentConfig.combos_esgotados) currentConfig.combos_esgotados = [];
+  if(isEsgotado){
+    if(!currentConfig.combos_esgotados.includes(name))
+      currentConfig.combos_esgotados.push(name);
+  } else {
+    currentConfig.combos_esgotados = currentConfig.combos_esgotados.filter(n => n !== name);
+  }
+  saveConfig();
+}
+
+// ========================
+// SALVAR CONFIG
+// ========================
+async function saveConfig(){
+  const config = {
+    motoboy_on: document.getElementById('toggle-motoboy').checked,
+    restaurante_aberto: document.getElementById('toggle-restaurante').checked,
+    produtos_esgotados: currentConfig.produtos_esgotados || [],
+    combos_esgotados: currentConfig.combos_esgotados || [],
+    motoboys: currentConfig.motoboys || [] // ENVIA A LISTA DE MOTOBOYS ATUALIZADA
+  };
+
+  try {
+    const res = await fetch('/api/admin?action=update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify(config),
+    });
+    if(!res.ok) throw new Error('Erro ao salvar');
+    currentConfig = { ...currentConfig, ...config };
+
+    document.getElementById('stat-status').innerText = config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
+
+  } catch(e) {
+    alert('Erro ao salvar. Tente novamente.');
+  }
+}
+
+// ========================
+// AUTO-RELOAD PEDIDOS A CADA 30s
+// ========================
+
+
+// ========================
+// INIT
+// ========================
+if(adminToken){
+  showPanel();
+} 
+</script>
+</body>
+</html>
