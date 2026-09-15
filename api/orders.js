@@ -121,8 +121,8 @@ const PRODUCTS = {
   "Yakisoba de Legumes (G)": 25,  
   "Yakisoba de Carne (M)": 28,
   "Yakisoba de Carne (G)": 35,
-  "Yakisoba Misto (M)": 25,
-  "Yakisoba Misto (G)": 35,
+  "Yakisoba Misto (M)": 30,
+  "Yakisoba Misto (G)": 37,
 
   // ── Combos ──
   "Mega Combo Hot Roll": 40,
