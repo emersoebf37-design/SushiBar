@@ -126,8 +126,8 @@ const PRODUCTS = {
 
   // ── Combos ──
   "Mega Combo Hot Roll": 40,
-  "Combo Osaka": 65,
-  "Combo Shanghai": 35,
+  "Combo Osaka": 75,
+  "Combo Shanghai": 45,
   "Combo Kawaguchi": 47,
   "Combo Crocantissimo": 50,
   //"Combo Individual": 40,
