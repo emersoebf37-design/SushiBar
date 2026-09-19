@@ -218,11 +218,6 @@ async function imprimir(order) {
     unlinkSync(tmpFile);
   }
 }
-// ========================
-// Replacer
-// ========================
-
-replace
 
 
 // ========================
