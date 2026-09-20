@@ -123,6 +123,8 @@ const PRODUCTS = {
   "Yakisoba de Carne (G)": 35,
   "Yakisoba Misto (M)": 30,
   "Yakisoba Misto (G)": 37,
+  "Yakisoba Camarão (M)":30,
+  "Yakisoba Camarão (G)":35,
 
   // ── Combos ──
   "Mega Combo Hot Roll": 40,
