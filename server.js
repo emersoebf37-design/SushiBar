@@ -64,6 +64,19 @@ const CUT       = GS  + "V\x41\x03";
 const COLS = 32;
 const DIV  = "-".repeat(COLS);
 
+const ADDON_INFO_FIXOS = {
+  hashi:                    { name: "Hashi (adaptador)", price: 0 },
+  talheres:                 { name: "Talheres",           price: 0 },
+  amendoim:                 { name: "Amendoim",           price: 0 },
+  pimenta:                  { name: "Pimenta Sichuan",    price: 0 },
+  geleia:                   { name: "Geleia de Pimenta",  price: 1.00 },
+  creamCheeseExtra:         { name: "CC extra x8",        price: 1.00 },
+  creamCheeseCrocante:      { name: "CC crocante x8",     price: 1.50 },
+  creamCheeseCouve:         { name: "CC couve frita x8",  price: 1.50 },
+  creamCheeseGeleiaPimenta: { name: "CC geleia pimenta",  price: 1.50 },
+  creamCheeseTemaki:        { name: "CC extra temaki",    price: 2.00 },
+};
+
 const NOME_CURTO = {
   "Hot Roll Philadelphia Salmão (8 unidades)": "Hot Phil. Salmão x8",
   "Haru hot Philadelphia Salmão (8 unidades)": "Haru Phil. Salmão x8",
@@ -161,16 +174,40 @@ function formatarPedido(order) {
   }
   body += DIV + LF;
 
-  const adicionaisPedido = Object.entries(order.addons || {})
-    .filter(([, qty]) => qty > 0);
+  const addonsList = [];
 
-  if (adicionaisPedido.length > 0) {
+  // 1. Adicionais fixos / legados (salvos em order.addons como camelCase pelo orders.js)
+  for (const [key, qty] of Object.entries(order.addons || {})) {
+    if (qty > 0) {
+      const info = ADDON_INFO_FIXOS[key] || { name: key, price: 0 };
+      addonsList.push({
+        name: nomeCurto(info.name),
+        qty,
+        price: info.price,
+      });
+    }
+  }
+
+  // 2. Adicionais customizados criados pelo admin (salvos em order.customAddons pelo orders.js)
+  if (Array.isArray(order.customAddons)) {
+    for (const ca of order.customAddons) {
+      if (ca.quantity > 0) {
+        addonsList.push({
+          name: nomeCurto(ca.name),
+          qty: ca.quantity,
+          price: Number(ca.unitPrice) || 0,
+        });
+      }
+    }
+  }
+
+  if (addonsList.length > 0) {
     body += BOLD_ON + "ADICIONAIS" + LF + BOLD_OFF;
-    for (const [key, qty] of adicionaisPedido) {
-      const nomeAdic = nomeCurto(adicionaisCache[key] || key);
-      const prefixo  = qty + "x ";
-      const nomeMax  = COLS - prefixo.length - "Gratis".length - 1;
-      body += rowLR(prefixo + trunc(nomeAdic, nomeMax), "Gratis");
+    for (const adic of addonsList) {
+      const subtotal = adic.price > 0 ? moeda(adic.price * adic.qty) : "Gratis";
+      const prefixo  = adic.qty + "x ";
+      const nomeMax  = COLS - prefixo.length - subtotal.length - 1;
+      body += rowLR(prefixo + trunc(adic.name, nomeMax), subtotal);
     }
     body += DIV + LF;
   }
@@ -279,16 +316,6 @@ async function imprimir(order) {
 // ========================
 // LISTENER FIRESTORE
 // ========================
-
-let adicionaisCache = {};
-
-db.collection("custom_products")
-  .where("type", "==", "adicional")
-  .onSnapshot(snap => {
-    adicionaisCache = {};
-    snap.forEach(doc => { adicionaisCache["custom_" + doc.id] = doc.data().name; });
-    adicionaisCache["hashi"] = "Adaptador de hashi";
-  });
 
 const jaImpressos = new Set();
 const iniciadoEm  = Date.now();
