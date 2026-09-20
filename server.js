@@ -80,6 +80,12 @@ const NOME_CURTO = {
   "Sashimi de Salmão (4 unidades)"           : "Sashimi Salmão x4",
   "Croquete de Camarão (4 unidades)"         : "Croquete Camarão x4",
   "Yakisoba de Calabresa"                    : "Yaki Calabresa",
+  "Adaptador de hashi"                       : "Hashi (adaptador)",
+  "Cream cheese extra (8 unidades)"          : "CC extra x8",
+  "Cream cheese extra com crocante (8 unidades)": "CC crocante x8",
+  "Cream cheese extra com couve frita (8 unidades)": "CC couve frita x8",
+  "Cream cheese extra com geleia de pimenta (8 unidades)": "CC geleia pimenta",
+  "Cream cheese extra no temaki"             : "CC extra temaki",
 };
 
 const COMBO_COMPOSICAO = {
@@ -155,8 +161,17 @@ function formatarPedido(order) {
   }
   body += DIV + LF;
 
-  if (order.addons?.hashi > 0) {
-    body += rowLR("Hashi x" + order.addons.hashi, "Gratis");
+  const adicionaisPedido = Object.entries(order.addons || {})
+    .filter(([, qty]) => qty > 0);
+
+  if (adicionaisPedido.length > 0) {
+    body += BOLD_ON + "ADICIONAIS" + LF + BOLD_OFF;
+    for (const [key, qty] of adicionaisPedido) {
+      const nomeAdic = nomeCurto(adicionaisCache[key] || key);
+      const prefixo  = qty + "x ";
+      const nomeMax  = COLS - prefixo.length - "Gratis".length - 1;
+      body += rowLR(prefixo + trunc(nomeAdic, nomeMax), "Gratis");
+    }
     body += DIV + LF;
   }
 
@@ -264,6 +279,16 @@ async function imprimir(order) {
 // ========================
 // LISTENER FIRESTORE
 // ========================
+
+let adicionaisCache = {};
+
+db.collection("custom_products")
+  .where("type", "==", "adicional")
+  .onSnapshot(snap => {
+    adicionaisCache = {};
+    snap.forEach(doc => { adicionaisCache["custom_" + doc.id] = doc.data().name; });
+    adicionaisCache["hashi"] = "Adaptador de hashi";
+  });
 
 const jaImpressos = new Set();
 const iniciadoEm  = Date.now();
