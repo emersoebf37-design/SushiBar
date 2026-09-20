@@ -64,6 +64,34 @@ const CUT       = GS  + "V\x41\x03";
 const COLS = 32;
 const DIV  = "-".repeat(COLS);
 
+const NOME_CURTO = {
+  "Hot Roll Philadelphia Salmão (8 unidades)": "Hot Phil. Salmão x8",
+  "Haru hot Philadelphia Salmão (8 unidades)": "Haru Phil. Salmão x8",
+  "Hot Roll Skin (8 unidades)"               : "Hot Roll Skin x8",
+  "Hossomaki Skin (8 unidades)"              : "Hossomaki Skin x8",
+  "Hot Roll Kani (8 unidades)"               : "Hot Roll Kani x8",
+  "Hossomaki Kani (8 unidades)"              : "Hossomaki Kani x8",
+  "Bolinho de bacalhau (8 unidades)"         : "Bolinho Bacalhau x8",
+  "Harumaki de Legumes (3 unidades)"         : "Harumaki Legumes x3",
+  "Harumaki de Salmão (3 unidades)"          : "Harumaki Salmão x3",
+  "Harumaki de queijo (3 unidades)"          : "Harumaki Queijo x3",
+  "Harumaki de Frango com Cream Cheese (3 unidades)": "Harumaki Frango x3",
+  "Harumaki de Doce de leite (3 unidades)"   : "Harumaki Doce x3",
+  "Sashimi de Salmão (4 unidades)"           : "Sashimi Salmão x4",
+  "Croquete de Camarão (4 unidades)"         : "Croquete Camarão x4",
+  "Yakisoba de Calabresa"                    : "Yaki Calabresa",
+};
+
+const COMBO_COMPOSICAO = {
+  "Combo Osaka"     : "1 Temaki Frito Salmao\n16 Hot Roll Phil.\n8 Hot Skin\n1 Refrig. Lata",
+  "Combo Shanghai"  : "1 Yakisoba M\n8 Hot Kani\n1 Guaravita",
+  "Combo Kawaguchi" : "8 Hot Salmao\n8 Hot Kani\n16 Bolinho Bacalhau\n2 Refrig. Lata",
+};
+
+function nomeCurto(nome) {
+  return NOME_CURTO[nome] || nome;
+}
+
 function trunc(str, maxLen) {
   return String(str || "").slice(0, maxLen);
 }
@@ -109,8 +137,21 @@ function formatarPedido(order) {
   for (const item of order.items) {
     const subtotal = moeda(item.unitPrice * item.quantity);
     const prefixo  = item.quantity + "x ";
+    const nome     = nomeCurto(item.name);
     const nomeMax  = COLS - prefixo.length - subtotal.length - 1;
-    body += rowLR(prefixo + trunc(item.name, nomeMax), subtotal);
+    body += rowLR(prefixo + trunc(nome, nomeMax), subtotal);
+    const comp = COMBO_COMPOSICAO[item.name];
+    if (comp) {
+      body += `  Total p/ ${item.quantity}x:` + LF;
+      comp.split("\n").forEach(l => {
+        const match = l.match(/^(\d+)\s+(.+)/);
+        if (match) {
+          body += `   ${parseInt(match[1]) * item.quantity}x ${match[2]}` + LF;
+        } else {
+          body += `   ${item.quantity}x ${l}` + LF;
+        }
+      });
+    }
   }
   body += DIV + LF;
 
