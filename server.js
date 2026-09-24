@@ -79,6 +79,8 @@ const ADDON_INFO_FIXOS = {
 
 const NOME_CURTO = {
   "Hot Roll Philadelphia Salmão (8 unidades)": "Hot Phil. Salmão x8",
+  "Hot Roll de Camarão (8 unidades)"         : "Hot Camarao x8",
+  "Hot Roll Camarão (8 unidades)"            : "Hot Camarao x8",
   "Haru hot Philadelphia Salmão (8 unidades)": "Haru Phil. Salmão x8",
   "Hot Roll Skin (8 unidades)"               : "Hot Roll Skin x8",
   "Hossomaki Skin (8 unidades)"              : "Hossomaki Skin x8",
@@ -93,6 +95,8 @@ const NOME_CURTO = {
   "Sashimi de Salmão (4 unidades)"           : "Sashimi Salmão x4",
   "Croquete de Camarão (4 unidades)"         : "Croquete Camarão x4",
   "Yakisoba de Calabresa"                    : "Yaki Calabresa",
+  "Yakisoba de Camarão"                      : "Yaki Camarao",
+  "Yakisoba Camarão"                         : "Yaki Camarao",
   "Adaptador de hashi"                       : "Hashi (adaptador)",
   "Cream cheese extra (8 unidades)"          : "CC extra x8",
   "Cream cheese extra com crocante (8 unidades)": "CC crocante x8",
