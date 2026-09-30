@@ -4,6 +4,7 @@ const qrcode = require('qrcode-terminal');
 const { fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 
 let sock = null;
+let notificacoesAtivas = true;
 
 /* CONECTAR WHATSAPP */
 async function conectarWhatsApp(){
@@ -17,8 +18,6 @@ async function conectarWhatsApp(){
   });
 
   sock.ev.on('creds.update', saveCreds);
-
-  const notifier = require('node-notifier');
 
   sock.ev.on('messages.upsert', async ({ messages, type }) => {
     if (type !== 'notify') return;
@@ -39,13 +38,15 @@ async function conectarWhatsApp(){
       console.log(`\n📩 MENSAGEM RECEBIDA DE: ${de}`);
       console.log(`💬 "${texto}"\n`);
 
-      // Beep nativo do Windows (assíncrono para não travar)
-      const { exec } = require('child_process');
-      exec('powershell -WindowStyle Hidden -c "[console]::beep(1000, 200); Start-Sleep -Milliseconds 100; [console]::beep(1000, 200); Start-Sleep -Milliseconds 100; [console]::beep(1000, 200)"');
+      if (notificacoesAtivas) {
+        // Beep nativo do Windows (assíncrono para não travar)
+        const { exec } = require('child_process');
+        exec('powershell -WindowStyle Hidden -c \"[console]::beep(1000, 200); Start-Sleep -Milliseconds 100; [console]::beep(1000, 200); Start-Sleep -Milliseconds 100; [console]::beep(1000, 200)\"');
 
-      // Notificação visual
-      const { exec: execNotif } = require('child_process');
-      execNotif(`powershell -c "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('De: ${de}\\n${texto.replace(/'/g, '')}', 'Kaizora — WhatsApp')"`);
+        // Notificação visual
+        const { exec: execNotif } = require('child_process');
+        execNotif(`powershell -c \"Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('De: ${de}\\n${texto.replace(/'/g, '')}', 'Kaizora — WhatsApp')\"`);
+      }
 
     }
   });
@@ -233,5 +234,8 @@ module.exports = {
   mensagemStatus,
   mensagemPix,
   mensagemCodigoPix,
-  mensagemMotoboy
+  mensagemMotoboy,
+  ligarNotificacoes: () => { notificacoesAtivas = true; },
+  desligarNotificacoes: () => { notificacoesAtivas = false; },
+  statusNotificacoes: () => notificacoesAtivas
 };

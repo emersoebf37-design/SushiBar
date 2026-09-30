@@ -19,9 +19,12 @@ const {
   enviarMensagem, 
   mensagemNovoPedido, 
   mensagemPix, 
-  mensagemCodigoPix, // 👈 Nova função adicionada aqui
+  mensagemCodigoPix,
   mensagemStatus,
-  mensagemMotoboy 
+  mensagemMotoboy,
+  ligarNotificacoes,
+  desligarNotificacoes,
+  statusNotificacoes
 } = require('./whatsapp');
 
 /* FIREBASE — credenciais via .env (mesmo padrão do server.js da impressora),
@@ -39,7 +42,11 @@ const db = admin.firestore();
 
 /* DISCORD */
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ]
 });
 
 const CHANNEL_ID = process.env.DISCORD_CHANNEL_ID || '1503577826207600823';
@@ -72,7 +79,25 @@ client.once('ready', () => {
   console.log(`Bot do Discord online: ${client.user.tag}`);
   conectarWhatsApp(); 
   listenOrders();
+  listenConfig();
 });
+
+/* ESCUTAR CONFIGURAÇÕES EM TEMPO REAL */
+function listenConfig() {
+  db.collection('config').doc('settings').onSnapshot((doc) => {
+    if (!doc.exists) return;
+    const data = doc.data();
+    if (data.whatsapp_notif === false) {
+      desligarNotificacoes();
+      console.log('🔕 Notificações de WhatsApp DESATIVADAS via Painel Admin.');
+    } else {
+      ligarNotificacoes();
+      console.log('🔔 Notificações de WhatsApp ATIVADAS via Painel Admin.');
+    }
+  }, (err) => {
+    console.warn('⚠️ Erro ao escutar config no Firebase:', err.message);
+  });
+}
 
 /* ESCUTAR PEDIDOS DO BANCO E EXIBIR NO DISCORD */
 async function listenOrders() {
@@ -259,6 +284,27 @@ client.on('interactionCreate', async (interaction) => {
       content: `❌ Falha ao atualizar dados ou notificar cliente.`,
       ephemeral: true
     }).catch(() => {});
+  }
+});
+
+/* CONTROLE DE NOTIFICAÇÕES VIA DISCORD */
+client.on('messageCreate', async (message) => {
+  if (message.author.bot) return;
+  if (!message.content.startsWith('!notif')) return;
+
+  const arg = message.content.split(' ')[1]?.toLowerCase();
+
+  if (arg === 'on') {
+    ligarNotificacoes();
+    await message.reply('🔔 Notificações de WhatsApp **ligadas**.');
+  } else if (arg === 'off') {
+    desligarNotificacoes();
+    await message.reply('🔕 Notificações de WhatsApp **desligadas**.');
+  } else if (arg === 'status') {
+    const ativo = statusNotificacoes();
+    await message.reply(`Notificações estão: **${ativo ? '🔔 ligadas' : '🔕 desligadas'}**`);
+  } else {
+    await message.reply('Comandos disponíveis: `!notif on` | `!notif off` | `!notif status`');
   }
 });
 

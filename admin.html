@@ -582,6 +582,17 @@ body{ background:#1a0000; color:white; min-height:100vh; }
 
     <div class="toggle-row">
       <div class="toggle-label">
+        💬 Alertas WhatsApp
+        <small>Notificar mensagens recebidas no PC (beep e popup)</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-whatsapp-notif" onchange="saveConfig()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-label">
         🔓 Restaurante aberto
         <small>Clientes podem fazer pedidos</small>
       </div>
@@ -784,6 +795,7 @@ body{ background:#1a0000; color:white; min-height:100vh; }
     document.getElementById('stat-total').innerText = `R$${data.totalDia.toFixed(2)}`;
     document.getElementById('stat-status').innerText = data.config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
 
+    document.getElementById('toggle-whatsapp-notif').checked = data.config.whatsapp_notif ?? true;
     document.getElementById('toggle-restaurante').checked = data.config.restaurante_aberto ?? true;
     document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
 
@@ -1559,6 +1571,7 @@ function toggleCombo(name, isEsgotado){
 // ========================
 async function saveConfig(){
   const config = {
+    whatsapp_notif: document.getElementById('toggle-whatsapp-notif').checked,
     motoboy_on: document.getElementById('toggle-motoboy').checked,
     restaurante_aberto: document.getElementById('toggle-restaurante').checked,
     produtos_esgotados: currentConfig.produtos_esgotados || [],

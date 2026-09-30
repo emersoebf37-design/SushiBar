@@ -69,6 +69,7 @@ export default async function handler(req, res) {
         const config = configSnap.exists ? configSnap.data() : {
           motoboy_on: false,
           restaurante_aberto: true,
+          whatsapp_notif: true,
           produtos_esgotados: [],
           combos_esgotados: [],
           motoboys: [],
@@ -117,12 +118,13 @@ export default async function handler(req, res) {
   if (req.method === "POST" && req.query.action === "update") {
     try {
       // 1. Desestruturando "motoboys" que vem lá do admin.html
-      const { motoboy_on, restaurante_aberto, produtos_esgotados, combos_esgotados, motoboys } = req.body;
+      const { motoboy_on, restaurante_aberto, whatsapp_notif, produtos_esgotados, combos_esgotados, motoboys } = req.body;
 
       // 2. Gravando no Firestore incluindo a lista de motoboys
       await db.collection("config").doc("settings").set({
         motoboy_on: motoboy_on ?? false,
         restaurante_aberto: restaurante_aberto ?? true,
+        whatsapp_notif: whatsapp_notif ?? true,
         produtos_esgotados: produtos_esgotados ?? [],
         combos_esgotados: combos_esgotados ?? [],
         motoboys: motoboys ?? [],
