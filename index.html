@@ -1974,121 +1974,8 @@ body{
 /* PRODUCTS */
 /* ========================= */
 
-const productsBase = [
-{ name:'Hot Roll Philadelphia Salmão (8 unidades)', price:16, category:'Hots', description:'Sushi empanado com farinha Panko, recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Hot Roll Philadelphia.jpg', esgotado: false },
-{ name:'Haru hot Philadelphia Salmão (8 unidades)', price:22, category:'Hots', description:'Sushi recheado com salmão fresco, cream cheese e arroz, envolto em massa de rolinho primavera crocante.', image:'Imagens/Haru Salmão.jpg', esgotado: false },
-{ name:'Hot Roll Skin (8 unidades)', price:8, category:'Hots', description:'Sushi empanado com farinha Panko, recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Hot Roll Skin.jpg', esgotado: false },
-//{ name:'Hossomaki Skin (8 unidades)', price:6.50, category:'Hossomaki', description:'Sushi recheado com Skin de Salmão, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Roll Skin.jpg', esgotado: false },
-{ name:'Hot Roll Kani (8 unidades)', price:10.50, category:'Hots', description:'Sushi empanado com farinha Panko, recheado com kani, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Hot Roll Kani.jpg', esgotado: false },
-//{ name:'Hossomaki Kani (8 unidades)', price:8, category:'Hossomaki', description:'Sushi recheado com kani, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Roll Kani.jpg', esgotado: false },
-{ name:'Bolinho de bacalhau (8 unidades)', price:8, category:'Entradas', description:'Bolinhos de bacalhau crocantes.', image:'Imagens/Bolinho de bacalhau.jpg', esgotado: false },
-//{ name:'Harumaki de Legumes (3 unidades)', price:13, category:'Harumaki', description:'Rolinho primavera crocante recheado com cream cheese e legumes frescos e temperados.', image:'Imagens/Harumaki Legume.jpg', esgotado: false },
-//{ name:'Harumaki de Salmão (3 unidades)', price:19, category:'Harumaki', description:'Rolinho primavera recheado com salmão fresco e cream cheese, envolto em massa crocante.', image:'Imagens/Harumaki Salmão.jpeg', esgotado: false },
-//{ name:'Harumaki de queijo (3 unidades)', price:13, category:'Harumaki', description:'Rolinho primavera recheado com queijo e oregano, envolto em massa crocante.', image:'Imagens/Harumaki Queijo.jpg', esgotado: false },
-//{ name:'Harumaki de Frango com Cream Cheese (3 unidades)', price:13, category:'Harumaki', description:'Rolinho primavera recheado com frango e cream cheese, envolto em massa crocante.', image:'Imagens/Harumaki Frango.jpg', esgotado: false },
-{ name:'Harumaki de Doce de leite (3 unidades)', price:13, category:'Harumaki', description:'Rolinho primavera recheado com doce de leite, envolto em massa crocante.', image:'Imagens/Harumaki Doce de Leite.jpg', esgotado: false },
-{ name:'Big Dog Hot', price:35, category:'Hots', description:'Roll empanado frito com salmão fresco e cream cheese no topo, acompanhado de 3 unidades de camarão empanado', image:'Imagens/Big Dog Hot.jpg', esgotado: false },
-//{ name:'Shimeji na Manteiga', price:14.90, category:'Entradas', description:'Porção de cogumelo shimeji refogado na manteiga, temperado com shoyu e cebolinha.', image:'Imagens/Shimeji.jpg', esgotado: false },
-{ name:'Temaki Frito', price:24, category:'Hots', description:'Temaki empanado com farinha Panko, recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Temaki-Frito.jpg', esgotado: false },
-//{ name:'Temaki', price:20, category:'Hossomaki', description:'Temaki recheado com salmão fresco, cream cheese e arroz, envolto em alga nori.', image:'Imagens/Temaki.jpg', esgotado: false },
-//{ name:'Sashimi de Salmão (4 unidades)', price:11.90, category:'Yakisoba', description:'Fatias frescas de salmão cortadas na espessura ideal, servidas com shoyu.', image:'Imagens/Sashimi de Salmão.jpg', esgotado: false },
-//{ name:'Frango Xadrez', price:25, category:'Refeições', description:'Arroz soltinho, cubos suculentos de frango, pimentões crocantes e coloridos envolvidos em um molho shoyu e finalizado com gergelim para aquele toque especial de textura. Adicional de amendoim sem sal.', image:'Imagens/Frango Xadrez.jpg', esgotado: false },
-{ name:'Croquete de Camarão (4 unidades)', price:12, category:'Entradas', description:'Croquete de camarão e cream cheese crocantes.', image:'Imagens/Croquete de Camarão.jpeg', esgotado: false },
-{
-    name: 'Yakisoba de Frango',
-    category: 'Refeições',
-    description: 'Macarrão oriental selado na chapa com frango suculento, legumes e shoyu.',
-    image: 'Imagens/Yakisoba Frango.jpg',
-    esgotado: false,
-    isVariable: true,
-    sizes: [
-      { id: 'M', label: 'Médio', price: 25 },
-      { id: 'G', label: 'Grande', price: 30}
-    ]
-  },
-  {
-    name: 'Yakisoba de Calabresa',
-    category: 'Refeições',
-    description: 'Macarrão oriental selado na chapa com linguiça calabresa macia, legumes e shoyu.',
-    image: 'Imagens/Yakisoba Calabresa.JPG',
-    esgotado: false,
-    isVariable: true,
-    sizes: [
-      { id: 'M', label: 'Médio', price: 19 },
-      { id: 'G', label: 'Grande', price: 27}
-    ]
-  },
-  {
-    name: 'Yakisoba de Carne',
-    category: 'Refeições',
-    description: 'Macarrão oriental selado na chapa com carne bovina macia, legumes e shoyu.',
-    image: 'Imagens/Yakisoba Carne.jpg',
-    esgotado: false,
-    isVariable: true,
-    sizes: [
-      { id: 'M', label: 'Médio', price: 28 },
-      { id: 'G', label: 'Grande', price: 35}
-    ]
-  },
-
-    {
-    name: 'Yakisoba de Legumes',
-    category: 'Refeições',
-    description: 'Macarrão oriental selado na chapa com cenoura, repolho roxo, cebola, brocolis e shoyu.',
-    image: 'Imagens/Yakisoba Legumes.jpg',
-    esgotado: false,
-    isVariable: true,
-    sizes: [
-      { id: 'M', label: 'Médio', price: 17},
-      { id: 'G', label: 'Grande', price: 25}
-    ]
-  },
-
-    {
-    name: 'Yakisoba Misto',
-    category: 'Refeições',
-    description: 'Macarrão oriental selado na chapa com carne bovina, frango, linguiça calabresa, legumes, camarão e shoyu.',
-    image: 'Imagens/Yakisoba Misto.jpg',
-    esgotado: false,
-    isVariable: true,
-    sizes: [
-      { id: 'M', label: 'Médio', price: 30 },
-      { id: 'G', label: 'Grande', price: 37}
-    ]
-  },
-    {
-    name: 'Yakisoba de Camarão',
-    category: 'Refeições',
-    description: 'Macarrão oriental selado na chapa com camarão, legumes e shoyu.',
-    image: 'Imagens/Yakisoba Camarão.jpg',
-    esgotado: false,
-    isVariable: true,
-    sizes: [
-      { id: 'M', label: 'Médio', price: 30 },
-      { id: 'G', label: 'Grande', price: 35}
-    ]
-  },
-];
-
-//
-
-const combosBase = [
-//{ name: 'Mega Combo Hot Roll', description: 'Hot Roll até não dar mais.', descricaoModal: '32 Hot Roll Philadelphia.', price: 40, image: 'Imagens/Mega Combo Hot Roll.jpg', esgotado: false, hotHossoMin8: true },
-{ name: 'Combo Osaka', description: 'Combo completo individual', descricaoModal: '1 Temaki Frito de Salmão, 16 Hot Roll Philadelphia, 8 Hot Skin e 1 refrigerante Lata 350ml.', price: 75, image: 'Imagens/Combo Osaka.jpg', esgotado: false, hotHossoMin8: true, temakiFrito: true },
-{ name: 'Combo Shanghai', description: 'Um combo completo para se deliciar.', descricaoModal: '1 Yakisoba (Frango, Legumes ou calabresa), 8 Hot Roll Kani e 1 Guaravita.', price: 45, image: 'Imagens/Combo Shangai.jpg', esgotado: false, hotHossoMin8: true, temakiFrito: false },
-{ name: 'Combo Kawaguchi', description: '32 unidades de puro sabor', descricaoModal: '8 Hot roll de salmão, 8 Hot Kani, 16 bolinho de bacalhau e 2 refrigerantes Lata 350ml.', price: 47, image: 'Imagens/Combo Kawaguchi.jpg', esgotado: false, hotHossoMin8: true, temakiFrito: false },
-//{ name: 'Combo Individual', description: 'Uma seleção para as noites de muita fome.', descricaoModal: '1 Temaki Frito, 8 Hot Philadelphia, 2 Harumaki de Doce de Leite.', price: 40, image: 'Imagens/Combo Individual.png', esgotado: false, hotHossoMin8: true, temakiFrito: true },
-//{ name: 'Combo de Frios', description: 'Uma seleção de peças frias saborosas.', descricaoModal: '18 Hossomaki Skin, 18 Hossomaki Kani e Salada Sunomono.', price: 30, image: 'Imagens/Combo de Frios.png', esgotado: false, hotHossoMin8: true },
-//{ name: 'Combo Premium', description: 'Combo completo pensado para compartilhar.', descricaoModal: '24 Hot Philadelphia Salmão, 12 Hot Skin e 6 Lula à Dorê.', price: 75, image: 'Imagens/Combo Premium.png', esgotado: false, hotHossoMin8: true },
-//{ name: 'Combo Primavera', description: 'Uma seleção crocante de peças saborosas.', descricaoModal: '4 Harumaki de Legumes, 4 Harumaki de Queijo e 4 Harumaki de Frango.', price: 38, image: 'Imagens/Combo Primavera.jpg', esgotado: false },
-];
-
-let products = [...productsBase];
-let combos = [...combosBase];
-
-// ========================
-// PRODUTOS CUSTOMIZADOS (cadastrados pelo admin em admin.html)
-// ========================
+let products = [];
+let combos = [];
 let customAdicionaisCache = [];
 
 async function fetchCustomProducts(){
@@ -2097,34 +1984,33 @@ async function fetchCustomProducts(){
     const data = await res.json();
     const customItems = data.items || [];
 
-    const customProdutos = customItems
+    const loadedProdutos = customItems
       .filter(i => i.type === 'produto')
       .map(i => ({
+        id: i.id,
         name: i.name,
         price: i.price,
         category: i.category,
         description: i.description,
         image: i.image,
-        esgotado: false,
+        isVariable: i.isVariable === true,
+        sizes: Array.isArray(i.sizes) ? i.sizes : [],
+        esgotado: i.esgotado === true,
       }));
 
-    const customCombos = customItems
+    const loadedCombos = customItems
       .filter(i => i.type === 'combo')
       .map(i => ({
+        id: i.id,
         name: i.name,
         price: i.price,
         description: i.description,
         descricaoModal: i.descricaoModal || i.description,
         image: i.image,
-        esgotado: false,
+        esgotado: i.esgotado === true,
       }));
 
-    // ✨ Adicionais (sistema unificado): TODOS os adicionais — os que já
-    // existiam (hashi, geleia, cream cheese etc, migrados automaticamente
-    // pelo back-end) e os criados pelo admin — chegam aqui com o mesmo
-    // formato: appliesToAll (aparece sempre) ou appliesTo (lista de pratos
-    // e/ou combos aos quais ele se aplica).
-    const customAdicionais = customItems
+    const loadedAdicionais = customItems
       .filter(i => i.type === 'adicional')
       .map(i => ({
         id: i.id,
@@ -2133,16 +2019,17 @@ async function fetchCustomProducts(){
         image: i.image,
         appliesToAll: i.appliesToAll === true,
         appliesTo: Array.isArray(i.appliesTo) ? i.appliesTo : [],
+        esgotado: i.esgotado === true,
       }));
 
-    products = [...productsBase, ...customProdutos];
-    combos = [...combosBase, ...customCombos];
-    customAdicionaisCache = customAdicionais;
-    renderCustomAddonsUI(customAdicionais);
+    products = loadedProdutos;
+    combos = loadedCombos;
+    customAdicionaisCache = loadedAdicionais;
+    renderCustomAddonsUI(loadedAdicionais);
   } catch(e) {
-    console.warn('Não foi possível carregar itens customizados do cardápio:', e);
-    products = [...productsBase];
-    combos = [...combosBase];
+    console.warn('Não foi possível carregar itens do cardápio:', e);
+    products = [];
+    combos = [];
   }
 }
 
@@ -2334,8 +2221,16 @@ async function fetchConfig(force = false){
 }
 
 function applyEsgotados(){
-  products.forEach(p => { p.esgotado = siteConfig.produtos_esgotados?.includes(p.name) || false; });
-  combos.forEach(c => { c.esgotado = siteConfig.combos_esgotados?.includes(c.name) || false; });
+  products.forEach(p => { 
+    if (siteConfig.produtos_esgotados?.includes(p.name)) {
+      p.esgotado = true;
+    }
+  });
+  combos.forEach(c => { 
+    if (siteConfig.combos_esgotados?.includes(c.name)) {
+      c.esgotado = true;
+    }
+  });
   renderProducts(products);
   renderCombos();
 }

@@ -171,6 +171,12 @@ async function getFullProductList(db) {
           appliesToAll: data.appliesToAll === true,
           appliesTo: Array.isArray(data.appliesTo) ? data.appliesTo : [],
         };
+      } else if (data.isVariable && Array.isArray(data.sizes)) {
+        data.sizes.forEach(s => {
+          if (s && s.id && Number.isFinite(s.price)) {
+            custom[`${data.name} (${s.id})`] = s.price;
+          }
+        });
       } else if (data.name && Number.isFinite(data.price)) {
         custom[data.name] = data.price;
       }

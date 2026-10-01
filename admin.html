@@ -546,35 +546,60 @@ body{ background:#1a0000; color:white; min-height:100vh; }
 <div class="admin-panel" id="admin-panel">
 
   <div class="admin-header">
-  <h1>🍣 Kaizora Admin</h1>
-  <div style="display:flex; gap:10px;">
-    <button class="logout-btn" id="refresh-btn" onclick="loadData()">🔄 Atualizar</button>
-    <button class="logout-btn" onclick="doLogout()">Sair</button>
-  </div>
-</div>
-
-  <div class="admin-header">
     <h1>🍣 Kaizora Admin</h1>
-    <button class="logout-btn" onclick="doLogout()">Sair</button>
+    <div style="display:flex; gap:10px;">
+      <button class="logout-btn" id="refresh-btn" onclick="loadData()">🔄 Atualizar</button>
+      <button class="logout-btn" onclick="doLogout()">Sair</button>
+    </div>
   </div>
 
-  <div class="cards-grid">
-    <div class="stat-card">
-      <div class="stat-value" id="stat-pedidos">—</div>
-      <div class="stat-label">Pedidos hoje</div>
+  <div class="section">
+    <h2>🍽️ Cardápio & Estoque</h2>
+    <p style="color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:15px;">
+      Gerencie todos os pratos, combos e adicionais. Cadastre novos itens, edite informações, defina disponibilidade em estoque ou remova itens.
+    </p>
+    <button class="add-btn" onclick="abrirModalNovoItem()">+ Adicionar Novo Item</button>
+    <div id="custom-items-lista" style="margin-top:18px;"></div>
+  </div>
+
+  <div class="section">
+    <h2>🍱 Poke Personalizado</h2>
+    <p style="color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:15px;">
+      Configure o preço base, os ingredientes disponíveis em cada categoria (arroz, proteína,
+      salada e crocante) e os avisos exibidos ao cliente no monte-seu-poke do site.
+    </p>
+
+    <div class="modal-field">
+      <label>Nome do produto (aparece no card do cardápio)</label>
+      <input type="text" id="poke-titulo" class="section-input" maxlength="60">
     </div>
-    <div class="stat-card">
-      <div class="stat-value" id="stat-ticket">—</div>
-      <div class="stat-label">Ticket médio</div>
+
+    <div class="modal-field">
+      <label>Descrição do produto (aparece no card do cardápio)</label>
+      <textarea id="poke-descricao" class="section-input" maxlength="300" rows="2" style="resize:vertical;"></textarea>
     </div>
-    <div class="stat-card">
-      <div class="stat-value" id="stat-total">—</div>
-      <div class="stat-label">Total do dia</div>
+
+    <div class="modal-field">
+      <label>Preço base do Poke (R$)</label>
+      <input type="number" id="poke-preco-base" class="section-input" step="0.01" min="0" style="max-width:180px;">
     </div>
-    <div class="stat-card">
-      <div class="stat-value" id="stat-status">—</div>
-      <div class="stat-label">Status do restaurante</div>
+
+    <div class="modal-field">
+      <label>Quantidade de opções de salada que o cliente escolhe</label>
+      <input type="number" id="poke-salada-qtd" class="section-input" step="1" min="1" max="5" style="max-width:120px;">
     </div>
+
+    <div class="modal-field">
+      <label>⚠️ Avisos (exibidos para o cliente ao montar o Poke)</label>
+      <div id="poke-avisos-lista" style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;"></div>
+      <button class="add-btn" type="button" onclick="pokeAddAviso()">+ Adicionar aviso</button>
+    </div>
+
+    <div id="poke-grupos-container"></div>
+
+    <div class="modal-error" id="poke-erro" style="display:none;"></div>
+
+    <button class="add-btn" id="poke-save-btn" onclick="salvarPokeConfig()" style="margin-top:10px;">💾 Salvar Configurações do Poke</button>
   </div>
 
   <div class="section">
@@ -625,63 +650,6 @@ body{ background:#1a0000; color:white; min-height:100vh; }
   </div>
 
   <div class="section">
-    <h2>🆕 Cardápio</h2>
-    <p style="color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:15px;">Cadastre novos pratos, adicionais ou combos. Eles aparecem automaticamente no site e passam a ser aceitos nos pedidos.</p>
-    <button class="add-btn" onclick="abrirModalNovoItem()">+ Adicionar Novo Item</button>
-    <div id="custom-items-lista" style="margin-top:18px;"></div>
-  </div>
-
-  <div class="section">
-    <h2>🍱 Poke Personalizado</h2>
-    <p style="color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:15px;">
-      Configure o preço base, os ingredientes disponíveis em cada categoria (arroz, proteína,
-      salada e crocante) e os avisos exibidos ao cliente no monte-seu-poke do site.
-    </p>
-
-    <div class="modal-field">
-      <label>Nome do produto (aparece no card do cardápio)</label>
-      <input type="text" id="poke-titulo" class="section-input" maxlength="60">
-    </div>
-
-    <div class="modal-field">
-      <label>Descrição do produto (aparece no card do cardápio)</label>
-      <textarea id="poke-descricao" class="section-input" maxlength="300" rows="2" style="resize:vertical;"></textarea>
-    </div>
-
-    <div class="modal-field">
-      <label>Preço base do Poke (R$)</label>
-      <input type="number" id="poke-preco-base" class="section-input" step="0.01" min="0" style="max-width:180px;">
-    </div>
-
-    <div class="modal-field">
-      <label>Quantidade de opções de salada que o cliente escolhe</label>
-      <input type="number" id="poke-salada-qtd" class="section-input" step="1" min="1" max="5" style="max-width:120px;">
-    </div>
-
-    <div class="modal-field">
-      <label>⚠️ Avisos (exibidos para o cliente ao montar o Poke)</label>
-      <div id="poke-avisos-lista" style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;"></div>
-      <button class="add-btn" type="button" onclick="pokeAddAviso()">+ Adicionar aviso</button>
-    </div>
-
-    <div id="poke-grupos-container"></div>
-
-    <div class="modal-error" id="poke-erro" style="display:none;"></div>
-
-    <button class="add-btn" id="poke-save-btn" onclick="salvarPokeConfig()" style="margin-top:10px;">💾 Salvar Configurações do Poke</button>
-  </div>
-
-  <div class="section">
-    <h2>📦 Produtos</h2>
-    <div id="produtos-lista"><div class="loading">Carregando...</div></div>
-  </div>
-
-  <div class="section">
-    <h2>🎁 Combos</h2>
-    <div id="combos-lista"><div class="loading">Carregando...</div></div>
-  </div>
-
-  <div class="section">
     <h2>📋 Pedidos de hoje</h2>
     <div id="pedidos-lista"><div class="loading">Carregando...</div></div>
   </div>
@@ -729,10 +697,24 @@ body{ background:#1a0000; color:white; min-height:100vh; }
       <small>💡 Esse adicional vai aparecer como um card (com foto, preço e contador) dentro do modal de finalização do pedido — não aparece como prato no cardápio.</small>
     </div>
 
-    <div class="modal-field">
+    <div class="modal-field" id="campo-variavel-check" style="display:block;">
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+        <input type="checkbox" id="novo-item-is-variable" style="width:auto;" onchange="onIsVariableChange()">
+        Possui múltiplos tamanhos / variações (ex: Médio, Grande)
+      </label>
+    </div>
+
+    <div class="modal-field" id="campo-preco-simples">
       <label id="novo-item-preco-label">Preço (R$)</label>
       <input type="number" id="novo-item-preco" class="section-input" placeholder="Ex: 25.00" step="0.01" min="0">
       <small id="novo-item-preco-hint" style="display:none;">Deixe 0 para um adicional grátis (ex: hashi, talheres).</small>
+    </div>
+
+    <div class="modal-field" id="campo-tamanhos-box" style="display:none;">
+      <label>Tamanhos e Preços</label>
+      <small style="margin-bottom:8px; display:block;">Adicione quantos tamanhos desejar (ex: ID "M", Nome "Médio", Preço "25.00").</small>
+      <div id="tamanhos-lista-container" style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;"></div>
+      <button class="add-btn" type="button" onclick="adicionarLinhaTamanho()">+ Adicionar Tamanho</button>
     </div>
 
     <div class="modal-field">
@@ -775,128 +757,43 @@ body{ background:#1a0000; color:white; min-height:100vh; }
 </div>
 
 <script>
-
-  async function loadData(){
-  const btn = document.getElementById('refresh-btn');
-  if(btn){ btn.disabled = true; btn.innerText = '⏳ Carregando...'; }
-
-  try {
-    const res = await fetch('/api/admin', {
-      headers: { 'Authorization': `Bearer ${adminToken}` },
-    });
-
-    if(res.status === 401){ doLogout(); return; }
-
-    const data = await res.json();
-    currentConfig = data.config;
-
-    document.getElementById('stat-pedidos').innerText = data.totalPedidos;
-    document.getElementById('stat-ticket').innerText = `R$${data.ticketMedio.toFixed(2)}`;
-    document.getElementById('stat-total').innerText = `R$${data.totalDia.toFixed(2)}`;
-    document.getElementById('stat-status').innerText = data.config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
-
-    document.getElementById('toggle-whatsapp-notif').checked = data.config.whatsapp_notif ?? true;
-    document.getElementById('toggle-restaurante').checked = data.config.restaurante_aberto ?? true;
-    document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
-
-    await loadCustomItems();
-    renderCustomItemsList();
-    renderMotoboys(data.config.motoboys || []);
-    renderProdutos(data.config.produtos_esgotados || []);
-    renderCombos(data.config.combos_esgotados || []);
-    renderPedidos(data.pedidosHoje || []);
-
-  } catch(e) {
-    console.error('Erro ao carregar dados:', e);
-    alert('Erro ao atualizar. Tente novamente.');
-  } finally {
-    if(btn){ btn.disabled = false; btn.innerText = '🔄 Atualizar'; }
-  }
-}
-
-const produtosBase = [
-  { name:'Hot Roll Philadelphia Salmão (8 unidades)', category:'Hots' },
-  { name:'Temaki Frito', category:'Hots' },
-  { name:'Haru hot Philadelphia Salmão (8 unidades)', category:'Hots' },
-  //{ name:'Hossomaki Philadelphia Salmão (8 unidades)', category:'Hossomaki' },
-  //{ name:'Shimeji na Manteiga', category:'Porções' },
-  { name:'Hot Roll Skin (8 unidades)', category:'Hots' },
-  //{ name:'Hossomaki Skin (8 unidades)', category:'Hossomaki' },
-  { name:'Hot Roll Kani (8 unidades)', category:'Hots' },
-  //{ name:'Hossomaki Kani (8 unidades)', category:'Hossomaki' },
-  //{ name:'Lula à Dorê (6 unidades)', category:'Porções' },
-  { name:'Bolinho de bacalhau (8 unidades)', category:'Porções' },
-  { name:'Harumaki de Legumes (3 unidades)', category:'Harumaki' },
-  //{ name:'Harumaki de Salmão (3 unidades)', category:'Harumaki' },
-  //{ name:'Harumaki de queijo (3 unidades)', category:'Harumaki' },
-  //{ name:'Harumaki de Frango com Cream Cheese (3 unidades)', category:'Harumaki' },
-  { name:'Harumaki de Doce de leite (3 unidades)', category:'Harumaki' },
-  //{ name:'Salada Sunomono', category:'Saladas' },
-  //{ name:'Sashimi de Salmão (4 unidades)', category:'Sashimi' },
-  //{ name:'Joe de Salmão com Cream Cheese (4 unidades)', category:'Sashimi' },
-  { name:'Bolinho de Salmão (4 unidades)', category:'Hots' },
-  { name:'Yakisoba de Frango (M)', category:'Refeições' },
-  { name:'Yakisoba de Frango (G)', category:'Refeições' },
-  { name:'Yakisoba de Calabresa (M)', category:'Refeições' },
-  { name:'Yakisoba de Calabresa (G)', category:'Refeições' },
-  { name:'Yakisoba de Carne (M)', category:'Refeições' },
-  { name:'Yakisoba de Carne (G)', category:'Refeições' },
-  { name:'Yakisoba de Legumes (M)', category:'Refeições' },
-  { name:'Yakisoba de Legumes (G)', category:'Refeições' },
-  { name:'Yakisoba Misto (M)', category:'Refeições' },
-  { name:'Yakisoba Misto (G)', category:'Refeições' },
-  { name:'Yakisoba Camarão (M)', category:'Refeições' },
-  { name:'Yakisoba Camarão (G)', category:'Refeições' },
-  //{ name:'Frango Xadrez', category:'Refeições' },
-];
-
-const combosBase = [
-  { name:'Mega Combo Hot Roll' },
-  //{ name:'Combo Apaixonados' },
-  //{ name:'Combo Crocantissimo' },
-  //{ name:'Combo Individual' },
-  //{ name:'Combo de Frios' },
-  //{ name:'Combo Premium' },
-  //{ name:'Combo Primavera' },
-  //{ name:'Combo Salmão Lovers' },
-  { name:'Combo Osaka'},
-  { name:'Combo Shanghai'},
-  { name:'Combo Kawaguchi'}
-];
-
-let produtos = [...produtosBase];
-let combos = [...combosBase];
+// ========================
+// CARDÁPIO (itens cadastrados na base de dados)
+// ========================
 let customItems = [];
-
 let adminToken = localStorage.getItem('admin_token') || null;
 let currentConfig = {};
 
-// ========================
-// CARDÁPIO CUSTOMIZADO (itens criados pelo admin)
-// ========================
 async function loadCustomItems(){
   try {
     const res = await fetch('/api/products');
     const data = await res.json();
     customItems = data.items || [];
   } catch(e) {
-    console.error('Erro ao carregar itens customizados:', e);
+    console.error('Erro ao carregar itens do cardápio:', e);
     customItems = [];
   }
-  mergeCustomItems();
 }
 
-function mergeCustomItems(){
-  const produtosCustom = customItems
-    .filter(i => i.type === 'produto')
-    .map(i => ({ name: i.name, category: i.category, custom: true, id: i.id, tipo: i.type }));
-
-  const combosCustom = customItems
-    .filter(i => i.type === 'combo')
-    .map(i => ({ name: i.name, custom: true, id: i.id }));
-
-  produtos = [...produtosBase, ...produtosCustom];
-  combos = [...combosBase, ...combosCustom];
+async function toggleItemStock(id, isEsgotado){
+  try {
+    const res = await fetch(`/api/products?action=toggle_stock&id=${encodeURIComponent(id)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({ esgotado: isEsgotado }),
+    });
+    if(!res.ok) throw new Error('Erro ao alterar status de estoque');
+    const item = customItems.find(i => i.id === id);
+    if(item) item.esgotado = isEsgotado;
+    renderCustomItemsList();
+  } catch(e) {
+    alert('Erro ao atualizar estoque do item.');
+    await loadCustomItems();
+    renderCustomItemsList();
+  }
 }
 
 function renderCustomItemsList(){
@@ -904,7 +801,7 @@ function renderCustomItemsList(){
   if(!container) return;
 
   if(!customItems || customItems.length === 0){
-    container.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Nenhum item customizado cadastrado ainda.</p>';
+    container.innerHTML = '<p style="color:rgba(255,255,255,0.4); font-size:13px;">Nenhum item cadastrado no cardápio ainda.</p>';
     return;
   }
 
@@ -923,20 +820,34 @@ function renderCustomItemsList(){
         badgeAplicaA = `<span class="custom-item-thumb" style="background:#9e050533; color:#e57373;">🎯 ${primeiros}${resto}</span>`;
       }
     }
-    const precoTexto = item.type === 'adicional' && !(Number(item.price) > 0)
+    let precoTexto = item.type === 'adicional' && !(Number(item.price) > 0)
       ? 'Grátis'
       : `R$${Number(item.price).toFixed(2)}`;
+
+    if (item.type === 'produto' && item.isVariable && Array.isArray(item.sizes) && item.sizes.length > 0) {
+      const minP = Math.min(...item.sizes.map(s => s.price));
+      const siglas = item.sizes.map(s => s.id).join(', ');
+      precoTexto = `A partir de R$${minP.toFixed(2)} (${siglas})`;
+    }
+    
+    const isEsgotado = item.esgotado === true;
+
     container.innerHTML += `
-      <div class="produto-item">
+      <div class="produto-item" style="${isEsgotado ? 'opacity:0.75;' : ''}">
         <div class="produto-nome">
-          ${item.name}
+          <span style="${isEsgotado ? 'text-decoration:line-through;color:#ff8585;' : ''}">${item.name}</span>
           <span class="custom-item-thumb ${tipoClass[item.type] || ''}">${tipoLabel[item.type] || item.type}</span>
           ${badgeAplicaA}
-          <small>${item.category} · ${precoTexto}</small>
+          <small>${item.category || (item.type === 'combo' ? 'Combos' : 'Adicionais')} · ${precoTexto} · <b style="color:${isEsgotado ? '#ff6b6b' : '#2ecc71'};">${isEsgotado ? 'Fora de estoque (Esgotado)' : 'Em estoque'}</b></small>
         </div>
-        <div style="display:flex; gap:6px;">
-          <button onclick='abrirModalEditarItem(${JSON.stringify(item.id)})' style="background:none; border:none; color:#9ec5ff; cursor:pointer; font-size:16px;" aria-label="Editar">✏️</button>
-          <button onclick="removeCustomItem('${item.id}')" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;" aria-label="Remover">🗑️</button>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <label class="toggle" title="${isEsgotado ? 'Item esgotado (clique para colocar em estoque)' : 'Item em estoque (clique para marcar esgotado)'}">
+            <input type="checkbox" class="danger" ${isEsgotado ? 'checked' : ''}
+              onchange="toggleItemStock('${item.id}', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+          <button onclick='abrirModalEditarItem(${JSON.stringify(item.id)})' style="background:none; border:none; color:#9ec5ff; cursor:pointer; font-size:16px;" aria-label="Editar" title="Editar item">✏️</button>
+          <button onclick="removeCustomItem('${item.id}')" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;" aria-label="Remover" title="Remover item">🗑️</button>
         </div>
       </div>`;
   });
@@ -952,8 +863,6 @@ async function removeCustomItem(id){
     if(!res.ok) throw new Error('Erro ao remover');
     await loadCustomItems();
     renderCustomItemsList();
-    renderProdutos(currentConfig.produtos_esgotados || []);
-    renderCombos(currentConfig.combos_esgotados || []);
   } catch(e) {
     alert('Erro ao remover item. Tente novamente.');
   }
@@ -964,13 +873,52 @@ async function removeCustomItem(id){
 // ========================
 let itemEditando = null; // null = criando; objeto do item = editando
 let aplicaASelecionados = new Set();
+let tamanhosEditando = [];
+
+function adicionarLinhaTamanho(id = '', label = '', price = '') {
+  tamanhosEditando.push({ id, label, price });
+  renderLinhasTamanhos();
+}
+
+function removerLinhaTamanho(index) {
+  tamanhosEditando.splice(index, 1);
+  renderLinhasTamanhos();
+}
+
+function atualizarCampoTamanho(index, field, value) {
+  if (tamanhosEditando[index]) {
+    tamanhosEditando[index][field] = value;
+  }
+}
+
+function renderLinhasTamanhos() {
+  const container = document.getElementById('tamanhos-lista-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  tamanhosEditando.forEach((t, idx) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex; gap:8px; align-items:center;';
+    row.innerHTML = `
+      <input type="text" class="section-input" placeholder="Sigla/ID (ex: M, G)" value="${String(t.id || '').replace(/"/g, '&quot;')}" style="width:110px;" oninput="atualizarCampoTamanho(${idx}, 'id', this.value)">
+      <input type="text" class="section-input" placeholder="Nome exibido (ex: Médio)" value="${String(t.label || '').replace(/"/g, '&quot;')}" style="flex:1;" oninput="atualizarCampoTamanho(${idx}, 'label', this.value)">
+      <input type="number" class="section-input" placeholder="Preço (R$)" step="0.01" min="0" value="${t.price != null ? t.price : ''}" style="width:110px;" oninput="atualizarCampoTamanho(${idx}, 'price', this.value)">
+      <button type="button" onclick="removerLinhaTamanho(${idx})" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;">🗑️</button>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function onIsVariableChange() {
+  const isVar = document.getElementById('novo-item-is-variable').checked;
+  document.getElementById('campo-tamanhos-box').style.display = isVar ? 'block' : 'none';
+  document.getElementById('campo-preco-simples').style.display = isVar ? 'none' : 'block';
+}
 
 function listaCompletaPratosECombos(){
-  // Nomes de todos os pratos e combos (base + customizados) — fonte pro
-  // seletor "aplica a" dos adicionais.
-  const nomesProdutos = produtos.map(p => ({ name: p.name, tipo: 'Prato' }));
-  const nomesCombos = combos.map(c => ({ name: c.name, tipo: 'Combo' }));
-  return [...nomesProdutos, ...nomesCombos];
+  return customItems
+    .filter(i => i.type === 'produto' || i.type === 'combo')
+    .map(i => ({ name: i.name, tipo: i.type === 'combo' ? 'Combo' : 'Prato' }));
 }
 
 function renderAplicaALista(){
@@ -1011,6 +959,7 @@ function onAplicaTodosChange(){
 function abrirModalNovoItem(){
   itemEditando = null;
   aplicaASelecionados = new Set();
+  tamanhosEditando = [];
 
   document.getElementById('novo-item-titulo').innerText = '🆕 Adicionar Novo Item';
   document.getElementById('novo-item-save-btn').innerText = 'Adicionar';
@@ -1018,6 +967,7 @@ function abrirModalNovoItem(){
   document.getElementById('novo-item-tipo').value = 'produto';
   document.getElementById('novo-item-nome').value = '';
   document.getElementById('novo-item-categoria').value = '';
+  document.getElementById('novo-item-is-variable').checked = false;
   document.getElementById('novo-item-preco').value = '';
   document.getElementById('novo-item-descricao').value = '';
   document.getElementById('novo-item-descricao-modal').value = '';
@@ -1025,7 +975,9 @@ function abrirModalNovoItem(){
   document.getElementById('novo-item-aplica-todos').checked = false;
   document.getElementById('aplica-a-filtro').value = '';
   document.getElementById('novo-item-erro').style.display = 'none';
+  renderLinhasTamanhos();
   onTipoNovoItemChange();
+  onIsVariableChange();
   renderAplicaALista();
   document.getElementById('novo-item-overlay').style.display = 'flex';
 }
@@ -1036,6 +988,9 @@ function abrirModalEditarItem(id){
 
   itemEditando = item;
   aplicaASelecionados = new Set(Array.isArray(item.appliesTo) ? item.appliesTo : []);
+  tamanhosEditando = (item.isVariable && Array.isArray(item.sizes))
+    ? item.sizes.map(s => ({ id: s.id, label: s.label, price: s.price }))
+    : [];
 
   document.getElementById('novo-item-titulo').innerText = '✏️ Editar Item';
   document.getElementById('novo-item-save-btn').innerText = 'Salvar alterações';
@@ -1043,6 +998,7 @@ function abrirModalEditarItem(id){
   document.getElementById('novo-item-tipo').disabled = true; // não dá pra trocar o tipo depois de criado
   document.getElementById('novo-item-nome').value = item.name || '';
   document.getElementById('novo-item-categoria').value = item.category || '';
+  document.getElementById('novo-item-is-variable').checked = item.isVariable === true;
   document.getElementById('novo-item-preco').value = item.price != null ? item.price : '';
   document.getElementById('novo-item-descricao').value = item.description || '';
   document.getElementById('novo-item-descricao-modal').value = item.descricaoModal || '';
@@ -1050,7 +1006,9 @@ function abrirModalEditarItem(id){
   document.getElementById('novo-item-aplica-todos').checked = item.appliesToAll === true;
   document.getElementById('aplica-a-filtro').value = '';
   document.getElementById('novo-item-erro').style.display = 'none';
+  renderLinhasTamanhos();
   onTipoNovoItemChange();
+  onIsVariableChange();
   onAplicaTodosChange();
   renderAplicaALista();
   document.getElementById('novo-item-overlay').style.display = 'flex';
@@ -1060,6 +1018,7 @@ function fecharModalNovoItem(){
   document.getElementById('novo-item-overlay').style.display = 'none';
   document.getElementById('novo-item-tipo').disabled = false;
   itemEditando = null;
+  tamanhosEditando = [];
 }
 
 function onTipoNovoItemChange(){
@@ -1068,9 +1027,11 @@ function onTipoNovoItemChange(){
   document.getElementById('campo-aplica-a').style.display = (tipo === 'adicional') ? 'block' : 'none';
   document.getElementById('campo-categoria').style.display = (tipo === 'adicional') ? 'none' : 'block';
   document.getElementById('campo-adicional-info').style.display = (tipo === 'adicional') ? 'block' : 'none';
+  document.getElementById('campo-variavel-check').style.display = (tipo === 'produto') ? 'block' : 'none';
   document.getElementById('novo-item-preco-label').innerText = (tipo === 'adicional') ? 'Preço (R$) — opcional' : 'Preço (R$)';
   document.getElementById('novo-item-preco-hint').style.display = (tipo === 'adicional') ? 'block' : 'none';
   document.getElementById('novo-item-preco').min = (tipo === 'adicional') ? '0' : '0.01';
+  onIsVariableChange();
 }
 
 async function salvarNovoItem(){
@@ -1079,6 +1040,7 @@ async function salvarNovoItem(){
   erroBox.style.display = 'none';
 
   const tipo = document.getElementById('novo-item-tipo').value;
+  const isVariable = (tipo === 'produto') && document.getElementById('novo-item-is-variable').checked;
   const precoRaw = document.getElementById('novo-item-preco').value;
 
   const payload = {
@@ -1091,12 +1053,31 @@ async function salvarNovoItem(){
     image: document.getElementById('novo-item-imagem').value.trim(),
   };
 
+  if(isVariable){
+    payload.isVariable = true;
+    payload.sizes = tamanhosEditando.map(s => ({
+      id: String(s.id || '').trim(),
+      label: String(s.label || '').trim(),
+      price: parseFloat(s.price)
+    })).filter(s => s.id && s.label && Number.isFinite(s.price) && s.price >= 0);
+
+    if(payload.sizes.length === 0){
+      erroBox.innerText = 'Preencha ao menos um tamanho com ID, Nome e Preço válidos.';
+      erroBox.style.display = 'block';
+      return;
+    }
+    payload.price = Math.min(...payload.sizes.map(s => s.price));
+  } else {
+    payload.isVariable = false;
+    payload.sizes = [];
+  }
+
   if(tipo === 'adicional'){
     payload.appliesToAll = document.getElementById('novo-item-aplica-todos').checked;
     payload.appliesTo = Array.from(aplicaASelecionados);
   }
 
-  const precoValido = tipo === 'adicional' ? (payload.price >= 0) : (payload.price > 0);
+  const precoValido = isVariable ? true : (tipo === 'adicional' ? (payload.price >= 0) : (payload.price > 0));
   const categoriaOk = tipo === 'adicional' ? true : !!payload.category;
   const descricaoOk = tipo === 'adicional' ? true : !!payload.description;
 
@@ -1132,8 +1113,6 @@ async function salvarNovoItem(){
 
     await loadCustomItems();
     renderCustomItemsList();
-    renderProdutos(currentConfig.produtos_esgotados || []);
-    renderCombos(currentConfig.combos_esgotados || []);
     fecharModalNovoItem();
   } catch(e) {
     erroBox.innerText = e.message || 'Erro ao salvar. Tente novamente.';
@@ -1199,12 +1178,6 @@ async function loadData(){
     const data = await res.json();
     currentConfig = data.config;
 
-    // Stats
-    document.getElementById('stat-pedidos').innerText = data.totalPedidos;
-    document.getElementById('stat-ticket').innerText = `R$${data.ticketMedio.toFixed(2)}`;
-    document.getElementById('stat-total').innerText = `R$${data.totalDia.toFixed(2)}`;
-    document.getElementById('stat-status').innerText = data.config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
-
     // Toggles
     document.getElementById('toggle-restaurante').checked = data.config.restaurante_aberto ?? true;
     document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
@@ -1213,8 +1186,6 @@ async function loadData(){
     await loadCustomItems();
     renderCustomItemsList();
     renderMotoboys(data.config.motoboys || []);
-    renderProdutos(data.config.produtos_esgotados || []);
-    renderCombos(data.config.combos_esgotados || []);
     renderPedidos(data.pedidosHoje || []);
     await loadPokeConfig();
 
@@ -1285,49 +1256,6 @@ function removeMotoboy(index) {
     renderMotoboys(currentConfig.motoboys);
     saveConfig();
   }
-}
-
-// ========================
-// RENDER PRODUTOS
-// ========================
-function renderProdutos(esgotados){
-  const container = document.getElementById('produtos-lista');
-  container.innerHTML = '';
-  produtos.forEach(p => {
-    const isEsgotado = esgotados.includes(p.name);
-    container.innerHTML += `
-      <div class="produto-item">
-        <div class="produto-nome">
-          ${p.name}
-          <small>${p.category}</small>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" class="danger" ${isEsgotado ? 'checked' : ''}
-            onchange="toggleProduto('${p.name.replace(/'/g, "\\'")}', this.checked)">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>`;
-  });
-}
-
-// ========================
-// RENDER COMBOS
-// ========================
-function renderCombos(esgotados){
-  const container = document.getElementById('combos-lista');
-  container.innerHTML = '';
-  combos.forEach(c => {
-    const isEsgotado = esgotados.includes(c.name);
-    container.innerHTML += `
-      <div class="produto-item">
-        <div class="produto-nome">${c.name}</div>
-        <label class="toggle">
-          <input type="checkbox" class="danger" ${isEsgotado ? 'checked' : ''}
-            onchange="toggleCombo('${c.name}', this.checked)">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>`;
-  });
 }
 
 // ========================
@@ -1542,31 +1470,6 @@ async function salvarPokeConfig(){
 }
 
 // ========================
-// TOGGLE PRODUTO/COMBO
-// ========================
-function toggleProduto(name, isEsgotado){
-  if(!currentConfig.produtos_esgotados) currentConfig.produtos_esgotados = [];
-  if(isEsgotado){
-    if(!currentConfig.produtos_esgotados.includes(name))
-      currentConfig.produtos_esgotados.push(name);
-  } else {
-    currentConfig.produtos_esgotados = currentConfig.produtos_esgotados.filter(n => n !== name);
-  }
-  saveConfig();
-}
-
-function toggleCombo(name, isEsgotado){
-  if(!currentConfig.combos_esgotados) currentConfig.combos_esgotados = [];
-  if(isEsgotado){
-    if(!currentConfig.combos_esgotados.includes(name))
-      currentConfig.combos_esgotados.push(name);
-  } else {
-    currentConfig.combos_esgotados = currentConfig.combos_esgotados.filter(n => n !== name);
-  }
-  saveConfig();
-}
-
-// ========================
 // SALVAR CONFIG
 // ========================
 async function saveConfig(){
@@ -1574,8 +1477,6 @@ async function saveConfig(){
     whatsapp_notif: document.getElementById('toggle-whatsapp-notif').checked,
     motoboy_on: document.getElementById('toggle-motoboy').checked,
     restaurante_aberto: document.getElementById('toggle-restaurante').checked,
-    produtos_esgotados: currentConfig.produtos_esgotados || [],
-    combos_esgotados: currentConfig.combos_esgotados || [],
     motoboys: currentConfig.motoboys || [] // ENVIA A LISTA DE MOTOBOYS ATUALIZADA
   };
 
@@ -1590,8 +1491,6 @@ async function saveConfig(){
     });
     if(!res.ok) throw new Error('Erro ao salvar');
     currentConfig = { ...currentConfig, ...config };
-
-    document.getElementById('stat-status').innerText = config.restaurante_aberto ? '🟢 Aberto' : '🔴 Fechado';
 
   } catch(e) {
     alert('Erro ao salvar. Tente novamente.');
