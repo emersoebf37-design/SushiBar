@@ -253,11 +253,37 @@ body{ background:#1a0000; color:white; min-height:100vh; }
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:12px 0;
-  border-bottom:1px solid rgba(255,255,255,0.07);
+  padding:12px 14px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;
+  margin-bottom:8px;
+  transition:transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
-.produto-item:last-child{ border-bottom:none; }
+.produto-item.dragging{
+  opacity:0.35;
+  border:2px dashed #e67e22;
+  background:rgba(230,126,34,0.1);
+}
+
+.produto-item.drag-over{
+  border:2px solid #3498db;
+  background:rgba(52,152,219,0.15);
+  transform:scale(1.01);
+}
+
+.drag-handle{
+  cursor:grab;
+  padding:6px 10px;
+  color:rgba(255,255,255,0.4);
+  user-select:none;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  margin-right:8px;
+}
+.drag-handle:active{ cursor:grabbing; color:#fff; }
 
 /* ========================= */
 /* POKE PERSONALIZADO */
@@ -556,7 +582,7 @@ body{ background:#1a0000; color:white; min-height:100vh; }
   <div class="section">
     <h2>🍽️ Cardápio & Estoque</h2>
     <p style="color:rgba(255,255,255,0.6); font-size:13px; margin-bottom:15px;">
-      Gerencie todos os pratos, combos e adicionais. Cadastre novos itens, edite informações, defina disponibilidade em estoque ou remova itens.
+      Gerencie todos os pratos, combos e adicionais. Arraste os itens (pelo ícone ☰) para definir a ordem em que aparecem no cardápio do site.
     </p>
     <button class="add-btn" onclick="abrirModalNovoItem()">+ Adicionar Novo Item</button>
     <div id="custom-items-lista" style="margin-top:18px;"></div>
@@ -796,6 +822,8 @@ async function toggleItemStock(id, isEsgotado){
   }
 }
 
+let draggedItemIndex = null;
+
 function renderCustomItemsList(){
   const container = document.getElementById('custom-items-lista');
   if(!container) return;
@@ -809,7 +837,7 @@ function renderCustomItemsList(){
   const tipoClass = { produto: 'tipo-produto', adicional: 'tipo-adicional', combo: 'tipo-combo' };
 
   container.innerHTML = '';
-  customItems.forEach(item => {
+  customItems.forEach((item, index) => {
     let badgeAplicaA = '';
     if (item.type === 'adicional') {
       if (item.appliesToAll) {
@@ -832,25 +860,95 @@ function renderCustomItemsList(){
     
     const isEsgotado = item.esgotado === true;
 
-    container.innerHTML += `
-      <div class="produto-item" style="${isEsgotado ? 'opacity:0.75;' : ''}">
-        <div class="produto-nome">
+    const el = document.createElement('div');
+    el.className = 'produto-item';
+    el.draggable = true;
+    el.dataset.index = index;
+    if (isEsgotado) el.style.opacity = '0.75';
+
+    el.innerHTML = `
+      <div style="display:flex; align-items:center; flex:1; min-width:0;">
+        <span class="drag-handle" title="Arraste para reordenar">☰</span>
+        <div class="produto-nome" style="margin-left:4px;">
           <span style="${isEsgotado ? 'text-decoration:line-through;color:#ff8585;' : ''}">${item.name}</span>
           <span class="custom-item-thumb ${tipoClass[item.type] || ''}">${tipoLabel[item.type] || item.type}</span>
           ${badgeAplicaA}
           <small>${item.category || (item.type === 'combo' ? 'Combos' : 'Adicionais')} · ${precoTexto} · <b style="color:${isEsgotado ? '#ff6b6b' : '#2ecc71'};">${isEsgotado ? 'Fora de estoque (Esgotado)' : 'Em estoque'}</b></small>
         </div>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <label class="toggle" title="${isEsgotado ? 'Item esgotado (clique para colocar em estoque)' : 'Item em estoque (clique para marcar esgotado)'}">
-            <input type="checkbox" class="danger" ${isEsgotado ? 'checked' : ''}
-              onchange="toggleItemStock('${item.id}', this.checked)">
-            <span class="toggle-slider"></span>
-          </label>
-          <button onclick='abrirModalEditarItem(${JSON.stringify(item.id)})' style="background:none; border:none; color:#9ec5ff; cursor:pointer; font-size:16px;" aria-label="Editar" title="Editar item">✏️</button>
-          <button onclick="removeCustomItem('${item.id}')" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;" aria-label="Remover" title="Remover item">🗑️</button>
-        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <label class="toggle" title="${isEsgotado ? 'Item esgotado (clique para colocar em estoque)' : 'Item em estoque (clique para marcar esgotado)'}">
+          <input type="checkbox" class="danger" ${isEsgotado ? 'checked' : ''}
+            onchange="toggleItemStock('${item.id}', this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+        <button onclick='abrirModalEditarItem(${JSON.stringify(item.id)})' style="background:none; border:none; color:#9ec5ff; cursor:pointer; font-size:16px;" aria-label="Editar" title="Editar item">✏️</button>
+        <button onclick="removeCustomItem('${item.id}')" style="background:none; border:none; color:#ff6b6b; cursor:pointer; font-size:16px;" aria-label="Remover" title="Remover item">🗑️</button>
       </div>`;
+
+    // Eventos de Drag & Drop
+    el.addEventListener('dragstart', (e) => {
+      draggedItemIndex = index;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', index);
+    });
+
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      document.querySelectorAll('.produto-item').forEach(i => i.classList.remove('drag-over'));
+    });
+
+    el.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (!el.classList.contains('dragging')) {
+        el.classList.add('drag-over');
+      }
+    });
+
+    el.addEventListener('dragleave', () => {
+      el.classList.remove('drag-over');
+    });
+
+    el.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      const targetIndex = index;
+      if (draggedItemIndex !== null && draggedItemIndex !== targetIndex) {
+        const movedItem = customItems.splice(draggedItemIndex, 1)[0];
+        customItems.splice(targetIndex, 0, movedItem);
+        renderCustomItemsList();
+        await salvarNovaOrdem();
+      }
+    });
+
+    container.appendChild(el);
   });
+}
+
+async function salvarNovaOrdem(){
+  const ordersPayload = customItems.map((item, idx) => ({
+    id: item.id,
+    order: idx + 1
+  }));
+
+  try {
+    const res = await fetch('/api/products?action=reorder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({ orders: ordersPayload }),
+    });
+    if(!res.ok) throw new Error('Erro ao salvar ordem');
+  } catch(e) {
+    console.error('Erro ao salvar ordenação:', e);
+    alert('Erro ao salvar nova ordem dos itens.');
+    await loadCustomItems();
+    renderCustomItemsList();
+  }
 }
 
 async function removeCustomItem(id){

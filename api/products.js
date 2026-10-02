@@ -492,9 +492,16 @@ export default async function handler(req, res) {
       }
 
       await ensureDefaultProducts(db);
-      const snap = await db.collection("custom_products").orderBy("createdAt", "asc").get();
+      const snap = await db.collection("custom_products").get();
       const items = [];
       snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+
+      // Ordena por 'order' (se definido) ou por 'createdAt'
+      items.sort((a, b) => {
+        const orderA = Number.isFinite(a.order) ? a.order : (a.createdAt || 0);
+        const orderB = Number.isFinite(b.order) ? b.order : (b.createdAt || 0);
+        return orderA - orderB;
+      });
 
       productsCache = items;
       productsCacheAt = now;
@@ -514,6 +521,33 @@ export default async function handler(req, res) {
   const token = req.headers.authorization?.replace("Bearer ", "");
   if (token !== process.env.ADMIN_PASSWORD) {
     return res.status(401).json({ error: "Não autorizado." });
+  }
+
+  // ========================
+  // POST /api/products?action=reorder
+  // ========================
+  if (req.method === "POST" && req.query.action === "reorder") {
+    try {
+      const orders = req.body && Array.isArray(req.body.orders) ? req.body.orders : [];
+      if (orders.length === 0) {
+        return res.status(400).json({ error: "Lista de ordenação vazia." });
+      }
+
+      const batch = db.batch();
+      orders.forEach(item => {
+        if (item && item.id && Number.isFinite(item.order)) {
+          const ref = db.collection("custom_products").doc(item.id);
+          batch.update(ref, { order: item.order });
+        }
+      });
+
+      await batch.commit();
+      invalidateProductsCache();
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Erro ao reordenar produtos:", error);
+      return res.status(500).json({ error: "Erro ao salvar nova ordem dos produtos." });
+    }
   }
 
   // ========================
