@@ -2025,6 +2025,8 @@ async function fetchCustomProducts(){
     products = loadedProdutos;
     combos = loadedCombos;
     customAdicionaisCache = loadedAdicionais;
+    renderProducts(products);
+    renderCombos();
     renderCustomAddonsUI(loadedAdicionais);
   } catch(e) {
     console.warn('Não foi possível carregar itens do cardápio:', e);
@@ -2127,6 +2129,7 @@ async function fetchPokeConfig(){
       isPoke: true,
     });
   }
+  renderProducts(products);
 }
 
 const categories = [

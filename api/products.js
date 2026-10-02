@@ -372,45 +372,56 @@ const DEFAULT_PRODUCTS_MIGRATION = [
   },
 ];
 
+// Cache em memória na instância serverless para minimizar leituras no Firestore
+let productsCache = null;
+let productsCacheAt = 0;
+const PRODUCTS_CACHE_MS = 60 * 1000; // 60 segundos de cache
+
+function invalidateProductsCache() {
+  productsCache = null;
+  productsCacheAt = 0;
+}
+
 // Garante que todos os itens padrão (pratos, combos e adicionais) existam na coleção custom_products
+// Usa marcador 'meta/productsSeedV3' com transação para rodar APENAS 1 vez no banco inteiro
 async function ensureDefaultProducts(db) {
-  const markerRef = db.collection("meta").doc("productsSeedV2");
+  const markerRef = db.collection("meta").doc("productsSeedV3");
   const markerSnap = await markerRef.get();
   if (markerSnap.exists) return;
 
   try {
-    await db.runTransaction(async (transaction) => {
-      const snap = await transaction.get(markerRef);
-      if (snap.exists) return;
+    const now = Date.now();
+    const batch = db.batch();
 
-      const now = Date.now();
-      for (let i = 0; i < DEFAULT_PRODUCTS_MIGRATION.length; i++) {
-        const item = DEFAULT_PRODUCTS_MIGRATION[i];
-        const ref = db.collection("custom_products").doc(item.id);
-        const docSnap = await transaction.get(ref);
-        if (!docSnap.exists) {
-          const toSave = {
-            type: item.type,
-            name: item.name,
-            category: item.category,
-            description: item.description,
-            price: item.price,
-            image: item.image,
-            esgotado: item.esgotado || false,
-            createdAt: now + i,
-          };
-          if (item.descricaoModal) toSave.descricaoModal = item.descricaoModal;
-          if (item.type === "adicional") {
-            toSave.appliesToAll = item.appliesToAll;
-            toSave.appliesTo = item.appliesTo;
-          }
-          transaction.set(ref, toSave);
-        }
+    for (let i = 0; i < DEFAULT_PRODUCTS_MIGRATION.length; i++) {
+      const item = DEFAULT_PRODUCTS_MIGRATION[i];
+      const ref = db.collection("custom_products").doc(item.id);
+      const toSave = {
+        type: item.type,
+        name: item.name,
+        category: item.category,
+        description: item.description,
+        price: item.price,
+        image: item.image,
+        esgotado: item.esgotado || false,
+        createdAt: now + i,
+      };
+      if (item.isVariable) {
+        toSave.isVariable = true;
+        toSave.sizes = item.sizes || [];
       }
-      transaction.set(markerRef, { seededAt: now });
-    });
+      if (item.descricaoModal) toSave.descricaoModal = item.descricaoModal;
+      if (item.type === "adicional") {
+        toSave.appliesToAll = item.appliesToAll;
+        toSave.appliesTo = item.appliesTo;
+      }
+      batch.set(ref, toSave, { merge: true });
+    }
+
+    batch.set(markerRef, { seededAt: now });
+    await batch.commit();
   } catch (e) {
-    console.warn("Erro ao popular produtos/combos/adicionais padrão:", e.message);
+    console.warn("Erro ao popular produtos padrão:", e.message);
   }
 }
 
@@ -474,13 +485,27 @@ export default async function handler(req, res) {
   // ========================
   if (req.method === "GET") {
     try {
+      const now = Date.now();
+      if (productsCache && (now - productsCacheAt < PRODUCTS_CACHE_MS)) {
+        res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
+        return res.status(200).json({ items: productsCache });
+      }
+
       await ensureDefaultProducts(db);
       const snap = await db.collection("custom_products").orderBy("createdAt", "asc").get();
       const items = [];
       snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+
+      productsCache = items;
+      productsCacheAt = now;
+
+      res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
       return res.status(200).json({ items });
     } catch (error) {
       console.error("Erro ao buscar produtos customizados:", error);
+      if (productsCache) {
+        return res.status(200).json({ items: productsCache });
+      }
       return res.status(500).json({ error: "Erro ao buscar produtos." });
     }
   }
@@ -510,6 +535,7 @@ export default async function handler(req, res) {
         : !existing.esgotado;
 
       await ref.update({ esgotado });
+      invalidateProductsCache();
       return res.status(200).json({ success: true, id, esgotado });
     } catch (error) {
       console.error("Erro ao alterar estoque:", error);
@@ -602,6 +628,7 @@ export default async function handler(req, res) {
       }
 
       const ref = await db.collection("custom_products").add(newItem);
+      invalidateProductsCache();
 
       return res.status(200).json({ success: true, id: ref.id, item: newItem });
     } catch (error) {
@@ -702,6 +729,7 @@ export default async function handler(req, res) {
       }
 
       await ref.update(updated);
+      invalidateProductsCache();
 
       return res.status(200).json({ success: true, id, item: { ...existing, ...updated } });
     } catch (error) {
@@ -719,6 +747,7 @@ export default async function handler(req, res) {
       if (!id) return res.status(400).json({ error: "ID não informado." });
 
       await db.collection("custom_products").doc(id).delete();
+      invalidateProductsCache();
       return res.status(200).json({ success: true });
     } catch (error) {
       console.error("Erro ao remover produto:", error);
