@@ -4,6 +4,7 @@ const { execSync } = require("child_process");
 const { writeFileSync, unlinkSync } = require("fs");
 const { join } = require("path");
 const { tmpdir } = require("os");
+const http = require("http");
 
 // ========================
 // FIREBASE
@@ -371,3 +372,62 @@ db.collection("orders")
       setTimeout(() => process.exit(1), 5000);
     }
   );
+
+// ========================
+// SERVIDOR HTTP LOCAL — REIMPRESSÃO
+// ========================
+
+const REPRINT_PORT = parseInt(process.env.REPRINT_PORT || "3099", 10);
+const REPRINT_SECRET = process.env.REPRINT_SECRET || "kaizora-reprint";
+
+const reprintServer = http.createServer(async (req, res) => {
+  if (req.method !== "POST" || req.url !== "/reprint") {
+    res.writeHead(404);
+    return res.end("Not found");
+  }
+
+  let body = "";
+  req.on("data", chunk => { body += chunk; });
+  req.on("end", async () => {
+    try {
+      const { orderId, secret } = JSON.parse(body);
+
+      if (secret !== REPRINT_SECRET) {
+        res.writeHead(401);
+        return res.end(JSON.stringify({ error: "Não autorizado." }));
+      }
+
+      if (!orderId) {
+        res.writeHead(400);
+        return res.end(JSON.stringify({ error: "orderId obrigatório." }));
+      }
+
+      const snap = await db
+        .collection("orders")
+        .where("orderId", "==", Number(orderId))
+        .limit(1)
+        .get();
+
+      if (snap.empty) {
+        res.writeHead(404);
+        return res.end(JSON.stringify({ error: `Pedido #${orderId} não encontrado.` }));
+      }
+
+      const order = snap.docs[0].data();
+      console.log(`🔄 Reimprimindo pedido #${order.orderId} — ${order.customer}`);
+
+      await imprimir(order);
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, orderId: order.orderId }));
+    } catch (err) {
+      console.error("❌ Erro na reimpressão:", err.message);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: err.message }));
+    }
+  });
+});
+
+reprintServer.listen(REPRINT_PORT, "127.0.0.1", () => {
+  console.log(`🖨️  Servidor de reimpressão escutando em http://127.0.0.1:${REPRINT_PORT}`);
+});

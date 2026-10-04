@@ -677,6 +677,11 @@ body{ background:#1a0000; color:white; min-height:100vh; }
 
   <div class="section">
     <h2>📋 Pedidos de hoje</h2>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+      <input type="number" id="reprint-orderId" class="section-input" placeholder="Nº do pedido" style="width:160px;" min="1">
+      <button class="add-btn" onclick="reimprimirPorNumero()">🖨️ Reimprimir</button>
+      <span id="reprint-feedback" style="font-size:13px;color:#2ecc71;display:none;"></span>
+    </div>
     <div id="pedidos-lista"><div class="loading">Carregando...</div></div>
   </div>
 
@@ -1391,8 +1396,61 @@ function renderPedidos(pedidos){
           }).join(', ')}
         </div>
         <span class="status-badge status-${statusClass}">${p.status}</span>${badgeDesconto}
+        <button onclick="reimprimir(${p.orderId})" style="margin-top:8px;background:#333;border:1px solid rgba(255,255,255,0.15);color:white;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;">🖨️ Reimprimir</button>
       </div>`;
   });
+}
+
+// ========================
+// REIMPRIMIR PEDIDO
+// ========================
+async function reimprimir(orderId) {
+  try {
+    const res = await fetch('/api/admin?action=reprint', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({ orderId }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
+    alert(`✅ Pedido #${orderId} enviado para impressão!`);
+  } catch (e) {
+    alert(`❌ Erro ao reimprimir pedido #${orderId}: ${e.message}`);
+  }
+}
+
+async function reimprimirPorNumero() {
+  const input = document.getElementById('reprint-orderId');
+  const feedback = document.getElementById('reprint-feedback');
+  const orderId = parseInt(input.value);
+  if (!orderId || orderId < 1) {
+    alert('Informe um número de pedido válido.');
+    return;
+  }
+  feedback.style.display = 'none';
+  try {
+    const res = await fetch('/api/admin?action=reprint', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({ orderId }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
+    feedback.textContent = `✅ Pedido #${orderId} enviado para impressão!`;
+    feedback.style.color = '#2ecc71';
+    feedback.style.display = 'inline';
+    input.value = '';
+  } catch (e) {
+    feedback.textContent = `❌ ${e.message}`;
+    feedback.style.color = '#ff6b6b';
+    feedback.style.display = 'inline';
+  }
 }
 
 // ========================

@@ -138,5 +138,61 @@ export default async function handler(req, res) {
     }
   }
 
+  // ========================
+  // POST /api/admin?action=reprint
+  // ========================
+  if (req.method === "POST" && req.query.action === "reprint") {
+    const { orderId } = req.body;
+    if (!orderId) {
+      return res.status(400).json({ error: "orderId obrigatório." });
+    }
+
+    const reprintPort = process.env.REPRINT_PORT || "3099";
+    const reprintSecret = process.env.REPRINT_SECRET || "kaizora-reprint";
+
+    try {
+      const http = require("http");
+      const payload = JSON.stringify({ orderId: Number(orderId), secret: reprintSecret });
+
+      await new Promise((resolve, reject) => {
+        const request = http.request(
+          {
+            hostname: "127.0.0.1",
+            port: reprintPort,
+            path: "/reprint",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Content-Length": Buffer.byteLength(payload),
+            },
+          },
+          (response) => {
+            let data = "";
+            response.on("data", chunk => { data += chunk; });
+            response.on("end", () => {
+              if (response.statusCode === 200) {
+                resolve(JSON.parse(data));
+              } else {
+                try {
+                  reject(new Error(JSON.parse(data).error || `Status ${response.statusCode}`));
+                } catch {
+                  reject(new Error(`Status ${response.statusCode}`));
+                }
+              }
+            });
+          }
+        );
+        request.on("error", reject);
+        request.write(payload);
+        request.end();
+      });
+
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      console.error("Erro na reimpressão:", err.message);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
   return res.status(405).json({ error: "Método não permitido." });
 }
