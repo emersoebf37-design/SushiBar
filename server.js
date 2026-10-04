@@ -381,6 +381,15 @@ const REPRINT_PORT = parseInt(process.env.REPRINT_PORT || "3099", 10);
 const REPRINT_SECRET = process.env.REPRINT_SECRET || "kaizora-reprint";
 
 const reprintServer = http.createServer(async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    res.writeHead(204);
+    return res.end();
+  }
+
   if (req.method !== "POST" || req.url !== "/reprint") {
     res.writeHead(404);
     return res.end("Not found");

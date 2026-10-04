@@ -1404,15 +1404,15 @@ function renderPedidos(pedidos){
 // ========================
 // REIMPRIMIR PEDIDO
 // ========================
+const REPRINT_URL = 'http://127.0.0.1:3099/reprint';
+const REPRINT_SECRET = 'kaizora-reprint';
+
 async function reimprimir(orderId) {
   try {
-    const res = await fetch('/api/admin?action=reprint', {
+    const res = await fetch(REPRINT_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({ orderId }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId, secret: REPRINT_SECRET }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
@@ -1432,13 +1432,10 @@ async function reimprimirPorNumero() {
   }
   feedback.style.display = 'none';
   try {
-    const res = await fetch('/api/admin?action=reprint', {
+    const res = await fetch(REPRINT_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({ orderId }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId, secret: REPRINT_SECRET }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
