@@ -18,9 +18,9 @@ module.exports = {
       restart_delay: 3000, // dá tempo pra porta COM/Bluetooth se recuperar antes de tentar de novo
       env: {
         NODE_ENV: "production",
-        PRINTER_BT_COM: "COM4",
+        PRINTER_BT_COM: "COM3",
         PRINTER_BT_BAUD: "9600",
-        PRINTER_USB_SHARE: "\\\\localhost\\copiar 2",
+        PRINTER_USB_SHARE: "\\\\localhost\\YICHIP-USB",
         PRINTER_BT_RETRIES: "2",
       },
     },
