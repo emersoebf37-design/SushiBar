@@ -1284,6 +1284,7 @@ async function loadData(){
     // Toggles
     document.getElementById('toggle-restaurante').checked = data.config.restaurante_aberto ?? true;
     document.getElementById('toggle-motoboy').checked = data.config.motoboy_on ?? false;
+    document.getElementById('toggle-whatsapp-notif').checked = data.config.whatsapp_notif ?? true;
 
     // Renderizações
     await loadCustomItems();
